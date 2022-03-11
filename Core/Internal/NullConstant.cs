@@ -133,7 +133,9 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
         return SCLNull.Instance;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// SCLNull
+    /// </summary>
     public ISCLObject Value => SCLNull.Instance;
 
     /// <inheritdoc />
@@ -144,4 +146,10 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
 
     /// <inheritdoc />
     public Maybe<ISCLObject> TryGetConstantValue() => Maybe<ISCLObject>.From(SCLNull.Instance);
+
+    /// <inheritdoc />
+    public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()
+    {
+        yield break;
+    }
 }

@@ -12,7 +12,7 @@ public sealed partial record StepParameter : IStepParameter
     /// <summary>
     /// A step parameter that uses a property info
     /// </summary>
-    private StepParameter(
+    internal StepParameter(
         PropertyInfo propertyInfo,
         StepPropertyBaseAttribute attribute)
     {
@@ -21,6 +21,9 @@ public sealed partial record StepParameter : IStepParameter
         Required = PropertyInfo.GetCustomAttributes<RequiredAttribute>().Any();
         Aliases = PropertyInfo.GetCustomAttributes<AliasAttribute>().Select(x => x.Name).ToList();
         Summary = propertyInfo.GetXmlDocsSummary();
+
+        Metadata = PropertyInfo.GetCustomAttributes<MetadataAttribute>()
+            .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
 
         StepType = PropertyInfo.PropertyType;
 
@@ -127,6 +130,10 @@ public sealed partial record StepParameter : IStepParameter
     /// <inheritdoc />
     [IgnoreEquality]
     public IReadOnlyDictionary<string, string> ExtraFields { get; }
+
+    /// <inheritdoc />
+    [IgnoreEquality]
+    public IReadOnlyDictionary<string, string> Metadata { get; }
 
     /// <inheritdoc />
     public MemberType MemberType { get; }

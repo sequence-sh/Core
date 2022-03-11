@@ -64,6 +64,7 @@ public sealed class RunExternalProcess : CompoundStep<Unit>
     [StepProperty(1)]
     [Required]
     [Log(LogOutputLevel.Trace)]
+    [Metadata("Path", "Read")]
     public IStep<StringStream> Path { get; set; } = null!;
 
     /// <summary>

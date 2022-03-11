@@ -1,26 +1,32 @@
 ﻿namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
-/// A property of a step
+/// A property of a step.
+/// Includes both the parameter and the argument
 /// </summary>
 public abstract record StepProperty
 (
-    string Name,
-    int Index,
+    StepParameter StepParameter,
+    int Index, //Note this index is not the Property order
     LogAttribute? LogAttribute,
     ImmutableList<RequirementAttribute> RequiredVersions) : ISerializable
 {
+    /// <summary>
+    /// The Name of this StepProperty
+    /// </summary>
+    public string Name => StepParameter.Name;
+
     /// <summary>
     /// A lambda function
     /// </summary>
     public record LambdaFunctionProperty
     (
         LambdaFunction LambdaFunction,
-        string Name,
+        StepParameter StepParameter,
         int Index,
         LogAttribute? LogAttribute,
         ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
-        Name,
+        StepParameter,
         Index,
         LogAttribute,
         RequiredVersions
@@ -55,11 +61,11 @@ public abstract record StepProperty
     /// </summary>
     public record VariableNameProperty(
         VariableName VariableName,
-        string Name,
+        StepParameter StepParameter,
         int Index,
         LogAttribute? LogAttribute,
         ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
-        Name,
+        StepParameter,
         Index,
         LogAttribute,
         RequiredVersions
@@ -90,11 +96,11 @@ public abstract record StepProperty
     /// </summary>
     public record SingleStepProperty(
         IStep Step,
-        string Name,
+        StepParameter StepParameter,
         int Index,
         LogAttribute? LogAttribute,
         ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
-        Name,
+        StepParameter,
         Index,
         LogAttribute,
         RequiredVersions
@@ -142,11 +148,11 @@ public abstract record StepProperty
     /// </summary>
     public record StepListProperty(
         IReadOnlyList<IStep> StepList,
-        string Name,
+        StepParameter StepParameter,
         int Index,
         LogAttribute? LogAttribute,
         ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
-        Name,
+        StepParameter,
         Index,
         LogAttribute,
         RequiredVersions

@@ -90,6 +90,12 @@ public abstract class OneOfStep : IStep
 
         return resultStep;
     }
+
+    /// <inheritdoc />
+    public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()
+    {
+        return StepValue.GetParameterValues();
+    }
 }
 
 /// <summary>

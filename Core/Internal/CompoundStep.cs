@@ -163,17 +163,17 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
                                          .GetCustomAttribute<StepPropertyBaseAttribute>())
                 )
                 .Where(x => x.attribute != null)
-                .OrderByDescending(x => x.attribute!.Order != null)
+                .OrderByDescending(x => x.attribute?.Order != null)
                 .ThenBy(x => x.attribute!.Order)
-                .SelectMany((x, i) => GetMember(x, i).ToEnumerable());
+                .SelectMany((x, i) => GetMember(x.propertyInfo, x.attribute!, i).ToEnumerable());
 
             return r;
 
             Maybe<StepProperty> GetMember(
-                (PropertyInfo propertyInfo, StepPropertyBaseAttribute? attribute) arg1,
+                PropertyInfo propertyInfo,
+                StepPropertyBaseAttribute attribute,
                 int index)
             {
-                var (propertyInfo, _) = arg1;
                 var val = propertyInfo.GetValue(this);
 
                 var logAttribute = propertyInfo.GetCustomAttribute<LogAttribute>();
@@ -181,11 +181,13 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
                 var requiredVersions = propertyInfo.GetCustomAttributes<RequirementAttribute>()
                     .ToImmutableList();
 
+                var stepParameter = new StepParameter(propertyInfo, attribute);
+
                 if (val is IStep step)
                 {
                     return new StepProperty.SingleStepProperty(
                         step,
-                        propertyInfo.Name,
+                        stepParameter,
                         index,
                         logAttribute,
                         requiredVersions
@@ -196,7 +198,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
                 {
                     return new StepProperty.LambdaFunctionProperty(
                         lf,
-                        propertyInfo.Name,
+                        stepParameter,
                         index,
                         logAttribute,
                         requiredVersions
@@ -207,7 +209,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
                 {
                     return new StepProperty.VariableNameProperty(
                         vn,
-                        propertyInfo.Name,
+                        stepParameter,
                         index,
                         logAttribute,
                         requiredVersions
@@ -220,7 +222,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
 
                     return new StepProperty.StepListProperty(
                         list,
-                        propertyInfo.Name,
+                        stepParameter,
                         index,
                         logAttribute,
                         requiredVersions
@@ -271,5 +273,28 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
             .Map(_ => Unit.Default);
 
         return finalResult;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()
+    {
+        foreach (var stepProperty in AllProperties)
+        {
+            if (stepProperty is StepProperty.SingleStepProperty ssp)
+            {
+                yield return (this, ssp.StepParameter, ssp.Step);
+
+                foreach (var nestedStep in ssp.Step.GetParameterValues())
+                    yield return nestedStep;
+            }
+            else if (stepProperty is StepProperty.StepListProperty slp)
+            {
+                foreach (var listStep in slp.StepList)
+                {
+                    foreach (var nestedStep in listStep.GetParameterValues())
+                        yield return nestedStep;
+                }
+            }
+        }
     }
 }

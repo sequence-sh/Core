@@ -66,7 +66,7 @@ public static class Extensions
     /// Returns the elements of the sequence which are not null.
     /// </summary>
     public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source) where T : class =>
-        (from val in source where val != null select val)!;
+        (from val in source where val != null select val);
 
     /// <summary>
     /// Tries to get the first two elements of a sequence
