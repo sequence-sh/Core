@@ -49,4 +49,9 @@ public interface IStepParameter
     /// The type of this parameter
     /// </summary>
     MemberType MemberType { get; }
+
+    /// <summary>
+    /// Metadata set by the MetadataAttribute
+    /// </summary>
+    IReadOnlyDictionary<string, string> Metadata { get; }
 }

@@ -22,6 +22,9 @@ public sealed partial record StepParameter : IStepParameter
         Aliases = PropertyInfo.GetCustomAttributes<AliasAttribute>().Select(x => x.Name).ToList();
         Summary = propertyInfo.GetXmlDocsSummary();
 
+        Metadata = PropertyInfo.GetCustomAttributes<MetadataAttribute>()
+            .ToDictionary(x => x.Key, x => x.Value);
+
         StepType = PropertyInfo.PropertyType;
 
         static Type TryGetNested(Type t) => t.IsGenericType ? t.GetGenericArguments()[0] : t;
@@ -127,6 +130,10 @@ public sealed partial record StepParameter : IStepParameter
     /// <inheritdoc />
     [IgnoreEquality]
     public IReadOnlyDictionary<string, string> ExtraFields { get; }
+
+    /// <inheritdoc />
+    [IgnoreEquality]
+    public IReadOnlyDictionary<string, string> Metadata { get; }
 
     /// <inheritdoc />
     public MemberType MemberType { get; }
