@@ -6,7 +6,7 @@ setVariable			: VARIABLENAME EQUALS step;
 getVariable         : VARIABLENAME ;
 getAutomaticVariable : AUTOMATICVARIABLE ;
 array				: OPENSQUAREBRACKET ( term COMMA? )* CLOSESQUAREBRACKET ;
-unbracketedArray	: ( nonArrayTerm COMMA )+ nonArrayTerm ;
+unbracketedArray	: ( sclObjectTerm COMMA )+ sclObjectTerm ;
 infixOperator		: DASH
 					| PLUS
 					| ASTERIX
@@ -37,15 +37,20 @@ number              : NUMBER (DOT NUMBER)? ;
 enumeration			: NAME DOT NAME ;
 nullValue           : NULLVALUE ;
 
-infixableTerm       : simpleTerm #SimpleTerm1                                      
-					
-                    | arrayOrEntity=infixableTerm OPENSQUAREBRACKET indexer=term CLOSESQUAREBRACKET #ArrayAccess
+infixableTerm       : sclObjectTerm #SclObjectTerm1                                   					
+                    | arrayOrEntity=infixableTerm OPENSQUAREBRACKET indexer=indexerTerm CLOSESQUAREBRACKET #ArrayAccess
                     | bracketedStep  #BracketedStep1   
                     ;
 
+indexerTerm         : infixableTerm
+                    | function
+                    | infixOperation 
+                    ;
+
+
 term				: infixableTerm   #InfixableTerm1
                     | function #Function1  
-                    
+                    | unbracketedArray #UnbracketedArray1
                     | infixOperation #InfixOperation1
                     ;
 step				: <assoc=right> step PIPE function #PipeFunction					
@@ -53,7 +58,7 @@ step				: <assoc=right> step PIPE function #PipeFunction
 					| stepSequence #StepSequence1
 					| term #Term1
 					;
-nonArrayTerm        : nullValue
+sclObjectTerm       : nullValue
                     | number
                     | boolean
 					| dateTime
@@ -66,8 +71,6 @@ nonArrayTerm        : nullValue
                     | entity
                     | array
                     ;
-simpleTerm			: nonArrayTerm
-                    | unbracketedArray ;
 stepSequence		: (NEWCOMMAND | DASH) step (NEWCOMMAND step)* ;
 fullSequence		: (step | stepSequence)  EOF ;
 

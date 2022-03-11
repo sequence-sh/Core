@@ -14,7 +14,7 @@ public class GetParameterValuesTests
     [Fact]
     public void GetParameterValuesShouldReturnCorrectValues()
     {
-        const string text = $"RunExternalProcess 'myPath' Arguments: ['a', 'b', 'c']";
+        const string text = $"RunExternalProcess 'myPath' ['a', 'b', 'c']";
         var          sfs  = StepFactoryStore.Create();
 
         var parseResult = SCLParsing

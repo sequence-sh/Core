@@ -150,7 +150,7 @@ public static class SCLParsing
             SCLParser.UnbracketedArrayContext context)
         {
             var members =
-                context.nonArrayTerm().Select(Visit);
+                context.sclObjectTerm().Select(Visit);
 
             var r = Aggregate(new TextLocation(context), members);
             return r;
