@@ -280,19 +280,35 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     {
         foreach (var stepProperty in AllProperties)
         {
-            if (stepProperty is StepProperty.SingleStepProperty ssp)
+            switch (stepProperty)
             {
-                yield return (this, ssp.StepParameter, ssp.Step);
-
-                foreach (var nestedStep in ssp.Step.GetParameterValues())
-                    yield return nestedStep;
-            }
-            else if (stepProperty is StepProperty.StepListProperty slp)
-            {
-                foreach (var listStep in slp.StepList)
+                case StepProperty.SingleStepProperty ssp:
                 {
-                    foreach (var nestedStep in listStep.GetParameterValues())
+                    yield return (this, ssp.StepParameter, ssp.Step);
+
+                    foreach (var nestedStep in ssp.Step.GetParameterValues())
                         yield return nestedStep;
+
+                    break;
+                }
+                case StepProperty.StepListProperty slp:
+                {
+                    foreach (var listStep in slp.StepList)
+                    {
+                        foreach (var nestedStep in listStep.GetParameterValues())
+                            yield return nestedStep;
+                    }
+
+                    break;
+                }
+                case StepProperty.LambdaFunctionProperty lfp:
+                {
+                    foreach (var lambdaStep in lfp.LambdaFunction.Step.GetParameterValues())
+                    {
+                        yield return lambdaStep;
+                    }
+
+                    break;
                 }
             }
         }
