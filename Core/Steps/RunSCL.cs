@@ -117,7 +117,9 @@ public sealed class RunSCL : CompoundStep<Unit>
 
             if (export.IsSuccess)
             {
-                var ev = export.Value.TryGetConstantValue();
+                var ev = export.Value.TryGetConstantValue(
+                    ImmutableDictionary<VariableName, ISCLObject>.Empty
+                );
 
                 if (ev.HasValue && ev.GetValueOrThrow() is IArray { IsEvaluated: true } nestedArray)
                 {

@@ -145,7 +145,9 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     }
 
     /// <inheritdoc />
-    public Maybe<ISCLObject> TryGetConstantValue() => Maybe<ISCLObject>.From(SCLNull.Instance);
+    public Maybe<ISCLObject> TryGetConstantValue(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues) =>
+        Maybe<ISCLObject>.From(SCLNull.Instance);
 
     /// <inheritdoc />
     public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()

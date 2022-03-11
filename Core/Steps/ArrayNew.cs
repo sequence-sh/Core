@@ -46,13 +46,14 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep where T 
     public IEnumerable<IStep> ElementSteps => Elements;
 
     /// <inheritdoc />
-    public override Maybe<ISCLObject> TryGetConstantValue()
+    public override Maybe<ISCLObject> TryGetConstantValue(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues)
     {
         var builder = ImmutableList<ISCLObject>.Empty.ToBuilder();
 
         foreach (var element in Elements)
         {
-            var ev = element.TryGetConstantValue();
+            var ev = element.TryGetConstantValue(variableValues);
 
             if (ev.HasNoValue)
                 return Maybe<ISCLObject>.None;

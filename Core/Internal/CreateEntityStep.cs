@@ -173,13 +173,14 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
-    public Maybe<ISCLObject> TryGetConstantValue()
+    public Maybe<ISCLObject> TryGetConstantValue(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues)
     {
         var properties = new List<(EntityPropertyKey entityPropertyKey, ISCLObject value)>();
 
         foreach (var (key, step) in Properties)
         {
-            var r = step.TryGetConstantValue();
+            var r = step.TryGetConstantValue(variableValues);
 
             if (r.HasNoValue)
                 return Maybe<ISCLObject>.None;

@@ -140,7 +140,8 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     }
 
     /// <inheritdoc />
-    public virtual Maybe<ISCLObject> TryGetConstantValue() => Maybe<ISCLObject>.None;
+    public virtual Maybe<ISCLObject> TryGetConstantValue(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues) => Maybe<ISCLObject>.None;
 
     /// <inheritdoc />
     public virtual bool ShouldBracketWhenSerialized => true;

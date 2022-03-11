@@ -1,4 +1,5 @@
-﻿using Reductech.Sequence.Core.Internal.Parser;
+﻿using System.Collections.Immutable;
+using Reductech.Sequence.Core.Internal.Parser;
 
 namespace Reductech.Sequence.Core.Tests;
 
@@ -29,10 +30,12 @@ public class GetParameterValuesTests
 
         pathParameters.Should().HaveCount(1);
 
-        pathParameters.Single().Value.TryGetConstantValue().ShouldHaveValue();
+        pathParameters.Single()
+            .Value.TryGetConstantValue(ImmutableDictionary<VariableName, ISCLObject>.Empty)
+            .ShouldHaveValue();
 
         pathParameters.Single()
-            .Value.TryGetConstantValue()
+            .Value.TryGetConstantValue(ImmutableDictionary<VariableName, ISCLObject>.Empty)
             .Value.Should()
             .Be(new StringStream("myPath"));
     }

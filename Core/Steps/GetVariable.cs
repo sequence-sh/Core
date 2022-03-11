@@ -28,6 +28,16 @@ public sealed class GetVariable<T> : CompoundStep<T> where T : ISCLObject
         ? base.Name
         : $"Get {Variable.Serialize(SerializeOptions.Name)}";
 
+    /// <inheritdoc />
+    public override Maybe<ISCLObject> TryGetConstantValue(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues)
+    {
+        if (variableValues.TryGetValue(Variable, out var sclObject))
+            return Maybe<ISCLObject>.From(sclObject);
+
+        return Maybe<ISCLObject>.None;
+    }
+
     /// <summary>
     /// Gets the value of a named variable.
     /// </summary>

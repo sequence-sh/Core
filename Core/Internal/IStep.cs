@@ -53,7 +53,8 @@ public interface IStep : ISerializable
     /// <summary>
     /// Get the value of this step if it is constant
     /// </summary>
-    Maybe<ISCLObject> TryGetConstantValue();
+    Maybe<ISCLObject> TryGetConstantValue(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues);
 
     /// <summary>
     /// Get all parameters of this step and all nested steps

@@ -1,4 +1,5 @@
-﻿using Reductech.Sequence.ConnectorManagement.Base;
+﻿using System.Collections.Immutable;
+using Reductech.Sequence.ConnectorManagement.Base;
 using Reductech.Sequence.Core.Internal.Parser;
 
 namespace Reductech.Sequence.Core.Tests;
@@ -86,7 +87,9 @@ public class EntityConversionTests
                         StepFactoryStore.Create()
                     )
                 )
-                .Map(x => x.TryGetConstantValue());
+                .Map(
+                    x => x.TryGetConstantValue(ImmutableDictionary<VariableName, ISCLObject>.Empty)
+                );
 
         parseResult.ShouldBeSuccessful();
 
