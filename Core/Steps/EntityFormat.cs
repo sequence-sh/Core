@@ -4,6 +4,7 @@
 /// Formats an entity as a string
 /// </summary>
 [Alias("Format")]
+[AllowConstantFolding]
 public sealed class EntityFormat : CompoundStep<StringStream>
 {
     /// <inheritdoc />

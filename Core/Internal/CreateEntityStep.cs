@@ -173,13 +173,16 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
-    public Maybe<ISCLObject> TryGetConstantValue()
+    /// <inheritdoc />
+    public async Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
+        StepFactoryStore sfs)
     {
         var properties = new List<(EntityPropertyKey entityPropertyKey, ISCLObject value)>();
 
         foreach (var (key, step) in Properties)
         {
-            var r = step.TryGetConstantValue();
+            var r = await step.TryGetConstantValueAsync(variableValues, sfs);
 
             if (r.HasNoValue)
                 return Maybe<ISCLObject>.None;
@@ -188,6 +191,19 @@ public record CreateEntityStep
         }
 
         return Entity.Create(properties);
+    }
+
+    /// <inheritdoc />
+    public bool HasConstantValue(IEnumerable<VariableName> providedVariables)
+    {
+        foreach (var (_, step) in Properties)
+        {
+            // ReSharper disable once PossibleMultipleEnumeration
+            if (!step.HasConstantValue(providedVariables))
+                return false;
+        }
+
+        return true;
     }
 
     /// <inheritdoc />

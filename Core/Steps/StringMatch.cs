@@ -9,6 +9,7 @@ namespace Reductech.Sequence.Core.Steps;
 [SCLExample("IsMatch String: 'abracadabra' Regex: 'ab\\w+?ab'",    "True")]
 [Alias("IsMatch")]
 [Alias("RegexMatch")]
+[AllowConstantFolding]
 public sealed class StringMatch : CompoundStep<SCLBool>
 {
     /// <inheritdoc />

@@ -10,6 +10,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// [documentation](https://docs.reductech.io/sequence/how-to/scl/schemas.html).
 /// </summary>
 [Alias("SchemaValidate")]
+[AllowConstantFolding]
 public sealed class Validate : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />

@@ -3,6 +3,7 @@
 /// <summary>
 /// Base class for operator operations
 /// </summary>
+[AllowConstantFolding]
 public abstract class BaseOperatorStep<TStep, TElement, TOutput> : CompoundStep<TOutput>
     where TStep : BaseOperatorStep<TStep, TElement, TOutput>, new()
     where TElement : ISCLObject

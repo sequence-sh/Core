@@ -12,6 +12,7 @@
     "('title': \"My Schema\" 'type': \"object\" 'additionalProperties': False 'properties': ('StringProperty': ('type': \"string\") 'IntegerProperty': ('type': \"integer\")) 'required': [\"StringProperty\", \"IntegerProperty\"])",
     "Even though IntegerProperty is represented as a string in the input entity (quoted), it is converted to an integer in the schema."
 )]
+[AllowConstantFolding]
 public sealed class SchemaCreateCoerced : CompoundStep<Entity>
 {
     /// <inheritdoc />

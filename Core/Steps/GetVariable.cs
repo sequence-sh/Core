@@ -3,6 +3,7 @@
 /// <summary>
 /// Gets the value of a named variable.
 /// </summary>
+[AllowConstantFolding]
 public sealed class GetVariable<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />

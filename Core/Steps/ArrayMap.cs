@@ -19,6 +19,7 @@
 )]
 [Alias("EntityMap")] // legacy name
 [Alias("Map")]
+[AllowConstantFolding]
 public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
     where TIn : ISCLObject
     where TOut : ISCLObject

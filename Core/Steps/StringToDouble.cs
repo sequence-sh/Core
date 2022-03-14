@@ -5,6 +5,7 @@
 /// </summary>
 [Alias("ToDouble")]
 [SCLExample("StringToDouble '123.45'", "123.45")]
+[AllowConstantFolding]
 public sealed class StringToDouble : CompoundStep<SCLDouble>
 {
     /// <summary>

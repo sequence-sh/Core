@@ -14,6 +14,7 @@
     "[('Key': \"A\" 'Values': [('type': \"A\" 'value': 1), ('type': \"A\" 'value': 3)]), ('Key': \"B\" 'Values': [('type': \"B\" 'value': 2)])]"
 )]
 [Alias("Group")]
+[AllowConstantFolding]
 public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>> where T : ISCLObject
 {
     /// <inheritdoc />

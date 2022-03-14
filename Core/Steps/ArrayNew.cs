@@ -17,6 +17,7 @@ public interface IArrayNewStep
 [Alias("Array")]
 [Alias("NewArray")]
 [Alias("ArrayCreate")]
+[AllowConstantFolding]
 public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep where T : ISCLObject
 {
     /// <inheritdoc />
@@ -44,24 +45,6 @@ public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep where T 
 
     /// <inheritdoc />
     public IEnumerable<IStep> ElementSteps => Elements;
-
-    /// <inheritdoc />
-    public override Maybe<ISCLObject> TryGetConstantValue()
-    {
-        var builder = ImmutableList<ISCLObject>.Empty.ToBuilder();
-
-        foreach (var element in Elements)
-        {
-            var ev = element.TryGetConstantValue();
-
-            if (ev.HasNoValue)
-                return Maybe<ISCLObject>.None;
-
-            builder.Add(ev.GetValueOrThrow());
-        }
-
-        return builder.ToSCLArray();
-    }
 
     /// <summary>
     /// Creates an array.

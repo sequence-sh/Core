@@ -3,6 +3,7 @@
 /// <summary>
 /// Raises an integer to the power of a list of integers sequentially
 /// </summary>
+[AllowConstantFolding]
 public sealed class Power : BaseOperatorStep<Power, SCLInt, SCLInt>
 {
     /// <inheritdoc />

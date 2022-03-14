@@ -3,6 +3,7 @@
 /// <summary>
 /// Repeat a step a set number of times.
 /// </summary>
+[AllowConstantFolding]
 public sealed class DoXTimes : CompoundStep<Unit> //TODO replace with a lambda function
 {
     /// <summary>

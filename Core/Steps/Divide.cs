@@ -4,6 +4,7 @@
 /// Divide an integer by a list of integers
 /// </summary>
 [SCLExample("5 / 2", "2")]
+[AllowConstantFolding]
 public sealed class Divide : BaseOperatorStep<Divide, SCLInt, SCLInt>
 {
     /// <inheritdoc />

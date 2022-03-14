@@ -1,7 +1,7 @@
 ﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
-/// Do an action for each element in an array or entity in an entity stream.
+/// Do an action for each element in an array
 /// </summary>
 [Alias("EntityForEach")]
 [Alias("ForEachItem")]

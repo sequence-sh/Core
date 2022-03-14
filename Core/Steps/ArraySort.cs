@@ -30,6 +30,7 @@ public enum SortOrder
 ] Using: (<>['type'])",
     "[('type': \"A\" 'value': 2), ('type': \"B\" 'value': 3), ('type': \"C\" 'value': 1)]"
 )]
+[AllowConstantFolding]
 public sealed class ArraySort<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <summary>

@@ -6,6 +6,7 @@
 [Alias("Skip")]
 [SCLExample("ArraySkip [1, 2, 3] 2",             "[3]")]
 [SCLExample("Skip In: [1, 2, 3, 4, 5] Count: 3", "[4, 5]")]
+[AllowConstantFolding]
 public sealed class ArraySkip<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />

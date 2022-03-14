@@ -62,7 +62,13 @@ public abstract class OneOfStep : IStep
     public IEnumerable<Requirement> RuntimeRequirements => StepValue.RuntimeRequirements;
 
     /// <inheritdoc />
-    public Maybe<ISCLObject> TryGetConstantValue() => StepValue.TryGetConstantValue();
+    public bool HasConstantValue(IEnumerable<VariableName> providedVariables) =>
+        StepValue.HasConstantValue(providedVariables);
+
+    /// <inheritdoc />
+    public Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
+        StepFactoryStore sfs) => StepValue.TryGetConstantValueAsync(variableValues, sfs);
 
     /// <summary>
     /// Create a OneOfStep

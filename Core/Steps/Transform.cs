@@ -12,6 +12,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// [documentation](https://docs.reductech.io/sequence/how-to/scl/schemas.html). 
 /// </summary>
 [Alias("SchemaTransform")]
+[AllowConstantFolding]
 public sealed class Transform : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />

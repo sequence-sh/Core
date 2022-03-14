@@ -3,6 +3,7 @@
 /// <summary>
 /// Creates an array by repeating an element.
 /// </summary>
+[AllowConstantFolding]
 public sealed class Repeat<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <summary>

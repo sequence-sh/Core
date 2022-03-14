@@ -1,4 +1,5 @@
-﻿using Reductech.Sequence.ConnectorManagement.Base;
+﻿using System.Collections.Immutable;
+using Reductech.Sequence.ConnectorManagement.Base;
 using Reductech.Sequence.Core.Internal.Parser;
 
 namespace Reductech.Sequence.Core.Tests;
@@ -74,6 +75,8 @@ public class EntityConversionTests
 
     private static Entity CreateEntityFromString(string s)
     {
+        var sfs = StepFactoryStore.Create();
+
         var parseResult =
             SCLParsing.TryParseStep(s)
                 .Bind(
@@ -83,14 +86,19 @@ public class EntityConversionTests
                             nameof(Entity),
                             TypeReference.Actual.Entity
                         ),
-                        StepFactoryStore.Create()
+                        sfs
                     )
                 )
-                .Map(x => x.TryGetConstantValue());
+                .Map(
+                    x => x.TryGetConstantValueAsync(
+                        ImmutableDictionary<VariableName, ISCLObject>.Empty,
+                        sfs
+                    )
+                );
 
-        parseResult.ShouldBeSuccessful();
+        parseResult.Result.ShouldBeSuccessful();
 
-        return parseResult.Value.GetValueOrThrow() as Entity;
+        return parseResult.Result.Value.GetValueOrThrow() as Entity;
     }
 
     [Fact]

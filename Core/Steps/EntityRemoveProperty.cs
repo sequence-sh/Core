@@ -10,6 +10,7 @@
 [SCLExample("Remove From: ('type': 'A', 'value': 1) Property: 'value'", "('type': \"A\")")]
 [Alias("Remove")]
 [Alias("RemoveProperty")]
+[AllowConstantFolding]
 public sealed class EntityRemoveProperty : CompoundStep<Entity>
 {
     /// <inheritdoc />

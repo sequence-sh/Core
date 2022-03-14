@@ -7,6 +7,7 @@
 [Alias("FromArray")]
 [Alias("ElementAtIndex")]
 [SCLExample("FromArray ['A', 'B', 'C'] GetElement: 1", "B")]
+[AllowConstantFolding]
 public sealed class ArrayElementAtIndex<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <summary>

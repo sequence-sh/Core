@@ -95,7 +95,15 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     }
 
     /// <inheritdoc />
-    public Maybe<ISCLObject> TryGetConstantValue() => Value;
+    public bool HasConstantValue(IEnumerable<VariableName> providedVariables)
+    {
+        return true;
+    }
+
+    /// <inheritdoc />
+    public Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
+        StepFactoryStore sfs) => Task.FromResult(Maybe<ISCLObject>.From(Value));
 
     /// <inheritdoc />
     public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()

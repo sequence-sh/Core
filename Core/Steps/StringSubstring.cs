@@ -6,6 +6,7 @@
 [Alias("GetSubstring")]
 [SCLExample("StringSubstring 'hello world!' Index: 6 Length: 5", "world")]
 [SCLExample("GetSubstring From: 'hello world!' Length: 5",       "hello")]
+[AllowConstantFolding]
 public sealed class StringSubstring : CompoundStep<StringStream>
 {
     /// <summary>
