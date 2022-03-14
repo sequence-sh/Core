@@ -1,4 +1,7 @@
-﻿using Reductech.Sequence.Core.Internal.Logging;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Logging.Abstractions;
+using Reductech.Sequence.Core.Abstractions;
+using Reductech.Sequence.Core.Internal.Logging;
 
 namespace Reductech.Sequence.Core.Internal;
 
@@ -140,8 +143,86 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     }
 
     /// <inheritdoc />
-    public virtual Maybe<ISCLObject> TryGetConstantValue(
-        IReadOnlyDictionary<VariableName, ISCLObject> variableValues) => Maybe<ISCLObject>.None;
+    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+    public bool HasConstantValue(IEnumerable<VariableName> providedVariables)
+    {
+        if (!GetType().GetCustomAttributes<AllowConstantFoldingAttribute>().Any())
+            return false;
+
+        foreach (var stepProperty in AllProperties)
+        {
+            switch (stepProperty)
+            {
+                case StepProperty.LambdaFunctionProperty lambdaFunctionProperty:
+                {
+                    var newVariables = providedVariables
+                        .Append(lambdaFunctionProperty.LambdaFunction.VariableNameOrItem);
+
+                    if (!lambdaFunctionProperty.LambdaFunction.Step.HasConstantValue(newVariables))
+                        return false;
+
+                    break;
+                }
+                case StepProperty.SingleStepProperty singleStepProperty:
+                {
+                    if (!singleStepProperty.Step.HasConstantValue(providedVariables))
+                        return false;
+
+                    break;
+                }
+                case StepProperty.StepListProperty stepListProperty:
+                {
+                    foreach (var step in stepListProperty.StepList)
+                    {
+                        if (!step.HasConstantValue(providedVariables))
+                            return false;
+                    }
+
+                    break;
+                }
+
+                case StepProperty.VariableNameProperty variableNameProperty:
+                {
+                    if (!providedVariables.Contains(variableNameProperty.VariableName))
+                        return false; //We do not have the value of this variable
+
+                    break;
+                }
+
+                default: throw new ArgumentOutOfRangeException(nameof(stepProperty));
+            }
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
+        StepFactoryStore sfs)
+    {
+        if (!HasConstantValue(variableValues.Keys))
+            return Maybe<ISCLObject>.None;
+
+        var stateMonad = new StateMonad(
+            NullLogger.Instance,
+            sfs,
+            NullExternalContext.Instance,
+            ImmutableDictionary<string, object>.Empty
+        );
+
+        var r1 = stateMonad.SetInitialVariablesAsync(variableValues).Result;
+
+        if (r1.IsSuccess)
+        {
+            var r = await RunUntyped(stateMonad, CancellationToken.None);
+
+            if (r.IsSuccess)
+                return Maybe<ISCLObject>.From(r.Value);
+        }
+
+        return Maybe<ISCLObject>.None;
+    }
 
     /// <inheritdoc />
     public virtual bool ShouldBracketWhenSerialized => true;

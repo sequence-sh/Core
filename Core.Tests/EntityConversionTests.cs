@@ -75,6 +75,8 @@ public class EntityConversionTests
 
     private static Entity CreateEntityFromString(string s)
     {
+        var sfs = StepFactoryStore.Create();
+
         var parseResult =
             SCLParsing.TryParseStep(s)
                 .Bind(
@@ -84,16 +86,19 @@ public class EntityConversionTests
                             nameof(Entity),
                             TypeReference.Actual.Entity
                         ),
-                        StepFactoryStore.Create()
+                        sfs
                     )
                 )
                 .Map(
-                    x => x.TryGetConstantValue(ImmutableDictionary<VariableName, ISCLObject>.Empty)
+                    x => x.TryGetConstantValueAsync(
+                        ImmutableDictionary<VariableName, ISCLObject>.Empty,
+                        sfs
+                    )
                 );
 
         parseResult.ShouldBeSuccessful();
 
-        return parseResult.Value.GetValueOrThrow() as Entity;
+        return parseResult.Value.Result.GetValueOrThrow() as Entity;
     }
 
     [Fact]

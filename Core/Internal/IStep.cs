@@ -51,10 +51,17 @@ public interface IStep : ISerializable
     IEnumerable<Requirement> RuntimeRequirements { get; }
 
     /// <summary>
-    /// Get the value of this step if it is constant
+    /// Whether this step can be evaluated to a constant value
     /// </summary>
-    Maybe<ISCLObject> TryGetConstantValue(
-        IReadOnlyDictionary<VariableName, ISCLObject> variableValues);
+    /// <returns></returns>
+    bool HasConstantValue(IEnumerable<VariableName> providedVariables);
+
+    /// <summary>
+    /// Get the value of this step if it is a constant
+    /// </summary>
+    ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
+        IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
+        StepFactoryStore sfs);
 
     /// <summary>
     /// Get all parameters of this step and all nested steps

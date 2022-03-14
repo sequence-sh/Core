@@ -7,6 +7,7 @@
 [SCLExample("ArrayConcat [[1,2,3], [4,5,6]]",         "[1, 2, 3, 4, 5, 6]")]
 [SCLExample("Combine Arrays: [[1, 2, 3], [4, 5, 6]]", "[1, 2, 3, 4, 5, 6]")]
 [Alias("Combine")]
+[AllowConstantFolding]
 public sealed class ArrayConcat<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />

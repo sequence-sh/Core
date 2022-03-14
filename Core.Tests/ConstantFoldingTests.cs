@@ -40,7 +40,7 @@ public class ConstantFoldingTests
 
         var expectedSclObject = ISCLObject.CreateFromCSharpObject(expectedValue);
 
-        var cv = parseResult.Value.TryGetConstantValue(variables);
+        var cv = parseResult.Value.TryGetConstantValueAsync(variables, sfs).Result;
         cv.ShouldHaveValue();
 
         cv.Value.Should().Be(expectedSclObject);

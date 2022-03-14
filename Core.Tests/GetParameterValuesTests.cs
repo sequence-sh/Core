@@ -30,12 +30,16 @@ public class GetParameterValuesTests
 
         pathParameters.Should().HaveCount(1);
 
-        pathParameters.Single()
-            .Value.TryGetConstantValue(ImmutableDictionary<VariableName, ISCLObject>.Empty)
-            .ShouldHaveValue();
+        var value = pathParameters.Single()
+            .Value.TryGetConstantValueAsync(
+                ImmutableDictionary<VariableName, ISCLObject>.Empty,
+                sfs
+            )
+            .Result;
 
-        pathParameters.Single()
-            .Value.TryGetConstantValue(ImmutableDictionary<VariableName, ISCLObject>.Empty)
+        value.ShouldHaveValue();
+
+        value
             .Value.Should()
             .Be(new StringStream("myPath"));
     }
