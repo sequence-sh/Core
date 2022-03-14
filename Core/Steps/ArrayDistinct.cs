@@ -12,6 +12,7 @@
     "[('a': 1 'b': 2), ('a': 1 'b': 2), ('a': 3 'b': 4)] | ArrayDistinct",
     "[('a': 1 'b': 2), ('a': 3 'b': 4)]"
 )]
+[AllowConstantFolding]
 public sealed class ArrayDistinct<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />

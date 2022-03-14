@@ -174,7 +174,7 @@ public record CreateEntityStep
 
     /// <inheritdoc />
     /// <inheritdoc />
-    public async ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public async Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
         StepFactoryStore sfs)
     {

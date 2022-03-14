@@ -148,9 +148,9 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     public bool HasConstantValue(IEnumerable<VariableName> providedVariables) => true;
 
     /// <inheritdoc />
-    public ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
-        StepFactoryStore sfs) => ValueTask.FromResult(Maybe<ISCLObject>.From(SCLNull.Instance));
+        StepFactoryStore sfs) => Task.FromResult(Maybe<ISCLObject>.From(SCLNull.Instance));
 
     /// <inheritdoc />
     public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()

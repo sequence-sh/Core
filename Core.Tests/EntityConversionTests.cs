@@ -96,9 +96,9 @@ public class EntityConversionTests
                     )
                 );
 
-        parseResult.ShouldBeSuccessful();
+        parseResult.Result.ShouldBeSuccessful();
 
-        return parseResult.Value.Result.GetValueOrThrow() as Entity;
+        return parseResult.Result.Value.GetValueOrThrow() as Entity;
     }
 
     [Fact]

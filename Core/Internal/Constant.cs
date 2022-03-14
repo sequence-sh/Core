@@ -101,9 +101,9 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     }
 
     /// <inheritdoc />
-    public ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
-        StepFactoryStore sfs) => ValueTask.FromResult(Maybe<ISCLObject>.From(Value));
+        StepFactoryStore sfs) => Task.FromResult(Maybe<ISCLObject>.From(Value));
 
     /// <inheritdoc />
     public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()

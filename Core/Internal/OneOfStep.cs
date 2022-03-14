@@ -66,7 +66,7 @@ public abstract class OneOfStep : IStep
         StepValue.HasConstantValue(providedVariables);
 
     /// <inheritdoc />
-    public ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
         StepFactoryStore sfs) => StepValue.TryGetConstantValueAsync(variableValues, sfs);
 

@@ -59,7 +59,7 @@ public interface IStep : ISerializable
     /// <summary>
     /// Get the value of this step if it is a constant
     /// </summary>
-    ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
         StepFactoryStore sfs);
 

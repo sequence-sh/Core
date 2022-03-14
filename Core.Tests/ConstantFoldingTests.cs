@@ -12,11 +12,12 @@ public class ConstantFoldingTests
     public ITestOutputHelper TestOutputHelper { get; set; }
 
     [Theory]
-    [InlineData("123",           123,   null)]
-    [InlineData("123 + 456",     579,   null)]
-    [InlineData("'abc'",         "abc", null)]
-    [InlineData("<myVar>",       "abc", "abc")]
-    [InlineData("123 + <myVar>", 579,   456)]
+    [InlineData("123",                       123,               null)]
+    [InlineData("123 + 456",                 579,               null)]
+    [InlineData("'abc'",                     "abc",             null)]
+    [InlineData("<myVar>",                   "abc",             "abc")]
+    [InlineData("123 + <myVar>",             579,               456)]
+    [InlineData("arrayMap [1,2,3] (<> + 1)", new[] { 2, 3, 4 }, null)]
     public void GetParameterValuesShouldReturnCorrectValues(
         string scl,
         object expectedValue,
@@ -38,11 +39,12 @@ public class ConstantFoldingTests
 
         parseResult.ShouldBeSuccessful();
 
-        var expectedSclObject = ISCLObject.CreateFromCSharpObject(expectedValue);
+        var expectedSclObject = ISCLObject.CreateFromCSharpObject(expectedValue)
+            .Serialize(SerializeOptions.Primitive);
 
         var cv = parseResult.Value.TryGetConstantValueAsync(variables, sfs).Result;
         cv.ShouldHaveValue();
 
-        cv.Value.Should().Be(expectedSclObject);
+        cv.Value.Serialize(SerializeOptions.Primitive).Should().Be(expectedSclObject);
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
 using Reductech.Sequence.Core.Abstractions;
 using Reductech.Sequence.Core.Internal.Logging;
 
@@ -143,12 +142,12 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     }
 
     /// <inheritdoc />
-    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
     public bool HasConstantValue(IEnumerable<VariableName> providedVariables)
     {
         if (!GetType().GetCustomAttributes<AllowConstantFoldingAttribute>().Any())
             return false;
 
+        // ReSharper disable PossibleMultipleEnumeration
         foreach (var stepProperty in AllProperties)
         {
             switch (stepProperty)
@@ -192,12 +191,13 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
                 default: throw new ArgumentOutOfRangeException(nameof(stepProperty));
             }
         }
+        // ReSharper restore PossibleMultipleEnumeration
 
         return true;
     }
 
     /// <inheritdoc />
-    public async ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public async Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
         StepFactoryStore sfs)
     {
