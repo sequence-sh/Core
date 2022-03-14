@@ -10,6 +10,7 @@
 [SCLExample("ArrayFind Array: [1, 2, 3] Element: 2", "1")]
 [SCLExample("Find In: ['a', 'b', 'c'] Item: 'a'",    "0")]
 [SCLExample("Find In: ['a', 'b', 'c'] Item: 'd'",    "-1")]
+[AllowConstantFolding]
 public sealed class ArrayFind<T> : CompoundStep<SCLInt> where T : ISCLObject
 {
     /// <summary>

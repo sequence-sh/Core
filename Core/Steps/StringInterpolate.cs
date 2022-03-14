@@ -10,6 +10,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// brackets { and } will be evaluated as SCL.
 /// </summary>
 [SCLExample("$\"The answer is {6 + (6 ^ 2)}\"", "The answer is 42")]
+[AllowConstantFolding]
 public sealed class StringInterpolate : CompoundStep<StringStream>
 {
     /// <inheritdoc />

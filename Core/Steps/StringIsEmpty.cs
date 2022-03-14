@@ -4,6 +4,7 @@
 /// Returns whether a string is empty.
 /// </summary>
 [Alias("IsStringEmpty")]
+[AllowConstantFolding]
 public sealed class StringIsEmpty : CompoundStep<SCLBool>
 {
     /// <inheritdoc />

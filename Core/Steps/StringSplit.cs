@@ -4,6 +4,7 @@
 /// Splits a string.
 /// </summary>
 [Alias("SplitString")]
+[AllowConstantFolding]
 public sealed class StringSplit : CompoundStep<Array<StringStream>>
 {
     /// <summary>

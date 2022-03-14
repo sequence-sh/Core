@@ -9,6 +9,7 @@ namespace Reductech.Sequence.Core.Steps;
 [Alias("ConvertStringToDate")]
 [Alias("ToDate")]
 [SCLExample("StringToDate '2020/10/20 20:30:40'", "2020-10-20T20:30:40.0000000")]
+[AllowConstantFolding]
 public sealed class StringToDate : CompoundStep<SCLDateTime>
 {
     /// <summary>

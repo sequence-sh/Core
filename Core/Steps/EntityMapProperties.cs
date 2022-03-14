@@ -18,6 +18,7 @@
     "RenameProperties In: [('a': 1), ('b': 1), ('c': 1)] To: ('value': ['a', 'b', 'c'])",
     "[('value': 1), ('value': 1), ('value': 1)]"
 )]
+[AllowConstantFolding]
 public class EntityMapProperties : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />

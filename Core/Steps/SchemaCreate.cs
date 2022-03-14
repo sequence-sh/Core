@@ -20,6 +20,7 @@
     "('title': \"My Schema\" 'type': \"object\" 'additionalProperties': False 'properties': ('StringProperty': ('type': \"string\") 'IntegerProperty': ('type': \"string\")) 'required': [\"StringProperty\", \"IntegerProperty\"])",
     "Since IntegerProperty is quoted, this step interprets it as a string."
 )]
+[AllowConstantFolding]
 public sealed class SchemaCreate : CompoundStep<Entity>
 {
     /// <inheritdoc />

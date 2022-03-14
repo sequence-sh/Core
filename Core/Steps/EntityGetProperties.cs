@@ -9,6 +9,7 @@
 )]
 [Alias("GetProps")]
 [Alias("GetProperties")]
+[AllowConstantFolding]
 public sealed class EntityGetProperties : CompoundStep<Array<StringStream>>
 {
     /// <inheritdoc />

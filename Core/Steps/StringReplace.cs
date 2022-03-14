@@ -22,6 +22,7 @@ namespace Reductech.Sequence.Core.Steps;
     "Replace captured groups"
 )]
 [Alias("RegexReplace")]
+[AllowConstantFolding]
 public sealed class StringReplace : CompoundStep<StringStream>
 {
     /// <inheritdoc />

@@ -7,6 +7,7 @@
 [SCLExample("IsNull 1",              "False")]
 [SCLExample("IsNull (a: Null)['a']", "True")]
 [SCLExample("IsNull (a: 1)['a']",    "False")]
+[AllowConstantFolding]
 public sealed class IsNull<T> : CompoundStep<SCLBool> where T : ISCLObject
 {
     /// <inheritdoc />

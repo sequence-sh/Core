@@ -15,6 +15,7 @@ namespace Reductech.Sequence.Core.Steps;
     IncludeInDocumentation = false,
     ExpectedLogs = new[] { "1", "2", "3" }
 )]
+[AllowConstantFolding]
 public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />

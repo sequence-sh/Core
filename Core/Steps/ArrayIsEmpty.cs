@@ -5,6 +5,7 @@
 /// </summary>
 [Alias("IsArrayEmpty")]
 [Alias("IsEmpty")]
+[AllowConstantFolding]
 public sealed class ArrayIsEmpty<T> : CompoundStep<SCLBool> where T : ISCLObject
 {
     /// <summary>

@@ -4,6 +4,7 @@
 /// Does nothing.
 /// </summary>
 [SCLExample("DoNothing", description: "Does nothing")]
+[AllowConstantFolding]
 public class DoNothing : CompoundStep<Unit>
 {
     /// <inheritdoc />

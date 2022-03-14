@@ -10,6 +10,7 @@ namespace Reductech.Sequence.Core.Steps;
 [Alias("ToCase")]
 [SCLExample("StringToCase String: 'string to change' Case: TextCase.Title", "String To Change")]
 [SCLExample("ChangeCase Of: 'string to change' To: 'Upper'",                "STRING TO CHANGE")]
+[AllowConstantFolding]
 public sealed class StringToCase : CompoundStep<StringStream>
 {
     /// <summary>

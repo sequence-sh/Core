@@ -4,6 +4,7 @@
 /// Executes a statement if a condition is true.
 /// </summary>
 [Alias("ValueIf")]
+[AllowConstantFolding]
 public sealed class If<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />

@@ -5,6 +5,7 @@
 /// </summary>
 [SCLExample("Not true",  "False")]
 [SCLExample("Not false", "True")]
+[AllowConstantFolding]
 public sealed class Not : CompoundStep<SCLBool>
 {
     /// <inheritdoc />

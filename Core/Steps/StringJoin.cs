@@ -4,6 +4,7 @@
 /// Join strings with a delimiter.
 /// </summary>
 [Alias("JoinStrings")]
+[AllowConstantFolding]
 public sealed class StringJoin : CompoundStep<StringStream>
 {
     /// <summary>

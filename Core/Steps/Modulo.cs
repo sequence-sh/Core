@@ -3,6 +3,7 @@
 /// <summary>
 /// Modulo a number by a list of integers sequentially
 /// </summary>
+[AllowConstantFolding]
 public sealed class Modulo : BaseOperatorStep<Modulo, SCLInt, SCLInt>
 {
     /// <inheritdoc />

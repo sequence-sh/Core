@@ -6,6 +6,7 @@
 [Alias("ToBool")]
 [SCLExample("StringToBool 'true'",  "True")]
 [SCLExample("StringToBool 'false'", "False")]
+[AllowConstantFolding]
 public sealed class StringToBool : CompoundStep<SCLBool>
 {
     /// <summary>

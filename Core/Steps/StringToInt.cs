@@ -5,6 +5,7 @@
 /// </summary>
 [Alias("ToInt")]
 [SCLExample("StringToInt '123'", "123")]
+[AllowConstantFolding]
 public sealed class StringToInt : CompoundStep<SCLInt>
 {
     /// <summary>

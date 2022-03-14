@@ -6,6 +6,7 @@
 [Alias("Take")]
 [SCLExample("ArrayTake [1, 2, 3] 2",               "[1, 2]")]
 [SCLExample("Take From: [1, 2, 3, 4, 5] Count: 3", "[1, 2, 3]")]
+[AllowConstantFolding]
 public sealed class ArrayTake<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />

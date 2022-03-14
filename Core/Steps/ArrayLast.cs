@@ -9,6 +9,7 @@
 [SCLExample("ArrayLast ['a', 'b', 'c']",                ExpectedOutput = "c")]
 [SCLExample("ArrayLast [('a': 1), ('a': 2), ('a': 3)]", ExpectedOutput = "('a': 3)")]
 [SCLExample("GetLastItem In: [1,2,3]",                  ExpectedOutput = "3")]
+[AllowConstantFolding]
 public sealed class ArrayLast<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />

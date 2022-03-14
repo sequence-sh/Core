@@ -8,6 +8,7 @@
 [SCLExample("DoesEntity ('type': 'C', 'value': 1) Have: 'type'",  "True")]
 [SCLExample("DoesEntity ('type': null, 'value': 1) Have: 'type'", "True")]
 [SCLExample("EntityHasProperty ('type': 'C', 'value': 1) 'name'", "False")]
+[AllowConstantFolding]
 public sealed class EntityHasProperty : CompoundStep<SCLBool>
 {
     /// <inheritdoc />

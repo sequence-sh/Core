@@ -4,6 +4,7 @@
 /// Gets the letter that appears at a specific index
 /// </summary>
 [SCLExample("CharAtIndex 'hello' 1", "e")]
+[AllowConstantFolding]
 public sealed class CharAtIndex : CompoundStep<StringStream>
 {
     /// <summary>

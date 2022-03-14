@@ -8,6 +8,7 @@ namespace Reductech.Sequence.Core.Steps;
 [SCLExample("StringTrim String: '  spaces '",              "spaces")]
 [SCLExample("TrimString '  spaces ' Side: TrimSide.Start", "spaces ")]
 [Alias("TrimString")]
+[AllowConstantFolding]
 public sealed class StringTrim : CompoundStep<StringStream>
 {
     /// <summary>

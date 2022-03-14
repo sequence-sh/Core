@@ -8,6 +8,7 @@
 [SCLExample("StringContains String: 'hello there' Substring: 'there'", "True")]
 [SCLExample("StringContains String: 'hello there' Substring: 'world'", "False")]
 [SCLExample("DoesString 'hello there' Contain: 'ello'",                "True")]
+[AllowConstantFolding]
 public sealed class StringContains : CompoundStep<SCLBool>
 {
     /// <inheritdoc />

@@ -8,6 +8,7 @@
 [Alias("ConvertDateToString")]
 [SCLExample("DateToString 1990-01-06T09:15:00",              "1990/01/06 09:15:00")]
 [SCLExample("DateToString 1990-01-06T09:15:00 'yyyy/MM/dd'", "1990/01/06")]
+[AllowConstantFolding]
 public sealed class DateToString : CompoundStep<StringStream>
 {
     /// <summary>

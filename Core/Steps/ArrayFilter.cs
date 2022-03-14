@@ -17,6 +17,7 @@
     new[] { "[]" },
     ExecuteInTests = false
 )]
+[AllowConstantFolding]
 public sealed class ArrayFilter<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />

@@ -6,6 +6,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// <summary>
 /// Produce a hash for some data using the specified hash algorithm
 /// </summary>
+[AllowConstantFolding]
 public class Hash : CompoundStep<StringStream>
 {
     /// <inheritdoc />

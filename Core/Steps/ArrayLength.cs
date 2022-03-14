@@ -6,6 +6,7 @@
 [Alias("Length")]
 [SCLExample("ArrayLength [1,2,3]", ExpectedOutput = "3")]
 [SCLExample("Length Of: [1,2,3]",  ExpectedOutput = "3")]
+[AllowConstantFolding]
 public sealed class ArrayLength<T> : CompoundStep<SCLInt> where T : ISCLObject
 {
     /// <summary>

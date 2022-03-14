@@ -47,4 +47,31 @@ public class ConstantFoldingTests
 
         cv.Value.Serialize(SerializeOptions.Primitive).Should().Be(expectedSclObject);
     }
+
+    [Theory]
+    [InlineData("log 123",            null)]
+    [InlineData("- <q> = 1\r\n- <q>", null)]
+    public async Task UnfoldableStepShouldNotFold(string scl, object? myVarValue)
+    {
+        var sfs = StepFactoryStore.Create();
+
+        var variables = myVarValue is null
+            ? new Dictionary<VariableName, ISCLObject>()
+            : new Dictionary<VariableName, ISCLObject>()
+            {
+                { new VariableName("myVar"), ISCLObject.CreateFromCSharpObject(myVarValue) }
+            };
+
+        var parseResult = SCLParsing
+            .TryParseStep(scl)
+            .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, sfs, variables));
+
+        parseResult.ShouldBeSuccessful();
+
+        parseResult.Value.HasConstantValue(variables.Keys).Should().BeFalse();
+
+        var r = await parseResult.Value.TryGetConstantValueAsync(variables, sfs);
+
+        r.ShouldHaveNoValue();
+    }
 }
