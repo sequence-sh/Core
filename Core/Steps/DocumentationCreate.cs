@@ -24,7 +24,11 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
+        var rootUrl = await RootUrl.Run(stateMonad, cancellationToken)
+            .Map(x => x.GetString());
+
+        if (rootUrl.IsFailure)
+            return rootUrl.ConvertFailure<Entity>();
 
         var documented = stateMonad.StepFactoryStore
             .Dictionary
@@ -32,10 +36,18 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
             .Select(x => new StepWrapper(x))
             .ToList();
 
-        var creationResult = DocumentationCreator.CreateDocumentation(documented);
+        var creationResult = DocumentationCreator.CreateDocumentation(documented, rootUrl.Value);
 
         return creationResult.ConvertToEntity();
     }
+
+    /// <summary>
+    /// Root URL of all links in the documentation. You should include a slash `/` at the end.
+    /// </summary>
+    [StepProperty(1)]
+    [Alias("Get")]
+    [DefaultValueExplanation("Empty String")]
+    public IStep<StringStream> RootUrl { get; set; } = new SCLConstant<StringStream>("");
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

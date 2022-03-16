@@ -170,6 +170,26 @@ public partial class DocumentationCreateTests : StepTestBase<DocumentationCreate
                 )
             );
 
+            yield return new StepCase(
+                "Generate Not Documentation with rootUrl",
+                new Log
+                {
+                    Value = new DocumentationCreate()
+                    {
+                        RootUrl = new SCLConstant<StringStream>("abc")
+                    }
+                },
+                Unit.Default,
+                notDocumentationEntity.ConvertToEntity()
+                    .Serialize(SerializeOptions.Serialize)
+                    .Replace("](", "[(abc/")
+            ) { TestDeserializeAndRun = false }.WithStepFactoryStore(
+                StepFactoryStore.Create(
+                    System.Array.Empty<ConnectorData>(),
+                    new[] { new SimpleStepFactory<Not, SCLBool>() }
+                )
+            );
+
             (string nameof, string category, string comment) exampleStepHeader = (
                 "DocumentationExampleStep",
                 "Examples",

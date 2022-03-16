@@ -12,7 +12,9 @@ public static class DocumentationCreator
     /// Creates documentation for a list of entities
     /// </summary>
     public static
-        DocumentationCreationResult CreateDocumentation(IEnumerable<IDocumentedStep> entities)
+        DocumentationCreationResult CreateDocumentation(
+            IEnumerable<IDocumentedStep> entities,
+            string rootUrl)
     {
         var enumTypes = new HashSet<Type>();
 
@@ -30,7 +32,7 @@ public static class DocumentationCreator
                 .Select(
                     x => new[]
                     {
-                        $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})",
+                        $"[{x.Name}]({rootUrl}{x.DocumentationCategory}/{x.FileName})",
                         x.DocumentationCategory, x.Summary
                     }
                 )
@@ -67,7 +69,8 @@ public static class DocumentationCreator
                     .Select(
                         x => new[]
                         {
-                            $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})", x.Summary
+                            $"[{x.Name}]({rootUrl}{x.DocumentationCategory}/{x.FileName})",
+                            x.Summary
                         }
                     )
                     .ToList();
