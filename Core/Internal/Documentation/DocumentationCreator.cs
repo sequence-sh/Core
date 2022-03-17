@@ -261,61 +261,100 @@ public static class DocumentationCreator
 
         if (doc.Examples.Any())
         {
-            sb.AppendLine();
+            sb.AppendLine("## Examples");
 
-            var showDescription    = doc.Examples.Any(x => x.Description is not null);
-            var showExpectedOutput = doc.Examples.Any(x => x.ExpectedOutput is not null);
-
-            var showExpectedLoggedValues =
-                doc.Examples.Any(x => x.ExpectedLogs is not null && x.ExpectedLogs.Any());
-
-            var exampleHeaders = new List<Prettifier.Cell>
+            for (var index = 0; index < doc.Examples.Count; index++)
             {
-                Prettifier.Cell.Create("Example SCL", Prettifier.Alignment.LeftJustified),
-            };
+                var docExample = doc.Examples[index];
 
-            if (showDescription)
-                exampleHeaders.Add(
-                    Prettifier.Cell.Create("Description", Prettifier.Alignment.Centre)
-                );
+                if (doc.Examples.Count > 1)
+                    sb.AppendLine($"### Example {index + 1}");
 
-            if (showExpectedOutput)
-                exampleHeaders.Add(
-                    Prettifier.Cell.Create("Expected Output", Prettifier.Alignment.Centre)
-                );
+                if (docExample.Description is not null)
+                    sb.AppendLine(docExample.Description);
 
-            if (showExpectedLoggedValues)
-                exampleHeaders.Add(
-                    Prettifier.Cell.Create("Expected Logged Values", Prettifier.Alignment.Centre)
-                );
+                sb.AppendLine($"#### {docExample.SCL}");
+                sb.AppendLine("```scl");
+                sb.AppendLine(docExample.SCL);
+                sb.AppendLine("```");
 
-            var exampleRows = doc.Examples.Select(
-                    x =>
+                if (docExample.ExpectedLogs is not null)
+                {
+                    sb.AppendLine($"#### Expected Logs");
+                    sb.AppendLine("```");
+
+                    foreach (var log in docExample.ExpectedLogs)
                     {
-                        var list = new List<string>() { Escape(x.SCL) };
-
-                        if (showDescription)
-                            list.Add(Escape(x.Description ?? ""));
-
-                        if (showExpectedOutput)
-                            list.Add(Escape(x.ExpectedOutput ?? ""));
-
-                        if (showExpectedLoggedValues)
-                            list.Add(
-                                x.ExpectedLogs is null
-                                    ? ""
-                                    : string.Join(
-                                        "\r\n",
-                                        x.ExpectedLogs.Select(Escape)
-                                    )
-                            );
-
-                        return list;
+                        sb.AppendLine(log);
                     }
-                )
-                .ToList();
 
-            Prettifier.CreateMarkdownTable(exampleHeaders, exampleRows, sb);
+                    sb.AppendLine("```");
+                }
+
+                if (docExample.ExpectedOutput is not null)
+                {
+                    sb.AppendLine($"#### Expected Output");
+                    sb.AppendLine("```scl");
+
+                    sb.AppendLine(docExample.ExpectedOutput);
+
+                    sb.AppendLine("```");
+                }
+            }
+
+            //var showDescription    = doc.Examples.Any(x => x.Description is not null);
+            //var showExpectedOutput = doc.Examples.Any(x => x.ExpectedOutput is not null);
+
+            //var showExpectedLoggedValues =
+            //    doc.Examples.Any(x => x.ExpectedLogs is not null && x.ExpectedLogs.Any());
+
+            //var exampleHeaders = new List<Prettifier.Cell>
+            //{
+            //    Prettifier.Cell.Create("Example SCL", Prettifier.Alignment.LeftJustified),
+            //};
+
+            //if (showDescription)
+            //    exampleHeaders.Add(
+            //        Prettifier.Cell.Create("Description", Prettifier.Alignment.Centre)
+            //    );
+
+            //if (showExpectedOutput)
+            //    exampleHeaders.Add(
+            //        Prettifier.Cell.Create("Expected Output", Prettifier.Alignment.Centre)
+            //    );
+
+            //if (showExpectedLoggedValues)
+            //    exampleHeaders.Add(
+            //        Prettifier.Cell.Create("Expected Logged Values", Prettifier.Alignment.Centre)
+            //    );
+
+            //var exampleRows = doc.Examples.Select(
+            //        x =>
+            //        {
+            //            var list = new List<string>() { Escape(x.SCL) };
+
+            //            if (showDescription)
+            //                list.Add(Escape(x.Description ?? ""));
+
+            //            if (showExpectedOutput)
+            //                list.Add(Escape(x.ExpectedOutput ?? ""));
+
+            //            if (showExpectedLoggedValues)
+            //                list.Add(
+            //                    x.ExpectedLogs is null
+            //                        ? ""
+            //                        : string.Join(
+            //                            "\r\n",
+            //                            x.ExpectedLogs.Select(Escape)
+            //                        )
+            //                );
+
+            //            return list;
+            //        }
+            //    )
+            //    .ToList();
+
+            //Prettifier.CreateMarkdownTable(exampleHeaders, exampleRows, sb);
         }
 
         var stepPage = new StepPage(

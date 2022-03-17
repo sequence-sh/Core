@@ -115,12 +115,40 @@ public static class TypeNameHelper
             { typeof(StringStream), "string" },
             { typeof(Entity), "entity" },
             { typeof(DateTime), "dateTime" },
-            { typeof(void), "void" },
+            { typeof(void), "unit" },
             { typeof(SCLBool), "bool" },
             { typeof(SCLInt), "int" },
             { typeof(SCLDouble), "double" },
-            { typeof(SCLDateTime), "dataTime" },
+            { typeof(SCLDateTime), "dateTime" },
             { typeof(SCLNull), "null" },
             { typeof(Unit), "unit" },
         };
+
+    /// <summary>
+    /// Get a human readable type description for a step factory
+    /// </summary>
+    public static string GetHumanReadableTypeDescription(this IStepFactory stepFactory)
+    {
+        if (TypeAliasesByString.TryGetValue(stepFactory.OutputTypeExplanation, out var s))
+            return $"`{s}`";
+
+        return stepFactory.OutputTypeExplanation;
+    }
+
+    /// <summary>
+    /// Get a human readable type description for a step parameter
+    /// </summary>
+    public static string GetHumanReadableTypeDescription(this IStepParameter stepParameter)
+    {
+        if (TypeAliases.TryGetValue(stepParameter.ActualType, out var v))
+            return v;
+
+        return "`" + stepParameter.ActualType.Name + "`";
+    }
+
+    /// <summary>
+    /// Gets the human readable type name for the output type of a step
+    /// </summary>
+    public static readonly Dictionary<string, string> TypeAliasesByString =
+        TypeAliases.ToDictionary(x => x.Key.Name, x => x.Value);
 }
