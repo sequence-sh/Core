@@ -8,10 +8,14 @@ public class StepWrapper : IDocumentedStep
     /// <summary>
     /// Creates a new StepWrapper.
     /// </summary>
-    public StepWrapper(IGrouping<IStepFactory, string> grouping)
+    public StepWrapper(IGrouping<IStepFactory, string> grouping) : this(grouping.Key, grouping) { }
+
+    public StepWrapper(IStepFactory stepFactory) : this(stepFactory, stepFactory.Names) { }
+
+    private StepWrapper(IStepFactory stepFactory, IEnumerable<string> names)
     {
-        Factory               = grouping.Key;
-        DocumentationCategory = grouping.Key.Category;
+        Factory               = stepFactory;
+        DocumentationCategory = stepFactory.Category;
 
         Parameters = Factory.ParameterDictionary
             .Values
@@ -20,11 +24,11 @@ public class StepWrapper : IDocumentedStep
             .ThenBy(x => x.Name)
             .ToList();
 
-        Requirements = grouping.Key.Requirements.Select(x => $"Requires {x}").ToList();
+        Requirements = stepFactory.Requirements.Select(x => $"Requires {x}").ToList();
 
-        TypeDetails = grouping.Key.OutputTypeExplanation;
+        TypeDetails = stepFactory.OutputTypeExplanation;
 
-        AllNames = grouping.ToList();
+        AllNames = names.ToList();
 
         Examples = Factory.Examples.ToList();
     }
