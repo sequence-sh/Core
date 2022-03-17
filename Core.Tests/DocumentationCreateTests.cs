@@ -15,7 +15,8 @@ public class DocumentationCreateTests
     private StepFactoryStore StepFactoryStore { get; }
 
     [Theory]
-    [InlineData("For", "", "Do an action", "<i>")]
+    [InlineData("For",          "", "Do an action",         "<i>")]
+    [InlineData("StringToCase", "", "../Enums/TextCase.md", "//")]
     public void TestGetStepPage(
         string step,
         string rootUrl,
