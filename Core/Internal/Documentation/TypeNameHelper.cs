@@ -37,7 +37,7 @@ public static class TypeNameHelper
         var typeName = t.Name.Split("`")[0];
 
         var arguments =
-            $"<{string.Join(",", t.GetGenericArguments().Select(x => GetMarkupTypeName(x, rootUrl)))}>";
+            $"<{string.Join(", ", t.GetGenericArguments().Select(x => GetMarkupTypeName(x, rootUrl)))}>";
 
         return typeName + arguments;
     }

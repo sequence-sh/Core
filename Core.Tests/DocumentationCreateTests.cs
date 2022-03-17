@@ -23,6 +23,12 @@ public class DocumentationCreateTests
         "The relative url          |\r\n|Headers",
         null
     )] //make sure the relative url comes before the headers
+    [InlineData(
+        "Transform",
+        "",
+        "SCLOneOf<`string`, Array<`string`>, `entity`>",
+        "SCLOneOf<`string`,Array<`string`>,`entity`>"
+    )]
     public void TestGetStepPage(
         string step,
         string rootUrl,
