@@ -17,6 +17,12 @@ public class DocumentationCreateTests
     [Theory]
     [InlineData("For",          "", "Do an action",         "<i>")]
     [InlineData("StringToCase", "", "../Enums/TextCase.md", "//")]
+    [InlineData(
+        "RestDelete",
+        "",
+        "The relative url          |\r\n|Headers",
+        null
+    )] //make sure the relative url comes before the headers
     public void TestGetStepPage(
         string step,
         string rootUrl,

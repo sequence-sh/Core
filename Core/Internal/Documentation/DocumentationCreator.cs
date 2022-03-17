@@ -217,6 +217,9 @@ public static class DocumentationCreator
             );
 
             var parameterRows = doc.Parameters
+                .OrderBy(x => x.Order is null)
+                .ThenBy(x => x.Order)
+                .ThenBy(x => x.Name)
                 .Select(
                     rp =>
 
