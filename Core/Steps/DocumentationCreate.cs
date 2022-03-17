@@ -24,11 +24,7 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var r = await stateMonad.RunStepsAsync(
-            RootUrl.WrapStringStream(),
-            HtmlEncode,
-            cancellationToken
-        );
+        var r = await RootUrl.WrapStringStream().Run(stateMonad, cancellationToken);
 
         if (r.IsFailure)
             return r.ConvertFailure<Entity>();
@@ -41,8 +37,7 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
 
         var creationResult = DocumentationCreator.CreateDocumentation(
             documented,
-            r.Value.Item1,
-            r.Value.Item2
+            r.Value
         );
 
         return creationResult.ConvertToEntity();
@@ -54,13 +49,6 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
     [StepProperty(1)]
     [DefaultValueExplanation("Empty String")]
     public IStep<StringStream> RootUrl { get; set; } = new SCLConstant<StringStream>("");
-
-    /// <summary>
-    /// Whether to HTML encode the markdown text
-    /// </summary>
-    [StepProperty(2)]
-    [DefaultValueExplanation("false")]
-    public IStep<SCLBool> HtmlEncode { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

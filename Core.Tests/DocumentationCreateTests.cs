@@ -15,11 +15,10 @@ public class DocumentationCreateTests
     private StepFactoryStore StepFactoryStore { get; }
 
     [Theory]
-    [InlineData("For", "", true, "Do an action for each value of &lt;i&gt; in a range", "<i>")]
+    [InlineData("For", "", "Do an action", "<i>")]
     public void TestGetStepPage(
         string step,
         string rootUrl,
-        bool htmlEncode,
         string? expectContains,
         string? expectNotContains)
     {
@@ -27,14 +26,15 @@ public class DocumentationCreateTests
 
         var page = DocumentationCreator.GetStepPage(
             new StepWrapper(stepFactory),
-            rootUrl,
-            htmlEncode
+            rootUrl
         );
+
+        TestOutputHelper.WriteLine(page.FileText);
 
         if (expectContains is not null)
             page.FileText.Should().Contain(expectContains);
 
         if (expectNotContains is not null)
-            page.FileText.Should().NotContain(expectContains);
+            page.FileText.Should().NotContain(expectNotContains);
     }
 }

@@ -356,7 +356,7 @@ public static class Helpers
         try
         {
             var stepWrapper = new StepWrapper(stepFactoryGroup);
-            var text        = DocumentationCreator.GetStepPage(stepWrapper, rootUrl, false);
+            var text        = DocumentationCreator.GetStepPage(stepWrapper, rootUrl);
 
             return text.FileText;
         }
