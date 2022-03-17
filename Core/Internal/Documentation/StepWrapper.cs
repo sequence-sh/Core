@@ -10,6 +10,9 @@ public class StepWrapper : IDocumentedStep
     /// </summary>
     public StepWrapper(IGrouping<IStepFactory, string> grouping) : this(grouping.Key, grouping) { }
 
+    /// <summary>
+    /// Creates a new StepWrapper.
+    /// </summary>
     public StepWrapper(IStepFactory stepFactory) : this(stepFactory, stepFactory.Names) { }
 
     private StepWrapper(IStepFactory stepFactory, IEnumerable<string> names)
@@ -39,11 +42,10 @@ public class StepWrapper : IDocumentedStep
     public string DocumentationCategory { get; }
 
     /// <inheritdoc />
-    public string Name =>
-        Factory.TypeName; // TypeNameHelper.GetHumanReadableTypeName(Factory.StepType);
+    public string Name => Factory.TypeName;
 
     /// <inheritdoc />
-    public string FileName => Factory.TypeName + ".md";
+    public string FileName => Factory.TypeName;
 
     /// <inheritdoc />
     public string Summary => Factory.Summary;

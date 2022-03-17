@@ -15,32 +15,47 @@ public class DocumentationCreateTests
     private StepFactoryStore StepFactoryStore { get; }
 
     [Theory]
-    [InlineData("For",          "", "Do an action",         "<i>")]
-    [InlineData("StringToCase", "", "../Enums/TextCase.md", "//")]
+    [InlineData("For",          "Do an action",         "<i>")]
+    [InlineData("StringToCase", "../Enums/TextCase.md", "//")]
+    [InlineData(
+        "StringToCase",
+        "](https://sequence.sh/steps/Enums/TextCase.md)",
+        null,
+        "https://sequence.sh/steps"
+    )]
+    [InlineData(
+        "StringToCase",
+        "](https://sequence.sh/steps/Enums/TextCase)",
+        null,
+        "https://sequence.sh/steps",
+        false
+    )]
     [InlineData(
         "RestDelete",
-        "",
         "The relative url          |\r\n|Headers",
         null
     )] //make sure the relative url comes before the headers
     [InlineData(
         "Transform",
-        "",
         "`string` or `array<string>` or `entity`",
         null
     )]
-    [InlineData("ArraySort", "", "```scl", null)]
+    [InlineData("ArraySort", "```scl", null)]
+    [InlineData("Not",       "```scl", null, "https://sequence.sh/steps", false, true)]
     public void TestGetStepPage(
         string step,
-        string rootUrl,
         string? expectContains,
-        string? expectNotContains)
+        string? expectNotContains,
+        string rootUrl = "",
+        bool includeExtensions = true,
+        bool includeLink = false,
+        bool includeExamples = true)
     {
         var stepFactory = StepFactoryStore.Dictionary[step];
 
         var page = DocumentationCreator.GetStepPage(
             new StepWrapper(stepFactory),
-            rootUrl
+            new DocumentationOptions(rootUrl, includeExtensions, includeLink, includeExamples)
         );
 
         TestOutputHelper.WriteLine(page.FileText);

@@ -37,7 +37,7 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
 
         var creationResult = DocumentationCreator.CreateDocumentation(
             documented,
-            r.Value
+            new DocumentationOptions() //Use default values
         );
 
         return creationResult.ConvertToEntity();

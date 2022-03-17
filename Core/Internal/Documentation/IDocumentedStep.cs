@@ -16,7 +16,7 @@ public interface IDocumentedStep
     string Name { get; }
 
     /// <summary>
-    /// The name of the file
+    /// The name of the file. Does not include the extension
     /// </summary>
     string FileName { get; }
 

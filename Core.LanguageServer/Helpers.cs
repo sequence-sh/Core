@@ -11,6 +11,12 @@ public static class Helpers
     public const string DocumentationRootUrl = "https://sequence.sh/steps/";
 
     /// <summary>
+    /// The documentation options
+    /// </summary>
+    public static readonly DocumentationOptions DefaultDocumentationOptions =
+        new(DocumentationRootUrl, false, true, false);
+
+    /// <summary>
     /// Does this token contain this position
     /// </summary>
     public static bool ContainsPosition(this IToken token, LinePosition position)
@@ -292,6 +298,9 @@ public static class Helpers
         );
     }
 
+    /// <summary>
+    /// Convert a test position to a line position
+    /// </summary>
     public static LinePosition ToLinePosition(this TextPosition textPosition)
     {
         return new LinePosition(textPosition.Line, textPosition.Column);
@@ -356,7 +365,7 @@ public static class Helpers
         try
         {
             var stepWrapper = new StepWrapper(stepFactoryGroup);
-            var text        = DocumentationCreator.GetStepPage(stepWrapper, rootUrl);
+            var text = DocumentationCreator.GetStepPage(stepWrapper, DefaultDocumentationOptions);
 
             return text.FileText;
         }

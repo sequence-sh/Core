@@ -8,17 +8,23 @@ public static class TypeNameHelper
     /// <summary>
     /// Gets the name of a type as it should appear in markup (possibly containing a link to the documentation)
     /// </summary>
-    public static string GetMarkupTypeName(Type t, string rootUrl)
+    public static string GetMarkupTypeName(Type t, DocumentationOptions options)
     {
         if (TypeAliases.TryGetValue(t, out var name))
             return $"`{name}`";
 
         if (!t.IsSignatureType && t.IsEnum)
         {
-            if (string.IsNullOrWhiteSpace(rootUrl))
-                return $"[{t.Name}](../Enums/{t.Name}.md)";
+            var extension = options.IncludeExtensionsInLinks ? ".md" : "";
 
-            return $"[{t.Name}]({rootUrl}/Enums/{t.Name}.md)";
+            if (string.IsNullOrWhiteSpace(options.RootUrl))
+            {
+                return $"[{t.Name}](../Enums/{t.Name}{extension})";
+            }
+            else
+            {
+                return $"[{t.Name}]({options.RootUrl.TrimEnd('/')}/Enums/{t.Name}{extension})";
+            }
         }
 
         if (!t.IsGenericType)
@@ -31,12 +37,12 @@ public static class TypeNameHelper
             if (underlyingType == null)
                 return t.Name;
 
-            return GetMarkupTypeName(underlyingType, rootUrl) + "?";
+            return GetMarkupTypeName(underlyingType, options) + "?";
         }
 
         var typeName = t.Name.Split("`")[0];
 
-        var arguments = t.GetGenericArguments().Select(x => GetMarkupTypeName(x, rootUrl)).ToList();
+        var arguments = t.GetGenericArguments().Select(x => GetMarkupTypeName(x, options)).ToList();
         var argumentsAreBackticked = arguments.All(x => x.StartsWith('`') && x.EndsWith('`'));
 
         switch (typeName)
