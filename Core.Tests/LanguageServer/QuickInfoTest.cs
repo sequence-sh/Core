@@ -47,7 +47,7 @@ public class QuickInfoTest
         "`TextCase`",
         "The case to convert the text to."
     )]
-    [InlineData("1  +  2", 0, 2, "`Sum`", "`SCLInt`", "Calculate the sum of a list of integers")]
+    [InlineData("1  +  2", 0, 2, "`Sum`", "`int`", "Calculate the sum of a list of integers")]
     [InlineData("<a> = 1", 0, 5, "`SetVariable`", "`Unit`", "Sets the value of a named variable.")]
     [InlineData("Print <a>", 0, 7, "`<a>`", "`Any`")]
     [InlineData(
@@ -62,7 +62,7 @@ public class QuickInfoTest
         0,
         6,
         "`ArrayNew`",
-        "`Array<SCLInt>`",
+        "`Array<int>`",
         "Represents an ordered collection of objects."
     )]
     [InlineData(

@@ -36,10 +36,28 @@ public static class TypeNameHelper
 
         var typeName = t.Name.Split("`")[0];
 
-        var arguments =
-            $"<{string.Join(", ", t.GetGenericArguments().Select(x => GetMarkupTypeName(x, rootUrl)))}>";
+        var arguments = t.GetGenericArguments().Select(x => GetMarkupTypeName(x, rootUrl)).ToList();
+        var argumentsAreBackticked = arguments.All(x => x.StartsWith('`') && x.EndsWith('`'));
 
-        return typeName + arguments;
+        switch (typeName)
+        {
+            case "SCLOneOf": return string.Join(" or ", arguments);
+            case "SCLEnum":  return arguments.Single();
+            case "Array" when argumentsAreBackticked:
+            {
+                var argumentsString =
+                    $"<{string.Join(", ", arguments.Select(x => x.Trim('`')))}>";
+
+                return $"`array{argumentsString}`";
+            }
+            default:
+            {
+                var argumentsString =
+                    $"<{string.Join(", ", arguments)}>";
+
+                return typeName + argumentsString;
+            }
+        }
     }
 
     /// <summary>
@@ -97,6 +115,12 @@ public static class TypeNameHelper
             { typeof(StringStream), "string" },
             { typeof(Entity), "entity" },
             { typeof(DateTime), "dateTime" },
-            { typeof(void), "void" }
+            { typeof(void), "void" },
+            { typeof(SCLBool), "bool" },
+            { typeof(SCLInt), "int" },
+            { typeof(SCLDouble), "double" },
+            { typeof(SCLDateTime), "dataTime" },
+            { typeof(SCLNull), "null" },
+            { typeof(Unit), "unit" },
         };
 }

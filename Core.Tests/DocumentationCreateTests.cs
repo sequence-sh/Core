@@ -26,8 +26,8 @@ public class DocumentationCreateTests
     [InlineData(
         "Transform",
         "",
-        "SCLOneOf<`string`, Array<`string`>, `entity`>",
-        "SCLOneOf<`string`,Array<`string`>,`entity`>"
+        "`string` or `array<string>` or `entity`",
+        null
     )]
     public void TestGetStepPage(
         string step,
