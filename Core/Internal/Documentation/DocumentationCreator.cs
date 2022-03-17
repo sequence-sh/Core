@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using Namotion.Reflection;
 
 namespace Reductech.Sequence.Core.Internal.Documentation;
@@ -14,7 +15,8 @@ public static class DocumentationCreator
     public static
         DocumentationCreationResult CreateDocumentation(
             IEnumerable<IDocumentedStep> entities,
-            string rootUrl)
+            string rootUrl,
+            bool htmlEncode)
     {
         var enumTypes = new HashSet<Type>();
 
@@ -48,7 +50,7 @@ public static class DocumentationCreator
             mainContents = new MainContents(
                 "all.md",
                 "all",
-                contentsStringBuilder.ToString().Trim(),
+                MaybeHtmlEncode(contentsStringBuilder.ToString().Trim(), htmlEncode),
                 ""
             );
         }
@@ -85,7 +87,7 @@ public static class DocumentationCreator
                 categoryContents = new CategoryContents(
                     $"{category.Key}.md",
                     category.Key,
-                    contentsStringBuilder.ToString().Trim(),
+                    MaybeHtmlEncode(contentsStringBuilder.ToString().Trim(), true),
                     "",
                     category.Key
                 );
@@ -101,7 +103,7 @@ public static class DocumentationCreator
                         .SelectMany(GetEnumTypes)
                 );
 
-                var stepPage = GetStepPage(doc);
+                var stepPage = GetStepPage(doc, rootUrl, htmlEncode);
                 stepPages.Add(stepPage);
             }
 
@@ -127,7 +129,7 @@ public static class DocumentationCreator
         {
             foreach (var type in enumTypes.OrderBy(x => x.Name))
             {
-                var enumData = GetEnumPage(type);
+                var enumData = GetEnumPage(type, htmlEncode);
                 enums.Add(enumData);
             }
         }
@@ -151,7 +153,7 @@ public static class DocumentationCreator
     /// <summary>
     /// Gets the documentation page for a step
     /// </summary>
-    public static StepPage GetStepPage(IDocumentedStep doc)
+    public static StepPage GetStepPage(IDocumentedStep doc, string rootUrl, bool htmlEncode)
     {
         var sb = new StringBuilder();
 
@@ -229,7 +231,7 @@ public static class DocumentationCreator
                         var r = new List<string?>
                         {
                             nameString,
-                            TypeNameHelper.GetMarkupTypeName(rp.ActualType),
+                            TypeNameHelper.GetMarkupTypeName(rp.ActualType, rootUrl),
                             rp.Required ? "✔" : "",
                             rp.Order?.ToString() ?? ""
                         };
@@ -318,7 +320,7 @@ public static class DocumentationCreator
         var stepPage = new StepPage(
             doc.FileName,
             doc.Name,
-            sb.ToString().Trim(),
+            MaybeHtmlEncode(sb.ToString().Trim(), htmlEncode),
             doc.DocumentationCategory,
             doc.DocumentationCategory,
             doc.Name,
@@ -331,7 +333,7 @@ public static class DocumentationCreator
         return stepPage;
     }
 
-    private static EnumPage GetEnumPage(Type type)
+    private static EnumPage GetEnumPage(Type type, bool htmlEncode)
     {
         var textStringBuilder = new StringBuilder();
         textStringBuilder.AppendLine($"## {Escape(type.Name)}");
@@ -363,7 +365,7 @@ public static class DocumentationCreator
         return new EnumPage(
             type.Name + ".md",
             type.Name,
-            textStringBuilder.ToString().Trim(),
+            MaybeHtmlEncode(textStringBuilder.ToString().Trim(), htmlEncode),
             "Enums",
             enumValues
         );
@@ -376,5 +378,13 @@ public static class DocumentationCreator
 
             return v;
         }
+    }
+
+    private static string MaybeHtmlEncode(string s, bool htmlEncode)
+    {
+        if (!htmlEncode)
+            return s;
+
+        return WebUtility.HtmlEncode(s);
     }
 }

@@ -8,15 +8,18 @@ public static class TypeNameHelper
     /// <summary>
     /// Gets the name of a type as it should appear in markup (possibly containing a link to the documentation)
     /// </summary>
-    /// <param name="t"></param>
-    /// <returns></returns>
-    public static string GetMarkupTypeName(Type t)
+    public static string GetMarkupTypeName(Type t, string rootUrl)
     {
         if (TypeAliases.TryGetValue(t, out var name))
             return $"`{name}`";
 
         if (!t.IsSignatureType && t.IsEnum)
-            return $"[{t.Name}](../Enums/{t.Name}.md)";
+        {
+            if (string.IsNullOrWhiteSpace(rootUrl))
+                return $"[{t.Name}](../Enums/{t.Name}.md)";
+
+            return $"[{t.Name}]({rootUrl}/Enums/{t.Name}.md)";
+        }
 
         if (!t.IsGenericType)
             return $"`{t.Name}`";
@@ -28,12 +31,13 @@ public static class TypeNameHelper
             if (underlyingType == null)
                 return t.Name;
 
-            return GetMarkupTypeName(underlyingType) + "?";
+            return GetMarkupTypeName(underlyingType, rootUrl) + "?";
         }
 
         var typeName = t.Name.Split("`")[0];
 
-        var arguments = $"<{string.Join(",", t.GetGenericArguments().Select(GetMarkupTypeName))}>";
+        var arguments =
+            $"<{string.Join(",", t.GetGenericArguments().Select(x => GetMarkupTypeName(x, rootUrl)))}>";
 
         return typeName + arguments;
     }

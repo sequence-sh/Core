@@ -24,11 +24,14 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var rootUrl = await RootUrl.Run(stateMonad, cancellationToken)
-            .Map(x => x.GetString());
+        var r = await stateMonad.RunStepsAsync(
+            RootUrl.WrapStringStream(),
+            HtmlEncode,
+            cancellationToken
+        );
 
-        if (rootUrl.IsFailure)
-            return rootUrl.ConvertFailure<Entity>();
+        if (r.IsFailure)
+            return r.ConvertFailure<Entity>();
 
         var documented = stateMonad.StepFactoryStore
             .Dictionary
@@ -36,7 +39,11 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
             .Select(x => new StepWrapper(x))
             .ToList();
 
-        var creationResult = DocumentationCreator.CreateDocumentation(documented, rootUrl.Value);
+        var creationResult = DocumentationCreator.CreateDocumentation(
+            documented,
+            r.Value.Item1,
+            r.Value.Item2
+        );
 
         return creationResult.ConvertToEntity();
     }
@@ -45,9 +52,15 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
     /// Root URL of all links in the documentation. You should include a slash `/` at the end.
     /// </summary>
     [StepProperty(1)]
-    [Alias("Get")]
     [DefaultValueExplanation("Empty String")]
     public IStep<StringStream> RootUrl { get; set; } = new SCLConstant<StringStream>("");
+
+    /// <summary>
+    /// Whether to HTML encode the markdown text
+    /// </summary>
+    [StepProperty(2)]
+    [DefaultValueExplanation("false")]
+    public IStep<SCLBool> HtmlEncode { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
