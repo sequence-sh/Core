@@ -270,25 +270,28 @@ public static class DocumentationCreator
                 if (doc.Examples.Count > 1)
                     sb.AppendLine($"### Example {index + 1}");
 
-                if (docExample.Description is not null)
+                if (!string.IsNullOrWhiteSpace(docExample.Description))
                     sb.AppendLine(docExample.Description);
 
-                sb.AppendLine($"#### {docExample.SCL}");
+                sb.AppendLine($"#### SCL");
                 sb.AppendLine("```scl");
                 sb.AppendLine(docExample.SCL);
                 sb.AppendLine("```");
 
                 if (docExample.ExpectedLogs is not null)
                 {
-                    sb.AppendLine($"#### Expected Logs");
-                    sb.AppendLine("```");
-
-                    foreach (var log in docExample.ExpectedLogs)
+                    if (docExample.ExpectedLogs.Any())
                     {
-                        sb.AppendLine(log);
-                    }
+                        sb.AppendLine($"#### Expected Logs");
+                        sb.AppendLine("```");
 
-                    sb.AppendLine("```");
+                        foreach (var log in docExample.ExpectedLogs)
+                        {
+                            sb.AppendLine(log);
+                        }
+
+                        sb.AppendLine("```");
+                    }
                 }
 
                 if (docExample.ExpectedOutput is not null)

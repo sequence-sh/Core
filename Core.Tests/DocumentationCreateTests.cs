@@ -29,6 +29,7 @@ public class DocumentationCreateTests
         "`string` or `array<string>` or `entity`",
         null
     )]
+    [InlineData("ArraySort", "", "```scl", null)]
     public void TestGetStepPage(
         string step,
         string rootUrl,
