@@ -4,7 +4,8 @@ using Reductech.Sequence.Core.Enums;
 namespace Reductech.Sequence.Core.Steps.REST;
 
 /// <summary>
-/// A step that calls a rest service
+/// Makes a Http Request to download data from the web.
+/// Returns a StringStream containing binary encoded data.
 /// </summary>
 [Alias("Download")]
 [Alias("GetWebStream")]

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text;
+﻿using System.Text;
 using Reductech.Sequence.Core.Steps.REST;
 
 namespace Reductech.Sequence.Core.Tests.Steps.REST;
