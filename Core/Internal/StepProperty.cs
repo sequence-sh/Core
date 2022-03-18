@@ -6,7 +6,7 @@
 /// </summary>
 public abstract record StepProperty
 (
-    StepParameter StepParameter,
+    IStepParameter StepParameter,
     int Index, //Note this index is not the Property order
     LogAttribute? LogAttribute,
     ImmutableList<RequirementAttribute> RequiredVersions) : ISerializable
@@ -22,7 +22,7 @@ public abstract record StepProperty
     public record LambdaFunctionProperty
     (
         LambdaFunction LambdaFunction,
-        StepParameter StepParameter,
+        IStepParameter StepParameter,
         int Index,
         LogAttribute? LogAttribute,
         ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
@@ -61,7 +61,7 @@ public abstract record StepProperty
     /// </summary>
     public record VariableNameProperty(
         VariableName VariableName,
-        StepParameter StepParameter,
+        IStepParameter StepParameter,
         int Index,
         LogAttribute? LogAttribute,
         ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
@@ -96,7 +96,7 @@ public abstract record StepProperty
     /// </summary>
     public record SingleStepProperty(
         IStep Step,
-        StepParameter StepParameter,
+        IStepParameter StepParameter,
         int Index,
         LogAttribute? LogAttribute,
         ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(
@@ -148,7 +148,7 @@ public abstract record StepProperty
     /// </summary>
     public record StepListProperty(
         IReadOnlyList<IStep> StepList,
-        StepParameter StepParameter,
+        IStepParameter StepParameter,
         int Index,
         LogAttribute? LogAttribute,
         ImmutableList<RequirementAttribute> RequiredVersions) : StepProperty(

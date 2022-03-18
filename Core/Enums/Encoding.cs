@@ -42,7 +42,12 @@ public enum EncodingEnum
     /// <summary>
     /// Unicode with little-endian byte order
     /// </summary>
-    Unicode
+    Unicode,
+
+    /// <summary>
+    /// Binary data has no encoding
+    /// </summary>
+    Binary
 }
 
 /// <summary>
@@ -64,6 +69,7 @@ public static class EncodingHelper
             EncodingEnum.UTF8BOM => new UTF8Encoding(true),
             EncodingEnum.UTF32 => Encoding.UTF32,
             EncodingEnum.Unicode => Encoding.Unicode,
+            EncodingEnum.Binary => Encoding.ASCII, //Use ascii encoding for binary files
             _ => throw new ArgumentOutOfRangeException(nameof(encodingEnum), encodingEnum, null)
         };
     }

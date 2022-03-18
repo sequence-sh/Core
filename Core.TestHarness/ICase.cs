@@ -32,7 +32,12 @@ public interface ICaseWithSetup
     Dictionary<VariableName, ISCLObject> InjectedVariables { get; }
 }
 
-public sealed class RESTSetup
+public interface IRestSetup
+{
+    void SetupClient(Mock<IRestClient> client);
+}
+
+public sealed class RESTSetup : IRestSetup
 {
     public RESTSetup(
         string? baseUri,
@@ -76,9 +81,9 @@ public sealed class RESTSetup
 
 public sealed class RESTClientSetupHelper
 {
-    private List<RESTSetup> Setups { get; } = new();
+    private List<IRestSetup> Setups { get; } = new();
 
-    public void AddHttpTestAction(RESTSetup restSetup) => Setups.Add(restSetup);
+    public void AddHttpTestAction(IRestSetup restSetup) => Setups.Add(restSetup);
 
     public IRestClient GetRESTClient(MockRepository mockRepository, List<Action> finalChecks)
     {
