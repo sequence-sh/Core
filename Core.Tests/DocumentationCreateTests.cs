@@ -31,11 +31,6 @@ public class DocumentationCreateTests
         false
     )]
     [InlineData(
-        "RestDelete",
-        "The relative url          |\r\n|Headers",
-        null
-    )] //make sure the relative url comes before the headers
-    [InlineData(
         "Transform",
         "`string` or `array<string>` or `entity`",
         null
