@@ -5,21 +5,18 @@ namespace Reductech.Sequence.Core.Tests.LanguageServer;
 
 public class CompletionTest
 {
-    public const string ErrorText = @"- FileRead 'artwork_data.csv'
-- 0.1.2.3";
-
     [Theory]
-    [InlineData("- ",                                             0, 2,  null,          null)]
-    [InlineData("- Print  ",                                      0, 11, "Value",       null)]
-    [InlineData("Print  ",                                        0, 9,  "Value",       null)]
-    [InlineData("Print P",                                        0, 8,  "Value",       null)]
-    [InlineData("Print\r\nV",                                     1, 0,  "Value",       null)]
-    [InlineData("- Print\r\nV",                                   1, 0,  "Value",       null)]
-    [InlineData("- Print P",                                      1, 8,  "Value",       null)]
-    [InlineData("- Print 123\r\n- RestGetJson BaseUrl: 'abc' u",  1, 30, "RelativeURL", 29)]
-    [InlineData("- Print ...\r\n- RestGetJson BaseUrl: 'abc' u",  1, 30, "RelativeURL", 29)]
-    [InlineData("- Print 123\r\n- RestGetJson BaseUrl: 'abc' ur", 1, 31, "RelativeURL", 29)]
-    [InlineData(LongText,                                         1, 2,  "ArrayFilter", null)]
+    [InlineData("- ",                                         0, 2,  null,          null)]
+    [InlineData("- Print  ",                                  0, 11, "Value",       null)]
+    [InlineData("Print  ",                                    0, 9,  "Value",       null)]
+    [InlineData("Print P",                                    0, 8,  "Value",       null)]
+    [InlineData("Print\r\nV",                                 1, 0,  "Value",       null)]
+    [InlineData("- Print\r\nV",                               1, 0,  "Value",       null)]
+    [InlineData("- Print P",                                  1, 8,  "Value",       null)]
+    [InlineData("- Print 123\r\n- HttpRequest Uri: 'abc' h",  1, 26, "Headers",     25)]
+    [InlineData("- Print ...\r\n- HttpRequest Uri: 'abc' h",  1, 26, "Headers",     25)]
+    [InlineData("- Print 123\r\n- HttpRequest Uri: 'abc' he", 1, 27, "Headers",     25)]
+    [InlineData(LongText,                                     1, 2,  "ArrayFilter", null)]
     public void ShouldGiveCorrectCompletion(
         string text,
         int line,

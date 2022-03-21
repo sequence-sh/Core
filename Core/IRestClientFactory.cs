@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using RestSharp;
 
 namespace Reductech.Sequence.Core;
 

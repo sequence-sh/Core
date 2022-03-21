@@ -1,7 +1,8 @@
 ﻿using System.IO;
 using Reductech.Sequence.Core.Enums;
+using RestSharp;
 
-namespace Reductech.Sequence.Core.Steps.REST;
+namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Makes a Http Request to download data from the web.
@@ -30,7 +31,7 @@ public class HttpRequest : CompoundStep<StringStream>
         var request = new RestRequest(uri);
 
         if (headers.HasValue)
-            request = request.AddHeaders(headers.GetValueOrThrow());
+            request = AddHeaders(request, headers.GetValueOrThrow());
 
         var restClient = stateMonad.ExternalContext.RestClientFactory.CreateRestClient(uri);
 
@@ -73,4 +74,17 @@ public class HttpRequest : CompoundStep<StringStream>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<HttpRequest, StringStream>();
+
+    static RestRequest AddHeaders(RestRequest request, Entity entity)
+    {
+        foreach (var (name, sclObject, _) in entity.Dictionary.Values)
+        {
+            request = request.AddHeader(
+                name,
+                sclObject.Serialize(SerializeOptions.Primitive)
+            );
+        }
+
+        return request;
+    }
 }
