@@ -1,4 +1,5 @@
-﻿using RestSharp.Serializers.Json;
+﻿using RestSharp;
+using RestSharp.Serializers.Json;
 
 namespace Reductech.Sequence.Core;
 

@@ -12,14 +12,13 @@ public class FormattingTest
         "- Print Value: 456 [start: (2, 0), end: (2, 11)]"
     )]
     [InlineData(
-        "RestGetJson baseurl: 'abc' #First Comment\r\nrelativeurl: 'def' /*Second Comment*/headers: (a: 1, b: 2)",
-        @"RESTGetJSON
-BaseURL    : ""abc"" #First Comment
-RelativeURL: ""def"" /*Second Comment*/
-Headers    : (
+        "HttpRequest uri: 'abc' #First Comment\r\nheaders: (a: 1, b: 2)",
+        @"HttpRequest
+Uri    : ""abc"" #First Comment
+Headers: (
 	'a': 1
 	'b': 2
-) [start: (0, 0), end: (1, 58)]"
+) [start: (0, 0), end: (1, 21)]"
     )]
     [InlineData(
         "print (StringToCase 'ab' /* my comment */ textcase.upper)",

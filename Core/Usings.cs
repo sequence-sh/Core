@@ -11,7 +11,6 @@ global using CSharpFunctionalExtensions;
 global using Reductech.Sequence.Core.Internal.Errors;
 global using Reductech.Sequence.Core.Util;
 global using System.Text.Json;
-global using RestSharp;
 global using Reductech.Sequence.Core.Internal.Serialization;
 global using System.ComponentModel.DataAnnotations;
 global using Json.More;
