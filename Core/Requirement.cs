@@ -34,6 +34,23 @@ public abstract record Requirement([property: DataMember] string ConnectorName) 
     protected abstract Result<Unit, IErrorBuilder> Check(ConnectorSettings connectorSettings);
 
     /// <summary>
+    /// Get the text of this requirement
+    /// </summary>
+    public abstract string GetText();
+
+    /// <inheritdoc />
+    public sealed override string ToString() => GetText();
+
+    /// <summary>
+    /// Format the Connector Name.
+    /// Get the section after the last period
+    /// </summary>
+    protected string FormattedConnectorName()
+    {
+        return ConnectorName.Split('.').Last();
+    }
+
+    /// <summary>
     /// Group requirements and remove redundant ones.
     /// </summary>
     public static IEnumerable<Requirement> CompressRequirements(
@@ -94,9 +111,9 @@ public sealed record ConnectorRequirement
     }
 
     /// <inheritdoc />
-    public override string ToString()
+    public override string GetText()
     {
-        return ConnectorName;
+        return ConnectorName; //Don't use FormattedConnectorName
     }
 }
 
@@ -130,22 +147,22 @@ public sealed record VersionRequirement
     }
 
     /// <inheritdoc />
-    public override string ToString()
+    public override string GetText()
     {
         if (MinVersion is not null)
         {
             if (MaxVersion is not null)
-                return $"{ConnectorName}.{VersionKey} {MinVersion}-{MaxVersion}";
+                return $"{FormattedConnectorName()}.{VersionKey} {MinVersion}-{MaxVersion}";
 
-            return $"{ConnectorName}.{VersionKey} {MinVersion}";
+            return $"{FormattedConnectorName()}.{VersionKey} {MinVersion}";
         }
 
         if (MaxVersion is not null)
         {
-            return $"{ConnectorName}.{VersionKey} <= {MaxVersion}";
+            return $"{FormattedConnectorName()}.{VersionKey} <= {MaxVersion}";
         }
 
-        return $"{ConnectorName}.{VersionKey}";
+        return $"{FormattedConnectorName()}.{VersionKey}";
     }
 }
 
@@ -159,10 +176,12 @@ public sealed record FeatureRequirement(
         [property: DataMember] IReadOnlyList<string> RequiredFeatures)
     : Requirement(ConnectorName)
 {
-    /// <inheritdoc />
-    public override string ToString()
+    /// <summary>
+    /// Get the text of this requirement
+    /// </summary>
+    public override string GetText()
     {
-        return $"{ConnectorName}.{FeaturesKey}: {string.Join(", ", RequiredFeatures)}";
+        return $"{FormattedConnectorName()}.{FeaturesKey}: {string.Join(", ", RequiredFeatures)}";
     }
 
     /// <inheritdoc />

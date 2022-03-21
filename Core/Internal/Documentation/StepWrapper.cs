@@ -27,7 +27,7 @@ public class StepWrapper : IDocumentedStep
             .ThenBy(x => x.Name)
             .ToList();
 
-        Requirements = stepFactory.Requirements.Select(x => $"Requires {x}").ToList();
+        Requirements = stepFactory.Requirements.Select(x => $"Requires {x.GetText()}").ToList();
 
         TypeDetails = stepFactory.OutputTypeExplanation;
 

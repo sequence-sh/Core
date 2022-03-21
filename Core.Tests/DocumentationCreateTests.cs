@@ -53,13 +53,7 @@ public class DocumentationCreateTests
             new DocumentationOptions(rootUrl, includeExtensions, includeLink, includeExamples)
         );
 
-        TestOutputHelper.WriteLine(page.FileText);
-
-        if (expectContains is not null)
-            page.FileText.Should().Contain(expectContains);
-
-        if (expectNotContains is not null)
-            page.FileText.Should().NotContain(expectNotContains);
+        TestText(expectContains, expectNotContains, page.FileText);
     }
 
     [Theory]
@@ -78,6 +72,24 @@ public class DocumentationCreateTests
 
         var text = createResult.MainContents.FileText;
 
+        TestText(expectContains, expectNotContains, text);
+    }
+
+    [Fact]
+    public void TestRequirementsStep()
+    {
+        var stepFactory = new StepRequirementsStep().StepFactory;
+
+        var page = DocumentationCreator.GetStepPage(
+            new StepWrapper(stepFactory),
+            new DocumentationOptions()
+        );
+
+        TestText("*Requires MyConnector.Features: Alpha, Beta*", null, page.FileText);
+    }
+
+    private void TestText(string? expectContains, string? expectNotContains, string text)
+    {
         TestOutputHelper.WriteLine(text);
 
         if (expectContains is not null)
@@ -85,5 +97,47 @@ public class DocumentationCreateTests
 
         if (expectNotContains is not null)
             text.Should().NotContain(expectNotContains);
+    }
+
+    private class StepRequirementsStep : CompoundStep<SCLInt>
+    {
+        /// <inheritdoc />
+        protected override Task<Result<SCLInt, IError>> Run(
+            IStateMonad stateMonad,
+            CancellationToken cancellationToken)
+        {
+            return BaseStep.Run(stateMonad, cancellationToken);
+        }
+
+        [Required][StepProperty(1)] public IStep<SCLInt> BaseStep { get; set; } = null!;
+
+        /// <inheritdoc />
+        public override IStepFactory StepFactory => StepRequirementsStepFactory.Instance;
+
+        private class StepRequirementsStepFactory : SimpleStepFactory<StepRequirementsStep, SCLInt>
+
+        {
+            private StepRequirementsStepFactory() { }
+            public static StepRequirementsStepFactory Instance { get; } = new();
+
+            /// <inheritdoc />
+            public override IEnumerable<Requirement> Requirements
+            {
+                get
+                {
+                    var connectorName = "Reductech.Connectors.MyConnector";
+
+                    yield return new ConnectorRequirement(connectorName);
+
+                    yield return new FeatureRequirement(
+                        connectorName,
+                        "Features",
+                        new[] { "Alpha", "Beta" }
+                    );
+
+                    yield return new VersionRequirement(connectorName, "Version");
+                }
+            }
+        }
     }
 }
