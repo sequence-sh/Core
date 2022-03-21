@@ -61,4 +61,29 @@ public class DocumentationCreateTests
         if (expectNotContains is not null)
             page.FileText.Should().NotContain(expectNotContains);
     }
+
+    [Theory]
+    [InlineData("For", "Do an action", "<i>")]
+    public void TestContents(
+        string step,
+        string? expectContains,
+        string? expectNotContains)
+    {
+        var stepFactory = StepFactoryStore.Dictionary[step];
+
+        var createResult = DocumentationCreator.CreateDocumentation(
+            new List<IDocumentedStep>() { new StepWrapper(stepFactory) },
+            new DocumentationOptions()
+        );
+
+        var text = createResult.MainContents.FileText;
+
+        TestOutputHelper.WriteLine(text);
+
+        if (expectContains is not null)
+            text.Should().Contain(expectContains);
+
+        if (expectNotContains is not null)
+            text.Should().NotContain(expectNotContains);
+    }
 }

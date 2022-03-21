@@ -42,7 +42,7 @@ public static class DocumentationCreator
                     x => new[]
                     {
                         FormatLink(x.Name, $"{x.DocumentationCategory}/{x.FileName}", options),
-                        x.DocumentationCategory, x.Summary
+                        x.DocumentationCategory, Escape(x.Summary)
                     }
                 )
                 .ToList();
@@ -83,7 +83,7 @@ public static class DocumentationCreator
                                 $"{x.DocumentationCategory}/{x.FileName}",
                                 options
                             ),
-                            x.Summary
+                            Escape(x.Summary)
                         }
                     )
                     .ToList();
