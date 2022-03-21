@@ -1,4 +1,6 @@
-﻿namespace Reductech.Sequence.Core.TestHarness;
+﻿using Reductech.Sequence.Core.TestHarness.Rest;
+
+namespace Reductech.Sequence.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
@@ -21,8 +23,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var restClient = RESTClientSetupHelper.GetRESTClient(mockRepository, FinalChecks);
-            var restClientFactory = new SingleRestClientFactory(restClient);
+            //var restClient = RESTClientSetupHelper.GetRESTClient(mockRepository, FinalChecks);
+            var restClientFactory = RESTClientSetupHelper.GetRESTClientFactory(mockRepository);
 
             var externalContext =
                 ExternalContextSetupHelper.GetExternalContext(mockRepository, restClientFactory);

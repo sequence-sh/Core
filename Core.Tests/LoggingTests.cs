@@ -1,4 +1,5 @@
 ﻿using MELT;
+using Reductech.Sequence.Core.TestHarness.Rest;
 
 namespace Reductech.Sequence.Core.Tests;
 
@@ -162,8 +163,7 @@ public partial class LoggingTests
             var logger = loggerFactory.CreateLogger("Test");
             var repo   = new MockRepository(MockBehavior.Strict);
 
-            var restClient = RESTClientSetupHelper.GetRESTClient(repo, FinalChecks);
-            var restClientFactory = new SingleRestClientFactory(restClient);
+            var restClientFactory = RESTClientSetupHelper.GetRESTClientFactory(repo);
             var context = ExternalContextSetupHelper.GetExternalContext(repo, restClientFactory);
 
             var sclRunner = new SCLRunner(

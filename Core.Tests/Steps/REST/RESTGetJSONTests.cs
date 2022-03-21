@@ -21,7 +21,8 @@ public partial class RESTGetJSONTests : StepTestBase<RESTGetJSON, Entity>
                 )
                 .SetupHTTPSuccess(
                     "http://www.abc.com",
-                    ("Thing/1", Method.GET, null),
+                    ("Thing/1", Method.Get, null),
+                    true,
                     HttpStatusCode.OK,
                     "{\"a\": 1}"
                 );

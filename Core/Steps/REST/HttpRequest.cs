@@ -27,26 +27,30 @@ public class HttpRequest : CompoundStep<StringStream>
 
         var (uri, headers) = stuff.Value;
 
-        IRestRequest request = new RestRequest(uri, Method.GET);
+        var request = new RestRequest(uri);
 
         if (headers.HasValue)
             request = request.AddHeaders(headers.GetValueOrThrow());
 
         var restClient = stateMonad.ExternalContext.RestClientFactory.CreateRestClient(uri);
 
-        byte[] response;
+        Stream? response;
 
         try
         {
             //TODO do this async
-            response = restClient.DownloadData(request);
+            response = await restClient.DownloadStreamAsync(request, cancellationToken);
         }
         catch (Exception ex)
         {
             return ErrorCode.Unknown.ToErrorBuilder(ex).WithLocationSingle(this);
         }
 
-        var ss = new StringStream(new MemoryStream(response), EncodingEnum.Binary);
+        var ss = new StringStream(
+            response ?? new MemoryStream(Array.Empty<byte>()),
+            EncodingEnum.Binary
+        );
+
         return ss;
     }
 

@@ -21,7 +21,8 @@ public partial class RESTDeleteTests : StepTestBase<RESTDelete, Unit>
                 )
                 .SetupHTTPSuccess(
                     "http://www.abc.com",
-                    ("Thing/1", Method.DELETE, null),
+                    ("Thing/1", Method.Delete, null),
+                    true,
                     HttpStatusCode.OK
                 );
         }
@@ -45,7 +46,7 @@ public partial class RESTDeleteTests : StepTestBase<RESTDelete, Unit>
                 )
             ).SetupHTTPError(
                 "http://www.abc.com",
-                ("Thing/1", Method.DELETE, null),
+                ("Thing/1", Method.Delete, null),
                 HttpStatusCode.Forbidden,
                 "Test Forbidden",
                 "Test Error"

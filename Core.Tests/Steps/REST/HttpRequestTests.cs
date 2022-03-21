@@ -1,5 +1,7 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using Reductech.Sequence.Core.Steps.REST;
+using Reductech.Sequence.Core.TestHarness.Rest;
 
 namespace Reductech.Sequence.Core.Tests.Steps.REST;
 
@@ -25,18 +27,22 @@ public partial class HttpRequestTests : StepTestBase<HttpRequest, StringStream>
         }
     }
 
-    private record DownloadSetup(string Uri, string Data) : IRestSetup
+    private record DownloadSetup(string BaseUri, string Data) : IRestSetup
     {
         /// <inheritdoc />
         public void SetupClient(Mock<IRestClient> client)
         {
             var byteArray = Encoding.ASCII.GetBytes(Data);
-
-            client.SetupSet(x => x.BaseUrl = new Uri("http://www.abc.com/Thing/1"));
+            var stream    = new MemoryStream(byteArray);
 
             client
-                .Setup(x => x.DownloadData(It.Is<IRestRequest>(req => req.Method == Method.GET)))
-                .Returns(byteArray);
+                .Setup(
+                    x => x.DownloadStreamAsync(
+                        It.Is<RestRequest>(req => req.Method == Method.Get),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(stream);
         }
     }
 }

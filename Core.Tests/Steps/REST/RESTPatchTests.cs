@@ -22,7 +22,8 @@ public partial class RESTPatchTests : StepTestBase<RESTPatch, Unit>
                 )
                 .SetupHTTPSuccess(
                     "http://www.abc.com",
-                    ("Thing/1", Method.PATCH, "{\"a\":123}"),
+                    ("Thing/1", Method.Patch, "{\"a\":123}"),
+                    true,
                     HttpStatusCode.OK
                 );
         }

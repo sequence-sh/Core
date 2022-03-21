@@ -10,12 +10,12 @@ public sealed class RESTPost : RESTStep<StringStream>
         new SimpleStepFactory<RESTPost, StringStream>();
 
     /// <inheritdoc />
-    public override Method Method => Method.POST;
+    public override Method Method => Method.Post;
 
     /// <inheritdoc />
-    protected override Task<Result<IRestRequest, IError>> SetRequestBody(
+    protected override Task<Result<RestRequest, IError>> SetRequestBody(
         IStateMonad stateMonad,
-        IRestRequest restRequest,
+        RestRequest restRequest,
         CancellationToken cancellationToken)
     {
         return SetRequestJSONBody(stateMonad, restRequest, Entity, cancellationToken);

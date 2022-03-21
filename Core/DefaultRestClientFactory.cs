@@ -1,4 +1,6 @@
-﻿namespace Reductech.Sequence.Core;
+﻿using RestSharp.Serializers.Json;
+
+namespace Reductech.Sequence.Core;
 
 /// <summary>
 /// Uses a standard REST client
@@ -21,6 +23,6 @@ public class DefaultRestClientFactory : IRestClientFactory
             new JsonSerializerOptions() { PropertyNameCaseInsensitive = false }
         );
 
-        return client;
+        return new DefaultRestClient(client);
     }
 }
