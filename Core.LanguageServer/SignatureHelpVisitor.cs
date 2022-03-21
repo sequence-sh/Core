@@ -120,7 +120,10 @@ public class SignatureHelpVisitor : SCLBaseVisitor<SignatureHelpResponse?>
 
     private static SignatureHelpResponse StepParametersSignatureHelp(IStepFactory stepFactory)
     {
-        var documentation = Helpers.GetMarkDownDocumentation(stepFactory);
+        var documentation = Helpers.GetMarkDownDocumentation(
+            stepFactory,
+            Helpers.DocumentationRootUrl
+        );
 
         var parameters =
             stepFactory.ParameterDictionary.Keys

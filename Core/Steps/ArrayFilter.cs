@@ -104,7 +104,7 @@ public sealed class ArrayFilter<T> : CompoundStep<Array<T>> where T : ISCLObject
         public override Type StepType => typeof(ArrayFilter<>);
 
         /// <inheritdoc />
-        public override string OutputTypeExplanation => "Array of T";
+        public override string OutputTypeExplanation => "`Array<T>`";
 
         protected override string LambdaPropertyName => nameof(ArrayFilter<ISCLObject>.Predicate);
     }

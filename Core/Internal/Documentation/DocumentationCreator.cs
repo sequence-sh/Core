@@ -4,6 +4,15 @@ using Namotion.Reflection;
 namespace Reductech.Sequence.Core.Internal.Documentation;
 
 /// <summary>
+/// Options for creating documentation
+/// </summary>
+public record DocumentationOptions(
+    string RootUrl = "",
+    bool IncludeExtensionsInLinks = true,
+    bool IncludeSequenceUrl = false,
+    bool IncludeExamples = true);
+
+/// <summary>
 /// Contains helper methods for creating documentation
 /// </summary>
 public static class DocumentationCreator
@@ -12,7 +21,9 @@ public static class DocumentationCreator
     /// Creates documentation for a list of entities
     /// </summary>
     public static
-        DocumentationCreationResult CreateDocumentation(IEnumerable<IDocumentedStep> entities)
+        DocumentationCreationResult CreateDocumentation(
+            IEnumerable<IDocumentedStep> entities,
+            DocumentationOptions options)
     {
         var enumTypes = new HashSet<Type>();
 
@@ -30,8 +41,8 @@ public static class DocumentationCreator
                 .Select(
                     x => new[]
                     {
-                        $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})",
-                        x.DocumentationCategory, x.Summary
+                        FormatLink(x.Name, $"{x.DocumentationCategory}/{x.FileName}", options),
+                        x.DocumentationCategory, Escape(x.Summary)
                     }
                 )
                 .ToList();
@@ -67,7 +78,12 @@ public static class DocumentationCreator
                     .Select(
                         x => new[]
                         {
-                            $"[{x.Name}]({x.DocumentationCategory}/{x.FileName})", x.Summary
+                            FormatLink(
+                                x.Name,
+                                $"{x.DocumentationCategory}/{x.FileName}",
+                                options
+                            ),
+                            Escape(x.Summary)
                         }
                     )
                     .ToList();
@@ -98,7 +114,7 @@ public static class DocumentationCreator
                         .SelectMany(GetEnumTypes)
                 );
 
-                var stepPage = GetStepPage(doc);
+                var stepPage = GetStepPage(doc, options);
                 stepPages.Add(stepPage);
             }
 
@@ -148,7 +164,7 @@ public static class DocumentationCreator
     /// <summary>
     /// Gets the documentation page for a step
     /// </summary>
-    public static StepPage GetStepPage(IDocumentedStep doc)
+    public static StepPage GetStepPage(IDocumentedStep doc, DocumentationOptions options)
     {
         var sb = new StringBuilder();
 
@@ -158,6 +174,11 @@ public static class DocumentationCreator
 
         sb.AppendLine($"_Alias_:{aliases}");
         sb.AppendLine();
+
+        if (options.IncludeSequenceUrl)
+            sb.AppendLine(
+                $"[Documentation]({options.RootUrl.TrimEnd('/')}/{doc.DocumentationCategory}/{doc.FileName})"
+            );
 
         if (!string.IsNullOrWhiteSpace(doc.TypeDetails))
         {
@@ -214,6 +235,9 @@ public static class DocumentationCreator
             );
 
             var parameterRows = doc.Parameters
+                .OrderBy(x => x.Order is null)
+                .ThenBy(x => x.Order)
+                .ThenBy(x => x.Name)
                 .Select(
                     rp =>
 
@@ -226,7 +250,7 @@ public static class DocumentationCreator
                         var r = new List<string?>
                         {
                             nameString,
-                            TypeNameHelper.GetMarkupTypeName(rp.ActualType),
+                            TypeNameHelper.GetMarkupTypeName(rp.ActualType, options),
                             rp.Required ? "✔" : "",
                             rp.Order?.ToString() ?? ""
                         };
@@ -253,67 +277,55 @@ public static class DocumentationCreator
             Prettifier.CreateMarkdownTable(parameterHeaders, parameterRows, sb);
         }
 
-        if (doc.Examples.Any())
+        if (doc.Examples.Any() && options.IncludeExamples)
         {
-            sb.AppendLine();
+            sb.AppendLine("## Examples");
 
-            var showDescription    = doc.Examples.Any(x => x.Description is not null);
-            var showExpectedOutput = doc.Examples.Any(x => x.ExpectedOutput is not null);
-
-            var showExpectedLoggedValues =
-                doc.Examples.Any(x => x.ExpectedLogs is not null && x.ExpectedLogs.Any());
-
-            var exampleHeaders = new List<Prettifier.Cell>
+            for (var index = 0; index < doc.Examples.Count; index++)
             {
-                Prettifier.Cell.Create("Example SCL", Prettifier.Alignment.LeftJustified),
-            };
+                var docExample = doc.Examples[index];
 
-            if (showDescription)
-                exampleHeaders.Add(
-                    Prettifier.Cell.Create("Description", Prettifier.Alignment.Centre)
-                );
+                if (doc.Examples.Count > 1)
+                    sb.AppendLine($"### Example {index + 1}");
 
-            if (showExpectedOutput)
-                exampleHeaders.Add(
-                    Prettifier.Cell.Create("Expected Output", Prettifier.Alignment.Centre)
-                );
+                if (!string.IsNullOrWhiteSpace(docExample.Description))
+                    sb.AppendLine(docExample.Description);
 
-            if (showExpectedLoggedValues)
-                exampleHeaders.Add(
-                    Prettifier.Cell.Create("Expected Logged Values", Prettifier.Alignment.Centre)
-                );
+                sb.AppendLine($"#### SCL");
+                sb.AppendLine("```scl");
+                sb.AppendLine(docExample.SCL);
+                sb.AppendLine("```");
 
-            var exampleRows = doc.Examples.Select(
-                    x =>
+                if (docExample.ExpectedLogs is not null)
+                {
+                    if (docExample.ExpectedLogs.Any())
                     {
-                        var list = new List<string>() { Escape(x.SCL) };
+                        sb.AppendLine($"#### Expected Logs");
+                        sb.AppendLine("```");
 
-                        if (showDescription)
-                            list.Add(Escape(x.Description ?? ""));
+                        foreach (var log in docExample.ExpectedLogs)
+                        {
+                            sb.AppendLine(log);
+                        }
 
-                        if (showExpectedOutput)
-                            list.Add(Escape(x.ExpectedOutput ?? ""));
-
-                        if (showExpectedLoggedValues)
-                            list.Add(
-                                x.ExpectedLogs is null
-                                    ? ""
-                                    : string.Join(
-                                        "\r\n",
-                                        x.ExpectedLogs.Select(Escape)
-                                    )
-                            );
-
-                        return list;
+                        sb.AppendLine("```");
                     }
-                )
-                .ToList();
+                }
 
-            Prettifier.CreateMarkdownTable(exampleHeaders, exampleRows, sb);
+                if (docExample.ExpectedOutput is not null)
+                {
+                    sb.AppendLine($"#### Expected Output");
+                    sb.AppendLine("```scl");
+
+                    sb.AppendLine(docExample.ExpectedOutput);
+
+                    sb.AppendLine("```");
+                }
+            }
         }
 
         var stepPage = new StepPage(
-            doc.FileName,
+            doc.FileName + ".md",
             doc.Name,
             sb.ToString().Trim(),
             doc.DocumentationCategory,
@@ -373,5 +385,11 @@ public static class DocumentationCreator
 
             return v;
         }
+    }
+
+    private static string FormatLink(string linkText, string url, DocumentationOptions options)
+    {
+        return
+            $"[{linkText}]({options.RootUrl.TrimEnd('/')}/{url}{(options.IncludeExtensionsInLinks ? ".md" : "")})";
     }
 }

@@ -8,15 +8,24 @@ public static class TypeNameHelper
     /// <summary>
     /// Gets the name of a type as it should appear in markup (possibly containing a link to the documentation)
     /// </summary>
-    /// <param name="t"></param>
-    /// <returns></returns>
-    public static string GetMarkupTypeName(Type t)
+    public static string GetMarkupTypeName(Type t, DocumentationOptions options)
     {
         if (TypeAliases.TryGetValue(t, out var name))
             return $"`{name}`";
 
         if (!t.IsSignatureType && t.IsEnum)
-            return $"[{t.Name}](../Enums/{t.Name}.md)";
+        {
+            var extension = options.IncludeExtensionsInLinks ? ".md" : "";
+
+            if (string.IsNullOrWhiteSpace(options.RootUrl))
+            {
+                return $"[{t.Name}](../Enums/{t.Name}{extension})";
+            }
+            else
+            {
+                return $"[{t.Name}]({options.RootUrl.TrimEnd('/')}/Enums/{t.Name}{extension})";
+            }
+        }
 
         if (!t.IsGenericType)
             return $"`{t.Name}`";
@@ -28,14 +37,33 @@ public static class TypeNameHelper
             if (underlyingType == null)
                 return t.Name;
 
-            return GetMarkupTypeName(underlyingType) + "?";
+            return GetMarkupTypeName(underlyingType, options) + "?";
         }
 
         var typeName = t.Name.Split("`")[0];
 
-        var arguments = $"<{string.Join(",", t.GetGenericArguments().Select(GetMarkupTypeName))}>";
+        var arguments = t.GetGenericArguments().Select(x => GetMarkupTypeName(x, options)).ToList();
+        var argumentsAreBackticked = arguments.All(x => x.StartsWith('`') && x.EndsWith('`'));
 
-        return typeName + arguments;
+        switch (typeName)
+        {
+            case "SCLOneOf": return string.Join(" or ", arguments);
+            case "SCLEnum":  return arguments.Single();
+            case "Array" when argumentsAreBackticked:
+            {
+                var argumentsString =
+                    $"<{string.Join(", ", arguments.Select(x => x.Trim('`')))}>";
+
+                return $"`array{argumentsString}`";
+            }
+            default:
+            {
+                var argumentsString =
+                    $"<{string.Join(", ", arguments)}>";
+
+                return typeName + argumentsString;
+            }
+        }
     }
 
     /// <summary>
@@ -93,6 +121,40 @@ public static class TypeNameHelper
             { typeof(StringStream), "string" },
             { typeof(Entity), "entity" },
             { typeof(DateTime), "dateTime" },
-            { typeof(void), "void" }
+            { typeof(void), "unit" },
+            { typeof(SCLBool), "bool" },
+            { typeof(SCLInt), "int" },
+            { typeof(SCLDouble), "double" },
+            { typeof(SCLDateTime), "dateTime" },
+            { typeof(SCLNull), "null" },
+            { typeof(Unit), "unit" },
         };
+
+    /// <summary>
+    /// Get a human readable type description for a step factory
+    /// </summary>
+    public static string GetHumanReadableTypeDescription(this IStepFactory stepFactory)
+    {
+        if (TypeAliasesByString.TryGetValue(stepFactory.OutputTypeExplanation, out var s))
+            return $"`{s}`";
+
+        return stepFactory.OutputTypeExplanation;
+    }
+
+    /// <summary>
+    /// Get a human readable type description for a step parameter
+    /// </summary>
+    public static string GetHumanReadableTypeDescription(this IStepParameter stepParameter)
+    {
+        if (TypeAliases.TryGetValue(stepParameter.ActualType, out var v))
+            return v;
+
+        return "`" + stepParameter.ActualType.Name + "`";
+    }
+
+    /// <summary>
+    /// Gets the human readable type name for the output type of a step
+    /// </summary>
+    public static readonly Dictionary<string, string> TypeAliasesByString =
+        TypeAliases.ToDictionary(x => x.Key.Name, x => x.Value);
 }

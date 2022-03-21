@@ -6,6 +6,17 @@
 public static class Helpers
 {
     /// <summary>
+    /// Root url of the Reductech Documentation Website
+    /// </summary>
+    public const string DocumentationRootUrl = "https://sequence.sh/steps/";
+
+    /// <summary>
+    /// The documentation options
+    /// </summary>
+    public static readonly DocumentationOptions DefaultDocumentationOptions =
+        new(DocumentationRootUrl, false, true, false);
+
+    /// <summary>
     /// Does this token contain this position
     /// </summary>
     public static bool ContainsPosition(this IToken token, LinePosition position)
@@ -287,6 +298,9 @@ public static class Helpers
         );
     }
 
+    /// <summary>
+    /// Convert a test position to a line position
+    /// </summary>
     public static LinePosition ToLinePosition(this TextPosition textPosition)
     {
         return new LinePosition(textPosition.Line, textPosition.Column);
@@ -332,24 +346,26 @@ public static class Helpers
     /// <summary>
     /// Get the documentation of the step
     /// </summary>
-    public static string GetMarkDownDocumentation(IStepFactory stepFactory)
+    public static string GetMarkDownDocumentation(IStepFactory stepFactory, string rootUrl)
     {
         var grouping = new[] { stepFactory }
             .GroupBy(x => x, x => x.TypeName)
             .Single();
 
-        return GetMarkDownDocumentation(grouping);
+        return GetMarkDownDocumentation(grouping, rootUrl);
     }
 
     /// <summary>
     /// Get the documentation of the step
     /// </summary>
-    public static string GetMarkDownDocumentation(IGrouping<IStepFactory, string> stepFactoryGroup)
+    public static string GetMarkDownDocumentation(
+        IGrouping<IStepFactory, string> stepFactoryGroup,
+        string rootUrl)
     {
         try
         {
             var stepWrapper = new StepWrapper(stepFactoryGroup);
-            var text        = DocumentationCreator.GetStepPage(stepWrapper);
+            var text = DocumentationCreator.GetStepPage(stepWrapper, DefaultDocumentationOptions);
 
             return text.FileText;
         }

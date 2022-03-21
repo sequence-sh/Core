@@ -15,12 +15,12 @@ public class QuickInfoTest
 ";
 
     [Theory]
-    [InlineData("Print 123", 0, 1, "`Print`", "`Unit`", "Prints a value to the console.")]
-    [InlineData("Print True", 0, 7, "`True`", "`SCLBool`")]
+    [InlineData("Print 123", 0, 1, "`Print`", "`unit`", "Prints a value to the console.")]
+    [InlineData("Print True", 0, 7, "`True`", "`bool`")]
     [InlineData("Print .", 0, 7, "Syntax Error: no viable alternative at input 'Print .'")]
-    [InlineData("Print 1990-01-06", 0, 7, "`1990-01-06`", "`SCLDateTime`")]
-    [InlineData("Print 123", 0, 8, "`123`", "`SCLInt`")]
-    [InlineData("Print 123.45", 0, 8, "`123.45`", "`SCLDouble`")]
+    [InlineData("Print 1990-01-06", 0, 7, "`1990-01-06`", "`dateTime`")]
+    [InlineData("Print 123", 0, 8, "`123`", "`int`")]
+    [InlineData("Print 123.45", 0, 8, "`123.45`", "`double`")]
     [InlineData("Print TextCase.Fake", 0, 8, "'Fake' is not a member of enumeration 'TextCase'")]
     [InlineData("Print Fake.Enum", 0, 8, "'Fake' is not a valid enum type.")]
     [InlineData(
@@ -28,41 +28,41 @@ public class QuickInfoTest
         0,
         15,
         "`'abc'`",
-        "`StringStream`"
+        "`string`"
     )]
     [InlineData(
         "StringToCase string:'abc' Case: TextCase.Upper",
         0,
         28,
         "`Case`",
-        "`SCLEnum`1`",
+        "`TextCase`",
         "The case to change to."
     )]
-    [InlineData("Foreach [1,2,3] (<> => Print <>)", 0, 30, "`<>`", "Automatic Variable")]
+    [InlineData("Foreach [1,2,3] (<> => Print <>)", 0, 30, "`<>`", "`variable name`")]
     [InlineData(
         "print TextCase.Upper",
         0,
         8,
         "`Upper`",
-        "`TextCase`",
+        "TextCase",
         "The case to convert the text to."
     )]
-    [InlineData("1  +  2", 0, 2, "`Sum`", "`SCLInt`", "Calculate the sum of a list of integers")]
-    [InlineData("<a> = 1", 0, 5, "`SetVariable`", "`Unit`", "Sets the value of a named variable.")]
-    [InlineData("Print <a>", 0, 7, "`<a>`", "`Any`")]
+    [InlineData("1  +  2", 0, 2, "`Sum`", "`int`", "Calculate the sum of a list of integers")]
+    [InlineData("<a> = 1", 0, 5, "`SetVariable`", "`unit`", "Sets the value of a named variable.")]
+    [InlineData("Print <a>", 0, 7, "`<a>`", "`any`")]
     [InlineData(
         "- <a> = 1\r\n- Print <a>",
         1,
         10,
         "`<a>`",
-        "`SCLInt`"
+        "`int`"
     )]
     [InlineData(
         "Print [1,2,3]",
         0,
         6,
         "`ArrayNew`",
-        "`Array<SCLInt>`",
+        "`array<int>`",
         "Represents an ordered collection of objects."
     )]
     [InlineData(
@@ -70,19 +70,19 @@ public class QuickInfoTest
         0,
         4,
         "`Print`",
-        "`Unit`",
+        "`unit`",
         "Prints a value to the console."
     )]
     [InlineData("- a .", 0, 3, "Syntax Error: no viable alternative at input '- a .'")]
     //[InlineData("- Print 123\r\n- a b", 1 ,1, "Syntax Error: no viable alternative at input '- a b'" )]
-    [InlineData("- <val> = 123\r\n- print <val>", 1, 9,  "`<val>`",           "`SCLInt`")]
-    [InlineData(LongText,                         0, 12, "`'Blake, Robert'`", "`StringStream`")]
+    [InlineData("- <val> = 123\r\n- print <val>", 1, 9,  "`<val>`",           "`int`")]
+    [InlineData(LongText,                         0, 12, "`'Blake, Robert'`", "`string`")]
     [InlineData(
         LongText,
         1,
         3,
         "`ArrayFilter`",
-        "`Array of T`",
+        "`Array<T>`",
         "Filter an array or entity stream using a conditional statement"
     )]
     [InlineData(

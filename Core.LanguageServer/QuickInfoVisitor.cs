@@ -121,9 +121,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
                             {
                                 return Description(
                                     stepParameter.Name,
-                                    TypeNameHelper.GetHumanReadableTypeName(
-                                        stepParameter.ActualType
-                                    ),
+                                    stepParameter.GetHumanReadableTypeDescription(),
                                     stepParameter.Summary
                                 );
                             }
@@ -151,7 +149,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
                             if (nHover is null)
                                 return Description(
                                     stepParameter.Name,
-                                    stepParameter.ActualType.Name,
+                                    TypeReference.Create(stepParameter.ActualType),
                                     stepParameter.Summary
                                 );
 
@@ -167,7 +165,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
             return Description(
                 stepFactory.TypeName,
-                stepFactory.OutputTypeExplanation,
+                stepFactory.GetHumanReadableTypeDescription(),
                 summary
             );
         }
@@ -183,11 +181,11 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         var text = context.GetText();
 
-        var typeReference = int.TryParse(text, out var _)
+        var typeName = int.TryParse(text, out var _)
             ? TypeReference.Actual.Integer
             : TypeReference.Actual.Double;
 
-        return Description(text, typeReference.Name, null);
+        return Description(text, typeName, null);
     }
 
     /// <inheritdoc />
@@ -198,7 +196,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         return Description(
             context.GetText(),
-            TypeReference.Actual.Bool.Name,
+            TypeReference.Actual.Bool,
             null
         );
     }
@@ -219,7 +217,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         return Description(
             context.GetText(),
-            TypeReference.Actual.Entity.Name,
+            TypeReference.Actual.Entity,
             null
         );
     }
@@ -232,7 +230,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         return Description(
             context.GetText(),
-            TypeReference.Actual.Date.Name,
+            TypeReference.Actual.Date,
             null
         );
     }
@@ -263,7 +261,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         return Description(
             value.ToString(),
-            enumType.Name,
+            TypeNameHelper.GetHumanReadableTypeName(enumType),
             summary
         );
     }
@@ -277,8 +275,8 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         return Description(
             "<>",
-            null,
-            "Automatic Variable"
+            TypeReference.AutomaticVariable.Instance,
+            null
         );
     }
 
@@ -301,7 +299,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
         {
             return Description(
                 context.GetText(),
-                tr.Name,
+                tr,
                 null
             );
         }
@@ -333,7 +331,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         return Description(
             setVariable.TypeName,
-            setVariable.OutputTypeExplanation,
+            setVariable.GetHumanReadableTypeDescription(),
             setVariable.Summary
         );
     }
@@ -358,7 +356,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
         {
             return Description(
                 text,
-                tr.Name,
+                tr,
                 null
             );
         }
@@ -378,7 +376,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         return Description(
             context.GetText(),
-            TypeReference.Actual.String.Name,
+            TypeReference.Actual.String,
             null
         );
     }
@@ -454,7 +452,6 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     private static QuickInfoResponse Description(IStep step)
     {
         var     name = step.Name;
-        var     type = TypeNameHelper.GetHumanReadableTypeName(step.OutputType);
         string? description;
 
         if (step is ICompoundStep cs)
@@ -462,7 +459,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
         else
             description = null;
 
-        return Description(name, type, description);
+        return Description(name, TypeReference.Create(step.OutputType), description);
     }
 
     private static QuickInfoResponse Description(
@@ -476,12 +473,22 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
             strings.Add($"`{name}`");
 
         if (type is not null)
-            strings.Add($"`{type}`");
+            strings.Add($"{type}");
 
         if (summary is not null)
             strings.Add(summary);
 
         return new() { MarkdownStrings = strings };
+    }
+
+    private static QuickInfoResponse Description(
+        string? name,
+        TypeReference type,
+        string? summary)
+    {
+        var tName = type.HumanReadableTypeName;
+        tName = $"`{tName.Trim('`')}`";
+        return Description(name, tName, summary);
     }
 
     private static QuickInfoResponse Error(string message)

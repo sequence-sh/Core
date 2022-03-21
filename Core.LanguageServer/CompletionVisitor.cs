@@ -203,7 +203,10 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
 
         IEnumerable<CompletionItem> CreateCompletionItems(IGrouping<IStepFactory, string> factory)
         {
-            var documentation = Helpers.GetMarkDownDocumentation(factory);
+            var documentation = Helpers.GetMarkDownDocumentation(
+                factory,
+                Helpers.DocumentationRootUrl
+            );
 
             var first = true;
 
@@ -234,7 +237,10 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
             .Select(x => x.NAME().GetText())
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        var documentation = Helpers.GetMarkDownDocumentation(stepFactory);
+        var documentation = Helpers.GetMarkDownDocumentation(
+            stepFactory,
+            Helpers.DocumentationRootUrl
+        );
 
         var options =
             stepFactory.ParameterDictionary

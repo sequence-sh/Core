@@ -1,4 +1,6 @@
-﻿namespace Reductech.Sequence.Core.Internal;
+﻿using Reductech.Sequence.Core.Internal.Documentation;
+
+namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
 /// A reference to a type
@@ -23,6 +25,11 @@ public abstract record TypeReference
     /// Whether this allows the other type reference
     /// </summary>
     public abstract bool Allow(TypeReference other, TypeResolver? typeResolver);
+
+    /// <summary>
+    /// The name of the type in human readable form
+    /// </summary>
+    public abstract string HumanReadableTypeName { get; }
 
     /// <summary>
     /// Try to combine this type reference with another
@@ -114,6 +121,9 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override string Name => nameof(Any);
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName => "any";
     }
 
     /// <summary>
@@ -182,6 +192,10 @@ public abstract record TypeReference
             /// <inheritdoc />
             public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver) =>
                 typeof(T);
+
+            /// <inheritdoc />
+            public override string HumanReadableTypeName { get; } =
+                TypeNameHelper.GetHumanReadableTypeName(typeof(T));
         }
     }
 
@@ -220,6 +234,10 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override string Name => nameof(Unit);
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName { get; } =
+            TypeNameHelper.GetHumanReadableTypeName(typeof(Unit));
     }
 
     /// <summary>
@@ -248,6 +266,10 @@ public abstract record TypeReference
         public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
             TypeResolver typeResolver) =>
             ErrorCode.CannotInferType.ToErrorBuilder($"{EnumType.Name} is not an Array Type");
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName { get; } =
+            TypeNameHelper.GetHumanReadableTypeName(EnumType);
     }
 
     /// <summary>
@@ -336,6 +358,12 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override bool IsUnknown => Options.Any(x => x.IsUnknown);
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName { get; } = string.Join(
+            " or ",
+            Options.Select(x => x.HumanReadableTypeName)
+        );
     }
 
     /// <summary>
@@ -371,6 +399,9 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override string Name => "Dynamic";
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName { get; } = "dynamic";
     }
 
     /// <summary>
@@ -410,6 +441,17 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override bool IsUnknown => MemberType.IsUnknown;
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName
+        {
+            get
+            {
+                var member = MemberType.HumanReadableTypeName;
+
+                return $"`array<{member.Trim('`')}>`";
+            }
+        }
     }
 
     /// <summary>
@@ -460,6 +502,9 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override string Name => nameof(AutomaticVariable);
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName { get; } = "`variable name`";
     }
 
     /// <summary>
@@ -524,6 +569,9 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override string Name => VariableName.Serialize(SerializeOptions.Serialize);
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName { get; } = "`variable name`";
     }
 
     /// <summary>
@@ -564,6 +612,9 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override bool IsUnknown => true;
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName { get; } = "`unknown`";
     }
 
     /// <summary>
