@@ -22,7 +22,8 @@ public partial class RESTPostTests : StepTestBase<RESTPost, StringStream>
                 )
                 .SetupHTTPSuccess(
                     "http://www.abc.com",
-                    ("Thing/1", Method.POST, "{\"a\":123}"),
+                    ("Thing/1", Method.Post, "{\"a\":123}"),
+                    true,
                     HttpStatusCode.OK,
                     "12345"
                 );

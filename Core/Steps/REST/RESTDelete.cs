@@ -9,16 +9,16 @@ public sealed class RESTDelete : RESTStep<Unit>
     public override IStepFactory StepFactory { get; } = new SimpleStepFactory<RESTDelete, Unit>();
 
     /// <inheritdoc />
-    public override Method Method => Method.DELETE;
+    public override Method Method => Method.Delete;
 
     /// <inheritdoc />
-    protected override async Task<Result<IRestRequest, IError>> SetRequestBody(
+    protected override async Task<Result<RestRequest, IError>> SetRequestBody(
         IStateMonad stateMonad,
-        IRestRequest restRequest,
+        RestRequest restRequest,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        return Result.Success<IRestRequest, IError>(restRequest);
+        return Result.Success<RestRequest, IError>(restRequest);
     }
 
     /// <inheritdoc />

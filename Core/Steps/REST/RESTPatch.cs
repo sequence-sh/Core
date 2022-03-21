@@ -9,12 +9,12 @@ public sealed class RESTPatch : RESTStep<Unit>
     public override IStepFactory StepFactory { get; } = new SimpleStepFactory<RESTPatch, Unit>();
 
     /// <inheritdoc />
-    public override Method Method => Method.PATCH;
+    public override Method Method => Method.Patch;
 
     /// <inheritdoc />
-    protected override Task<Result<IRestRequest, IError>> SetRequestBody(
+    protected override Task<Result<RestRequest, IError>> SetRequestBody(
         IStateMonad stateMonad,
-        IRestRequest restRequest,
+        RestRequest restRequest,
         CancellationToken cancellationToken)
     {
         return SetRequestJSONBody(stateMonad, restRequest, Entity, cancellationToken);

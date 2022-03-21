@@ -10,16 +10,16 @@ public sealed class RESTGetStream : RESTStep<StringStream>
         new SimpleStepFactory<RESTGetStream, StringStream>();
 
     /// <inheritdoc />
-    public override Method Method => Method.GET;
+    public override Method Method => Method.Get;
 
     /// <inheritdoc />
-    protected override async Task<Result<IRestRequest, IError>> SetRequestBody(
+    protected override async Task<Result<RestRequest, IError>> SetRequestBody(
         IStateMonad stateMonad,
-        IRestRequest restRequest,
+        RestRequest restRequest,
         CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
-        return Result.Success<IRestRequest, IError>(restRequest);
+        return Result.Success<RestRequest, IError>(restRequest);
     }
 
     /// <inheritdoc />

@@ -1,4 +1,5 @@
 ﻿using MELT;
+using Reductech.Sequence.Core.TestHarness.Rest;
 
 namespace Reductech.Sequence.Core.Tests;
 
@@ -28,8 +29,7 @@ public partial class DeserializationTests
             loggerFactory.AddXunit(testOutputHelper);
             var repository = new MockRepository(MockBehavior.Strict);
 
-            var restClient        = RESTClientSetupHelper.GetRESTClient(repository, FinalChecks);
-            var restClientFactory = new SingleRestClientFactory(restClient);
+            var restClientFactory = RESTClientSetupHelper.GetRESTClientFactory(repository);
 
             var externalContext =
                 ExternalContextSetupHelper.GetExternalContext(repository, restClientFactory);

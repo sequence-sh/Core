@@ -8,7 +8,7 @@ public static class RestHelpers
     /// <summary>
     /// Add entity properties as headers to this request
     /// </summary>
-    public static IRestRequest AddHeaders(this IRestRequest request, Entity entity)
+    public static RestRequest AddHeaders(this RestRequest request, Entity entity)
     {
         foreach (var (name, sclObject, _) in entity.Dictionary.Values)
         {
@@ -25,11 +25,11 @@ public static class RestHelpers
     /// Execute this request. Returns an error if it fails
     /// </summary>
     public static async Task<Result<string, IErrorBuilder>> TryRun(
-        this IRestRequest request,
+        this RestRequest request,
         IRestClient client,
         CancellationToken cancellationToken)
     {
-        IRestResponse response;
+        RestResponse response;
 
         try
         {
@@ -41,9 +41,13 @@ public static class RestHelpers
         }
 
         if (response.IsSuccessful)
-            return response.Content;
+            return response.Content ?? "";
 
         return ErrorCode.RequestFailed
-            .ToErrorBuilder(response.StatusCode, response.StatusDescription, response.ErrorMessage);
+            .ToErrorBuilder(
+                response.StatusCode,
+                response.StatusDescription ?? "",
+                response.ErrorMessage ?? ""
+            );
     }
 }

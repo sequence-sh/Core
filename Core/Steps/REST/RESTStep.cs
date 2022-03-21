@@ -27,7 +27,7 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput> where TOutput : 
 
         var (baseUrl, relativeUrl, headers) = stuff.Value;
 
-        IRestRequest request = new RestRequest(relativeUrl, Method);
+        var request = new RestRequest(relativeUrl, Method);
 
         if (headers.HasValue)
             request = request.AddHeaders(headers.GetValueOrThrow());
@@ -55,9 +55,9 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput> where TOutput : 
     /// <summary>
     /// Sets the Request Body
     /// </summary>
-    protected abstract Task<Result<IRestRequest, IError>> SetRequestBody(
+    protected abstract Task<Result<RestRequest, IError>> SetRequestBody(
         IStateMonad stateMonad,
-        IRestRequest restRequest,
+        RestRequest restRequest,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -89,23 +89,23 @@ public abstract class RESTStep<TOutput> : CompoundStep<TOutput> where TOutput : 
     /// <summary>
     /// Sets the JSON body of the REST request
     /// </summary>
-    protected static async Task<Result<IRestRequest, IError>> SetRequestJSONBody(
+    protected static async Task<Result<RestRequest, IError>> SetRequestJSONBody(
         IStateMonad stateMonad,
-        IRestRequest restRequest,
+        RestRequest restRequest,
         IStep<Entity> entityStep,
         CancellationToken cancellationToken)
     {
         var r = await stateMonad.RunStepsAsync(entityStep, cancellationToken);
 
         if (r.IsFailure)
-            return r.ConvertFailure<IRestRequest>();
+            return r.ConvertFailure<RestRequest>();
 
         var serializedObject = JsonSerializer
             .Serialize(r.Value);
 
         restRequest = restRequest.AddJsonBody(serializedObject);
 
-        return Result.Success<IRestRequest, IError>(restRequest);
+        return Result.Success<RestRequest, IError>(restRequest);
     }
 
     /// <summary>

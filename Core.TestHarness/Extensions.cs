@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Reductech.Sequence.Core.ExternalProcesses;
+using Reductech.Sequence.Core.TestHarness.Rest;
 
 namespace Reductech.Sequence.Core.TestHarness;
 
@@ -37,18 +38,18 @@ public static class Extensions
     }
 
     public static bool CheckRequest(
-        this IRestRequest request,
+        this RestRequest request,
         (string resource, Method method, object? body) expected)
     {
         if (request.Method != expected.method)
             return false;
 
-        var realURl = request.GetRealResource();
+        var realURl = request.GetFullResource();
 
         if (realURl != expected.resource)
             return false;
 
-        var realBody = request.GetRealBody();
+        var realBody = request.GetRequestBody();
 
         if (!Equals(realBody, expected.body))
             return false;
@@ -56,7 +57,7 @@ public static class Extensions
         return true;
     }
 
-    public static string GetRealResource(this IRestRequest request)
+    public static string GetFullResource(this RestRequest request)
     {
         var resource = request.Resource;
 
@@ -71,11 +72,8 @@ public static class Extensions
         return result;
     }
 
-    public static object? GetRealBody(this IRestRequest request)
+    public static object? GetRequestBody(this RestRequest request)
     {
-        if (request.Body is not null)
-            return request.Body.Value;
-
         foreach (var parameter in
                  request.Parameters.Where(x => x.Type == ParameterType.RequestBody))
         {
@@ -116,10 +114,11 @@ public static class Extensions
     /// </summary>
     public static T SetupHTTPSuccess<T>(
         this T stepCase,
-        string? baseUri,
+        string baseUri,
         (string resource,
             Method method,
             object? body) request,
+        bool responseSuccess,
         HttpStatusCode responseStatusCode,
         string responseContent = "")
         where T : ICaseWithSetup
@@ -130,6 +129,7 @@ public static class Extensions
             ContentLength  = responseContent.Length,
             ResponseStatus = ResponseStatus.Completed,
             StatusCode     = responseStatusCode,
+            IsSuccessful   = responseSuccess
         };
 
         stepCase.RESTClientSetupHelper.AddHttpTestAction(
@@ -148,7 +148,7 @@ public static class Extensions
     /// </summary>
     public static T SetupHTTPError<T>(
         this T stepCase,
-        string? baseUri,
+        string baseUri,
         (string resource,
             Method method,
             object? body) request,

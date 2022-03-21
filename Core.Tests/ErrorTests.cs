@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
+using Reductech.Sequence.Core.TestHarness.Rest;
 
 namespace Reductech.Sequence.Core.Tests;
 
@@ -135,8 +136,7 @@ public partial class RunErrorTests
             var spf  = StepFactoryStore.Create();
             var repo = new MockRepository(MockBehavior.Strict);
 
-            var restClient        = RESTClientSetupHelper.GetRESTClient(repo, FinalChecks);
-            var restClientFactory = new SingleRestClientFactory(restClient);
+            var restClientFactory = RESTClientSetupHelper.GetRESTClientFactory(repo);
 
             var externalContext =
                 ExternalContextSetupHelper.GetExternalContext(repo, restClientFactory);

@@ -22,7 +22,8 @@ public partial class RESTPutTests : StepTestBase<RESTPut, Unit>
                 )
                 .SetupHTTPSuccess(
                     "http://www.abc.com",
-                    ("Thing/1", Method.PUT, "{\"a\":123}"),
+                    ("Thing/1", Method.Put, "{\"a\":123}"),
+                    true,
                     HttpStatusCode.OK
                 );
         }
