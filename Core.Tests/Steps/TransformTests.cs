@@ -113,6 +113,49 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
             );
 
             yield return CreateCase(
+                "Transform Int to Double",
+                new List<Entity>() { Entity.Create(("Foo", 123)) },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyNumber))
+                    .Build(),
+                _ => { },
+                "('Foo': 123)"
+            );
+
+            yield return CreateCase(
+                "Transform Double to Int",
+                new List<Entity>() { Entity.Create(("Foo", 123.0)) },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyInt))
+                    .Build(),
+                _ => { },
+                "('Foo': 123)"
+            );
+
+            yield return CreateCase(
+                "Transform Double to Int with rounding",
+                new List<Entity>()
+                {
+                    Entity.Create(("Foo", 123.04)),
+                    Entity.Create(("Foo", 123.95)),
+                    Entity.Create(("Foo", "345.96")),
+                },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyInt))
+                    .Build(),
+                t => { t.RoundingPrecision = Constant(0.1); },
+                "('Foo': 123)",
+                "('Foo': 124)",
+                "('Foo': 346)"
+            );
+
+            yield return CreateCase(
                 "Transform DateTime",
                 new List<Entity> { Entity.Create(("Bar", new DateTime(1990, 1, 6))) },
                 new JsonSchemaBuilder()
@@ -238,6 +281,30 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                 ErrorCode.SchemaViolation,
                 "Should be DateTime",
                 ".Bar"
+            );
+
+            yield return CreateCase(
+                "Cannot round double",
+                new List<Entity> { Entity.Create(("Foo", 9.1)) },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyInt)),
+                ErrorCode.SchemaViolation,
+                "Too far from the nearest Integer",
+                ".Foo"
+            );
+
+            yield return CreateCase(
+                "Cannot round inside string",
+                new List<Entity> { Entity.Create(("Foo", "9.1")) },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyInt)),
+                ErrorCode.SchemaViolation,
+                "Too far from the nearest Integer",
+                ".Foo"
             );
 
             foreach (var baseErrorCase in base.ErrorCases)

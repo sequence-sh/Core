@@ -43,10 +43,38 @@ public record IntegerNode(
             return Maybe<ISCLObject>.None; // No change
         }
 
-        var v = value.Serialize(SerializeOptions.Primitive);
+        int i;
 
-        if (!int.TryParse(v, out var i))
-            return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Integer", propertyName);
+        if (value is SCLDouble evDouble)
+        {
+            i = (int)Math.Round(evDouble.Value);
+
+            if (Math.Abs(evDouble.Value - i) > transformSettings.RoundingPrecision)
+                return ErrorCode.SchemaViolation.ToErrorBuilder(
+                    "Too far from the nearest Integer",
+                    propertyName
+                );
+        }
+        else
+        {
+            var v = value.Serialize(SerializeOptions.Primitive);
+
+            if (int.TryParse(v, out i)) { }
+            else if (double.TryParse(v, out var d))
+            {
+                i = (int)Math.Round(d);
+
+                if (Math.Abs(d - i) > transformSettings.RoundingPrecision)
+                    return ErrorCode.SchemaViolation.ToErrorBuilder(
+                        "Too far from the nearest Integer",
+                        propertyName
+                    );
+            }
+            else
+            {
+                return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Integer", propertyName);
+            }
+        }
 
         var restrictionResult2 = Restrictions.Test(i, propertyName);
 

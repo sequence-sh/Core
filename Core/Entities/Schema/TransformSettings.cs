@@ -10,4 +10,5 @@ public record TransformSettings(
     Formatter NullFormatter,
     Formatter MultiValueFormatter,
     bool CaseSensitive,
-    Maybe<bool> RemoveExtra) { }
+    double RoundingPrecision,
+    Maybe<bool> RemoveExtra);
