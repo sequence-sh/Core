@@ -113,6 +113,49 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
             );
 
             yield return CreateCase(
+                "Transform Int to Double",
+                new List<Entity>() { Entity.Create(("Foo", 123)) },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyNumber))
+                    .Build(),
+                _ => { },
+                "('Foo': 123)"
+            );
+
+            yield return CreateCase(
+                "Transform Double to Int",
+                new List<Entity>() { Entity.Create(("Foo", 123.0)) },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyInt))
+                    .Build(),
+                _ => { },
+                "('Foo': 123)"
+            );
+
+            yield return CreateCase(
+                "Transform Double to Int with rounding",
+                new List<Entity>()
+                {
+                    Entity.Create(("Foo", 123.4)),
+                    Entity.Create(("Foo", 123.5)),
+                    Entity.Create(("Foo", "345.6")),
+                },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyInt))
+                    .Build(),
+                t => { t.AllowRounding = Constant(true); },
+                "('Foo': 123)",
+                "('Foo': 124)",
+                "('Foo': 346)"
+            );
+
+            yield return CreateCase(
                 "Transform DateTime",
                 new List<Entity> { Entity.Create(("Bar", new DateTime(1990, 1, 6))) },
                 new JsonSchemaBuilder()

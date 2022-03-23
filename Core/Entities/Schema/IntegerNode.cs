@@ -43,10 +43,26 @@ public record IntegerNode(
             return Maybe<ISCLObject>.None; // No change
         }
 
-        var v = value.Serialize(SerializeOptions.Primitive);
+        int i;
 
-        if (!int.TryParse(v, out var i))
-            return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Integer", propertyName);
+        if (transformSettings.AllowRounding && value is SCLDouble evDouble)
+        {
+            i = (int)Math.Round(evDouble.Value);
+        }
+        else
+        {
+            var v = value.Serialize(SerializeOptions.Primitive);
+
+            if (int.TryParse(v, out i)) { }
+            else if (transformSettings.AllowRounding && double.TryParse(v, out var d))
+            {
+                i = (int)Math.Round(d);
+            }
+            else
+            {
+                return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Integer", propertyName);
+            }
+        }
 
         var restrictionResult2 = Restrictions.Test(i, propertyName);
 

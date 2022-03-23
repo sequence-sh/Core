@@ -10,4 +10,5 @@ public record TransformSettings(
     Formatter NullFormatter,
     Formatter MultiValueFormatter,
     bool CaseSensitive,
-    Maybe<bool> RemoveExtra) { }
+    bool AllowRounding,
+    Maybe<bool> RemoveExtra);

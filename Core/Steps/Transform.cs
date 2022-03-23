@@ -37,6 +37,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             NullFormats.WrapNullable(inputFormatMap),
             ArrayDelimiters.WrapNullable(inputFormatMap),
             CaseSensitive,
+            AllowRounding,
             RemoveExtraProperties.WrapNullable(),
             cancellationToken
         );
@@ -53,6 +54,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             nullFormats,
             delimiters,
             caseSensitive,
+            allowRounding,
             removeExtraMaybe) = stepsResult.Value;
 
         var topNode = SchemaNode.Create(schema);
@@ -64,6 +66,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             Formatter.Create(nullFormats),
             Formatter.Create(delimiters),
             caseSensitive.Value,
+            allowRounding.Value,
             removeExtraMaybe.Map(x => x.Value)
         );
 
@@ -273,6 +276,13 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     [StepProperty]
     [DefaultValueExplanation("False")]
     public IStep<SCLBool> CaseSensitive { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
+
+    /// <summary>
+    /// Whether doubles can be rounded to integers
+    /// </summary>
+    [StepProperty]
+    [DefaultValueExplanation("False")]
+    public IStep<SCLBool> AllowRounding { get; set; } = new SCLConstant<SCLBool>(SCLBool.False);
 
     /// <summary>
     /// Whether additional properties outside the schema should be removed
