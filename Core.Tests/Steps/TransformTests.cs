@@ -140,16 +140,16 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                 "Transform Double to Int with rounding",
                 new List<Entity>()
                 {
-                    Entity.Create(("Foo", 123.4)),
-                    Entity.Create(("Foo", 123.5)),
-                    Entity.Create(("Foo", "345.6")),
+                    Entity.Create(("Foo", 123.04)),
+                    Entity.Create(("Foo", 123.95)),
+                    Entity.Create(("Foo", "345.96")),
                 },
                 new JsonSchemaBuilder()
                     .Title(SchemaName)
                     .AdditionalItems(false)
                     .Properties(("Foo", AnyInt))
                     .Build(),
-                t => { t.AllowRounding = Constant(true); },
+                t => { t.RoundingPrecision = Constant(0.1); },
                 "('Foo': 123)",
                 "('Foo': 124)",
                 "('Foo': 346)"
@@ -281,6 +281,30 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                 ErrorCode.SchemaViolation,
                 "Should be DateTime",
                 ".Bar"
+            );
+
+            yield return CreateCase(
+                "Cannot round double",
+                new List<Entity> { Entity.Create(("Foo", 9.1)) },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyInt)),
+                ErrorCode.SchemaViolation,
+                "Too far from the nearest Integer",
+                ".Foo"
+            );
+
+            yield return CreateCase(
+                "Cannot round inside string",
+                new List<Entity> { Entity.Create(("Foo", "9.1")) },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(("Foo", AnyInt)),
+                ErrorCode.SchemaViolation,
+                "Too far from the nearest Integer",
+                ".Foo"
             );
 
             foreach (var baseErrorCase in base.ErrorCases)

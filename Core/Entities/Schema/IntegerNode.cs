@@ -45,18 +45,30 @@ public record IntegerNode(
 
         int i;
 
-        if (transformSettings.AllowRounding && value is SCLDouble evDouble)
+        if (value is SCLDouble evDouble)
         {
             i = (int)Math.Round(evDouble.Value);
+
+            if (Math.Abs(evDouble.Value - i) > transformSettings.RoundingPrecision)
+                return ErrorCode.SchemaViolation.ToErrorBuilder(
+                    "Too far from the nearest Integer",
+                    propertyName
+                );
         }
         else
         {
             var v = value.Serialize(SerializeOptions.Primitive);
 
             if (int.TryParse(v, out i)) { }
-            else if (transformSettings.AllowRounding && double.TryParse(v, out var d))
+            else if (double.TryParse(v, out var d))
             {
                 i = (int)Math.Round(d);
+
+                if (Math.Abs(d - i) > transformSettings.RoundingPrecision)
+                    return ErrorCode.SchemaViolation.ToErrorBuilder(
+                        "Too far from the nearest Integer",
+                        propertyName
+                    );
             }
             else
             {
