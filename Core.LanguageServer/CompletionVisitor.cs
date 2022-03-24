@@ -41,10 +41,9 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
             if (child is ParserRuleContext prc)
             {
                 if (prc.StartsAfter(Position))
-                {
                     break;
-                }
-                else if (prc.ContainsPosition(Position))
+
+                if (prc.ContainsPosition(Position))
                 {
                     var result = Visit(child);
 

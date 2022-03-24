@@ -9,6 +9,8 @@ public class CompletionTest
     [InlineData("- ",                                         0, 2,  null,          null)]
     [InlineData("- Print  ",                                  0, 11, "Value",       null)]
     [InlineData("Print  ",                                    0, 9,  "Value",       null)]
+    [InlineData("Print Value:123",                            0, 9,  null,          null)]
+    [InlineData("Print Value: (Ad)",                          0, 15, "Add",         14)]
     [InlineData("Print P",                                    0, 8,  "Value",       null)]
     [InlineData("Print\r\nV",                                 1, 0,  "Value",       null)]
     [InlineData("- Print\r\nV",                               1, 0,  "Value",       null)]
