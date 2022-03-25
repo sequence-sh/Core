@@ -1,3 +1,50 @@
+# v0.14.0 (2022-03-25)
+
+## Summary of Changes
+
+### Steps
+
+- `Transform` can now round doubles to integers. This can be controlled with the `RoundingPrecision` parameter.
+- Added `Round` Step to round doubles
+- `GenerateDocumentation` now takes a `RootUri` parameter.
+
+### Sequence Configuration Language
+
+Steps whose outputs can be determined at compile time can now be folded into constants.
+
+### Core SDK
+
+- Step Parameters can now have any number of `[MetadataAttribute]` which allows you to designate custom metadata about the step.
+- Added an extension method to get all step parameters and values in a sequence which will allow users to check the values being passed to marked parameters in a compiled sequence.
+- Environment Variables can now be injected to sequences before compiling / running.
+- Added a new `Reductech.Sequence.LanguageServer` project with Language Server features
+
+## Issues Closed in this Release
+
+### New Features
+
+- Transform step should automatically convert between ints and doubles #393
+- Add Round step #392
+- Move REST steps into the rest connector #386
+- GenerateDocumentation should take a root URL for links. #391
+- Improve Documentation Layout #407
+- Add step for downloading files #385
+- Enable Constant Folding #405
+- Add a general metadata attribute that can be used to assign arbitrary values to step parameters #404
+- Allow injection of environment variables into a sequence. #398
+- Add a new project for Language Server features #380
+
+### Bug Fixes
+
+- GenerateDocumentation should html encode markdown #387
+- Cannot access elements of arrays #388
+
+### Maintenance
+
+- Migrate RestSharp to latest release #376
+- Reenable tests which use ConnectorManager #372
+- Add more tests for Core #381
+
 # v0.13.0 (2022-01-16)
 
 EDR is now Sequence. The following has changed:
@@ -844,4 +891,5 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
+
 

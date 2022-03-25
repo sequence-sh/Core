@@ -19,13 +19,13 @@
 
     <PackageProjectUrl>https://gitlab.com/reductech/sequence/core</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/reductech/sequence/core</RepositoryUrl>
-    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+    <PackageReleaseNotes>https://gitlab.com/reductech/sequence/core/-/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>ediscovery;forensics;automation;orchestration;edrm;testing;sequence</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
     <Authors>Reductech</Authors>
     <Company>Reductech</Company>
-    <Copyright>Copyright (c) 2021 Reductech Ltd</Copyright>
+    <Copyright>Copyright (c) 2022 Reductech Ltd</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,7 +39,7 @@
     <PackageReference Include="FluentAssertions" Version="6.5.1" />
     <PackageReference Include="MELT.Xunit" Version="0.8.0" />
     <PackageReference Include="Moq" Version="4.17.2" />
-    <PackageReference Include="Reductech.Utilities.AutoTheoryGenerator" Version="0.8.0-a.main.2203081405" />
+    <PackageReference Include="Reductech.Utilities.AutoTheoryGenerator" Version="0.8.0" />
     <PackageReference Include="RestSharp" Version="107.3.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
