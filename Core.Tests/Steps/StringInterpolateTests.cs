@@ -9,26 +9,18 @@ public partial class StringInterpolateTests : StepTestBase<StringInterpolate, St
         {
             yield return new StepCase(
                 "String Constants",
-                new StringInterpolate()
+                new StringInterpolate
                 {
-                    Strings = new List<IStep>()
-                    {
-                        StaticHelpers.Constant("a"),
-                        StaticHelpers.Constant("b"),
-                        StaticHelpers.Constant("c"),
-                    }
+                    Strings = new List<IStep> { Constant("a"), Constant("b"), Constant("c"), }
                 },
                 "abc"
             );
 
             yield return new StepCase(
                 "Mixed Constants",
-                new StringInterpolate()
+                new StringInterpolate
                 {
-                    Strings = new List<IStep>()
-                    {
-                        StaticHelpers.Constant("abc"), StaticHelpers.Constant(123)
-                    }
+                    Strings = new List<IStep> { Constant("abc"), Constant(123) }
                 },
                 "abc123"
             );
@@ -64,33 +56,24 @@ public partial class StringInterpolateTests : StepTestBase<StringInterpolate, St
         {
             yield return new SerializeCase(
                 "Single string constant",
-                new StringInterpolate()
-                {
-                    Strings = new List<IStep>() { StaticHelpers.Constant("abc"), }
-                },
+                new StringInterpolate { Strings = new List<IStep> { Constant("abc"), } },
                 "$\"abc\""
             );
 
             yield return new SerializeCase(
                 "Two string constants",
-                new StringInterpolate()
+                new StringInterpolate
                 {
-                    Strings = new List<IStep>()
-                    {
-                        StaticHelpers.Constant("abc"), StaticHelpers.Constant("def")
-                    }
+                    Strings = new List<IStep> { Constant("abc"), Constant("def") }
                 },
                 "$\"abcdef\""
             );
 
             yield return new SerializeCase(
                 "Two constants",
-                new StringInterpolate()
+                new StringInterpolate
                 {
-                    Strings = new List<IStep>()
-                    {
-                        StaticHelpers.Constant("abc"), StaticHelpers.Constant(123)
-                    }
+                    Strings = new List<IStep> { Constant("abc"), Constant(123) }
                 },
                 "$\"abc{123}\""
             );

@@ -7,7 +7,7 @@ public class Formatter : OneOfBase<IReadOnlyList<string>,
     IReadOnlyDictionary<string, IReadOnlyList<string>>>
 {
     /// <summary>
-    /// GVets possible formats for a property
+    /// Gets possible formats for a property
     /// </summary>
     public IEnumerable<string> GetFormats(string propertyName)
     {
@@ -27,6 +27,9 @@ public class Formatter : OneOfBase<IReadOnlyList<string>,
         }
     }
 
+    /// <summary>
+    /// Whether a particular value is a match
+    /// </summary>
     public bool IsMatch(string value, string path, bool caseSensitive)
     {
         var comparer = caseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;

@@ -8,7 +8,7 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
 )
 {
     /// <summary>
-    /// The default NumberNode
+    /// The default BooleanNode
     /// </summary>
     public static BooleanNode Default { get; } = new(EnumeratedValuesNodeData.Empty);
 
@@ -39,15 +39,20 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
         if (value is SCLBool)
             return Maybe<ISCLObject>.None;
 
-        var trueWords  = transformSettings.TruthFormatter.GetFormats(propertyName);
-        var falseWords = transformSettings.FalseFormatter.GetFormats(propertyName);
-
         var v = value.Serialize(SerializeOptions.Primitive);
 
-        if (trueWords.Contains(v))
+        if (transformSettings.TruthFormatter.IsMatch(
+                v,
+                propertyName,
+                transformSettings.CaseSensitive
+            ))
             return Maybe<ISCLObject>.From(SCLBool.True);
 
-        if (falseWords.Contains(v))
+        if (transformSettings.FalseFormatter.IsMatch(
+                v,
+                propertyName,
+                transformSettings.CaseSensitive
+            ))
             return Maybe<ISCLObject>.From(SCLBool.False);
 
         return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Boolean", propertyName);
