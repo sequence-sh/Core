@@ -22,6 +22,10 @@ Connectors are collections of Steps that are for use with
 a particular application. A Step is a unit of work in an application
 such as creating a case, ingesting data, searching or exporting data.
 
+# Documentation
+
+Documentation available at https://sequence.sh
+
 # Try SCL and Core
 
 Using the Sequence console application: https://gitlab.com/reductech/sequence/console

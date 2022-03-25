@@ -14,8 +14,8 @@ Steps whose outputs can be determined at compile time can now be folded into con
 
 ### Core SDK
 
-Step Parameters can now how any number of `[MetadataAttribute]` which allows you to designate custom metadata about the step.
-Added an extension method to get all step parameters and values in a sequence which will allow users to check the values being passed to marked parameters in a compiled sequence.
+- Step Parameters can now have any number of `[MetadataAttribute]` which allows you to designate custom metadata about the step.
+- Added an extension method to get all step parameters and values in a sequence which will allow users to check the values being passed to marked parameters in a compiled sequence.
 - Environment Variables can now be injected to sequences before compiling / running.
 - Added a new `Reductech.Sequence.LanguageServer` project with Language Server features
 
@@ -43,9 +43,6 @@ Added an extension method to get all step parameters and values in a sequence wh
 
 - Migrate RestSharp to latest release #376
 - Reenable tests which use ConnectorManager #372
-
-### Other
-
 - Add more tests for Core #381
 
 # v0.13.0 (2022-01-16)

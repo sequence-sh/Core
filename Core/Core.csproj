@@ -18,13 +18,13 @@
 
     <PackageProjectUrl>https://gitlab.com/reductech/sequence/core</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/reductech/sequence/core</RepositoryUrl>
-    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+    <PackageReleaseNotes>https://gitlab.com/reductech/sequence/core/-/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>ediscovery;forensics;automation;orchestration;m;sequence</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
     <Authors>Reductech</Authors>
     <Company>Reductech</Company>
-    <Copyright>Copyright (c) 2021 Reductech Ltd</Copyright>
+    <Copyright>Copyright (c) 2022 Reductech Ltd</Copyright>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(CI)' == ''">
