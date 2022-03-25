@@ -37,11 +37,13 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
         if (value is SCLNull)
             return Maybe<ISCLObject>.None;
 
-        var nullWords = transformSettings.NullFormatter.GetFormats(propertyName);
-
         var v = value.Serialize(SerializeOptions.Primitive);
 
-        if (nullWords.Contains(v))
+        if (transformSettings.NullFormatter.IsMatch(
+                v,
+                propertyName,
+                transformSettings.CaseSensitive
+            ))
             return Maybe<ISCLObject>.From(SCLNull.Instance);
 
         return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Null", propertyName);

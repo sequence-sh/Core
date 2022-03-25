@@ -176,9 +176,13 @@ public static class DocumentationCreator
         sb.AppendLine();
 
         if (options.IncludeSequenceUrl)
+        {
             sb.AppendLine(
                 $"[Documentation]({options.RootUrl.TrimEnd('/')}/{doc.DocumentationCategory}/{doc.FileName})"
             );
+
+            sb.AppendLine();
+        }
 
         if (!string.IsNullOrWhiteSpace(doc.TypeDetails))
         {

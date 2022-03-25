@@ -50,10 +50,22 @@ public record StringRestrictions
             return this;
 
         var restrictions = new StringRestrictions(
-            CombineHelpers.Combine(MinLength,    other.MinLength,    (a, b) => Math.Min(a, b)),
-            CombineHelpers.Combine(MaxLength,    other.MaxLength,    (a, b) => Math.Max(a, b)),
-            CombineHelpers.Combine(PatternRegex, other.PatternRegex, (a, _) => a)
-        ); //this is wrong
+            CombineHelpers.Combine(
+                MinLength,
+                other.MinLength,
+                (a, b) => Math.Max(a, b)
+            ), //We need the highest min length
+            CombineHelpers.Combine(
+                MaxLength,
+                other.MaxLength,
+                (a, b) => Math.Min(a, b)
+            ), // We need the lowest max length
+            CombineHelpers.Combine(
+                PatternRegex,
+                other.PatternRegex,
+                (a, _) => a
+            ) //TODO improve this
+        );    //this is wrong
 
         return restrictions;
     }
@@ -122,7 +134,7 @@ public record StringRestrictions
             builder.MinLength(MinLength.Value);
 
         if (MaxLength.HasValue)
-            builder.MinLength(MaxLength.Value);
+            builder.MaxLength(MaxLength.Value);
 
         if (PatternRegex is not null)
             builder.Pattern(PatternRegex);
