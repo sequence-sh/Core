@@ -110,25 +110,25 @@ public partial class NodeDataCombineTests
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.True }),
                 new EnumeratedValuesNodeData(null),
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.True })
-            );
+            ) { NameOverride = "True and then null" };
 
             yield return new NodeDataCombinationCase<EnumeratedValuesNodeData>(
                 new EnumeratedValuesNodeData(null),
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.True }),
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.True })
-            );
+            ) { NameOverride = "null and then True" };
 
             yield return new NodeDataCombinationCase<EnumeratedValuesNodeData>(
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.True }),
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.True }),
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.True })
-            );
+            ) { NameOverride = "True and True" };
 
             yield return new NodeDataCombinationCase<EnumeratedValuesNodeData>(
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.True }),
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.False }),
                 new EnumeratedValuesNodeData(new List<ISCLObject>() { SCLBool.True, SCLBool.False })
-            );
+            ) { NameOverride = "True and False" };
         }
     }
 
