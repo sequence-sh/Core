@@ -4,11 +4,11 @@
 /// Restricts number values
 /// </summary>
 public record NumberRestrictions(
-    double? Min,
-    double? Max,
-    double? ExclusiveMin,
-    double? ExclusiveMax,
-    double? MultipleOf) : NodeData<NumberRestrictions>
+    double? Min = null,
+    double? Max = null,
+    double? ExclusiveMin = null,
+    double? ExclusiveMax = null,
+    double? MultipleOf = null) : NodeData<NumberRestrictions>
 {
     /// <summary>
     /// Create a new NumberRestrictions

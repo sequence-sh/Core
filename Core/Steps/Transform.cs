@@ -197,9 +197,10 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// <summary>
     /// Strings which represent truth.
     /// This can either be a string, and array of string, or an entity mapping field names to strings or arrays of string
+    /// Case sensitivity is determined by the CaseSensitive property
     /// </summary>
     [StepProperty()]
-    [DefaultValueExplanation("True, Yes, or 1")]
+    [DefaultValueExplanation("True, true, Yes, or 1")]
     public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? BooleanTrueFormats
     {
         get;
@@ -207,7 +208,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     }
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
-                new[] { "True", "Yes", "1" }.Select(
+                new[] { "True", "true", "Yes", "1" }.Select(
                         x => new SCLConstant<StringStream>(new StringStream(x)) as
                             IStep<StringStream>
                     )
@@ -218,9 +219,10 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// <summary>
     /// Strings which represent falsity
     /// This can either be a string, and array of string, or an entity mapping field names to strings or arrays of string
+    /// Case sensitivity is determined by the CaseSensitive property
     /// </summary>
     [StepProperty()]
-    [DefaultValueExplanation("False, No, or 0")]
+    [DefaultValueExplanation("False, false, No, or 0")]
     public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? BooleanFalseFormats
     {
         get;
@@ -228,7 +230,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     }
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
-                new[] { "False", "No", "0" }.Select(
+                new[] { "False", "false", "No", "0" }.Select(
                         x => new SCLConstant<StringStream>(new StringStream(x)) as
                             IStep<StringStream>
                     )
@@ -239,13 +241,14 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     /// <summary>
     /// Strings which represent null
     /// This can either be a string, and array of string, or an entity mapping field names to strings or arrays of string
+    /// Case sensitivity is determined by the CaseSensitive property
     /// </summary>
     [StepProperty()]
-    [DefaultValueExplanation("Null")]
+    [DefaultValueExplanation("Null or null")]
     public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? NullFormats { get; set; }
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
-                new[] { "Null" }.Select(
+                new[] { "Null", "null" }.Select(
                         x => new SCLConstant<StringStream>(new StringStream(x)) as
                             IStep<StringStream>
                     )
@@ -262,7 +265,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
     public IStep<SCLOneOf<StringStream, Array<StringStream>, Entity>>? ArrayDelimiters { get; set; }
         = new OneOfStep<StringStream, Array<StringStream>, Entity>(
             ArrayNew<StringStream>.CreateArray(
-                new[] { "Null" }.Select(
+                new string[] { }.Select(
                         x => new SCLConstant<StringStream>(new StringStream(x)) as
                             IStep<StringStream>
                     )
