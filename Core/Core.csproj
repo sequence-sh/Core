@@ -19,7 +19,7 @@
     <PackageProjectUrl>https://gitlab.com/reductech/sequence/core</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/reductech/sequence/core</RepositoryUrl>
     <PackageReleaseNotes>https://gitlab.com/reductech/sequence/core/-/blob/main/CHANGELOG.md</PackageReleaseNotes>
-    <PackageTags>ediscovery;forensics;automation;orchestration;m;sequence</PackageTags>
+    <PackageTags>ediscovery;forensics;automation;orchestration;edrm;sequence</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
     <Authors>Reductech</Authors>
@@ -59,7 +59,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     <PackageReference Include="Namotion.Reflection" Version="2.0.10" />
     <PackageReference Include="OneOf" Version="3.0.216" />
-    <PackageReference Include="Reductech.Sequence.ConnectorManager.Base" Version="0.8.0-a.main.2203280109" />
+    <PackageReference Include="Reductech.Sequence.ConnectorManager.Base" Version="0.8.0-a.main.2204052008" />
     <PackageReference Include="RestSharp" Version="107.3.0" />
     <PackageReference Include="System.Linq.Async" Version="5.1.0" />
   </ItemGroup>
