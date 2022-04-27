@@ -6,34 +6,34 @@ variables:
   PACKAGE_NAME_NUGET: Reductech.Sequence.Core
   PACKAGE_NAME_DLL: Reductech.Sequence.Core
 
-# stages:
-#   - antlr
-#   - build
-#   - test
-#   - quality
-#   - package
-#   - sign
-#   - push
+stages:
+  - antlr
+  - build
+  - test
+  - quality
+  - package
+  - sign
+  - push
 
-# compile grammar:
-#   stage: antlr
-#   image: openjdk:11-jre-buster
-#   variables:
-#     ANTLR_JAR_URI: https://www.antlr.org/download/antlr-4.10.1-complete.jar
-#     ANTLR_JAR: antlr-4.10.1-complete.jar
-#     ANTLR_ENCODING: UTF-8
-#     ANTLR_NAMESPACE: Reductech.Sequence.Core.Internal.Parser
-#     ANTLR_OUTPUT: ./Core/Antlr
-#     ANTLR_GRAMMAR: ./Core/Internal/Parser/SCL.g4
-#   script:
-#     - wget -O $ANTLR_JAR $ANTLR_JAR_URI
-#     - java -jar $ANTLR_JAR -Dlanguage=CSharp -visitor -no-listener -Werror
-#       -encoding $ANTLR_ENCODING -package $ANTLR_NAMESPACE -o $ANTLR_OUTPUT
-#       -Xexact-output-dir $ANTLR_GRAMMAR
-#   artifacts:
-#     paths:
-#       - $ANTLR_OUTPUT
-#     expire_in: 2 hours
+compile grammar:
+  stage: antlr
+  image: openjdk:11-jre-buster
+  variables:
+    ANTLR_JAR_URI: https://www.antlr.org/download/antlr-4.10.1-complete.jar
+    ANTLR_JAR: antlr-4.10.1-complete.jar
+    ANTLR_ENCODING: UTF-8
+    ANTLR_NAMESPACE: Reductech.Sequence.Core.Internal.Parser
+    ANTLR_OUTPUT: ./Core/Antlr
+    ANTLR_GRAMMAR: ./Core/Internal/Parser/SCL.g4
+  script:
+    - wget -O $ANTLR_JAR $ANTLR_JAR_URI
+    - java -jar $ANTLR_JAR -Dlanguage=CSharp -visitor -no-listener -Werror
+      -encoding $ANTLR_ENCODING -package $ANTLR_NAMESPACE -o $ANTLR_OUTPUT
+      -Xexact-output-dir $ANTLR_GRAMMAR
+  artifacts:
+    paths:
+      - $ANTLR_OUTPUT
+    expire_in: 2 hours
 
 test dev:
   script:
@@ -48,7 +48,7 @@ mutation testing:
   image: mcr.microsoft.com/dotnet/sdk:6.0-windowsservercore-ltsc2019
   tags:
     - rt-windows
-  # needs:
-  #   - compile grammar
+  needs:
+    - compile grammar
   rules:
     - when: never
