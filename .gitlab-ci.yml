@@ -17,10 +17,10 @@ stages:
 
 compile grammar:
   stage: antlr
-  image: openjdk:8-jre-buster
+  image: openjdk:11-jre-buster
   variables:
-    ANTLR_JAR_URI: https://www.antlr.org/download/antlr-4.9-complete.jar
-    ANTLR_JAR: antlr-4.9-complete.jar
+    ANTLR_JAR_URI: https://www.antlr.org/download/antlr-4.10.1-complete.jar
+    ANTLR_JAR: antlr-4.10.1-complete.jar
     ANTLR_ENCODING: UTF-8
     ANTLR_NAMESPACE: Reductech.Sequence.Core.Internal.Parser
     ANTLR_OUTPUT: ./Core/Antlr
