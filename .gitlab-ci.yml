@@ -17,7 +17,7 @@ variables:
 
 # compile grammar:
 #   stage: antlr
-#   image: openjdk:8-jre-buster
+#   image: openjdk:11-jre-buster
 #   variables:
 #     ANTLR_JAR_URI: https://www.antlr.org/download/antlr-4.10.1-complete.jar
 #     ANTLR_JAR: antlr-4.10.1-complete.jar
@@ -48,7 +48,7 @@ mutation testing:
   image: mcr.microsoft.com/dotnet/sdk:6.0-windowsservercore-ltsc2019
   tags:
     - rt-windows
-  needs:
-    - compile grammar
+  # needs:
+  #   - compile grammar
   rules:
     - when: never
