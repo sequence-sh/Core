@@ -51,7 +51,7 @@
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.10.1" />
     <PackageReference Include="Antlr4BuildTasks" Version="8.21.0" />
-    <PackageReference Include="CSharpFunctionalExtensions" Version="2.29.0" />
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.29.1" />
     <PackageReference Include="Generator.Equals" Version="2.2.3" />
     <PackageReference Include="JsonSchema.Net" Version="1.13.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
@@ -59,7 +59,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     <PackageReference Include="Namotion.Reflection" Version="2.0.10" />
     <PackageReference Include="OneOf" Version="3.0.216" />
-    <PackageReference Include="Reductech.Sequence.ConnectorManager.Base" Version="0.8.0-a.main.2204250112" />
+    <PackageReference Include="Reductech.Sequence.ConnectorManager.Base" Version="0.8.0-a.main.2204271248" />
     <PackageReference Include="RestSharp" Version="107.3.0" />
     <PackageReference Include="System.Linq.Async" Version="5.1.0" />
   </ItemGroup>
