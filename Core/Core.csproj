@@ -27,7 +27,7 @@
     <Copyright>Copyright (c) 2022 Reductech Ltd</Copyright>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(CI)' == ''">
     <Antlr4 Include="Internal\Parser\SCL.g4">
       <Listener>false</Listener>
       <Error>true</Error>
@@ -40,7 +40,7 @@
     <Antlr4UseCSharpGenerator>True</Antlr4UseCSharpGenerator>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(CI)' != ''">
     <None Include="Antlr/*" />
   </ItemGroup>
 
