@@ -27,7 +27,7 @@ public static class LogChecker
             }
         );
 
-        if (expectedLoggedValues.IsNullOrEmpty())
+        if (!expectedLoggedValues.Any())
             infoOrHigherEntries.Should().BeEmpty("Log values should be empty");
         else
             infoOrHigherEntries.Should()
