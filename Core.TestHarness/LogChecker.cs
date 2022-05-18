@@ -1,6 +1,4 @@
-﻿using Castle.Core.Internal;
-
-namespace Reductech.Sequence.Core.TestHarness;
+﻿namespace Reductech.Sequence.Core.TestHarness;
 
 public static class LogChecker
 {
@@ -27,7 +25,7 @@ public static class LogChecker
             }
         );
 
-        if (expectedLoggedValues.IsNullOrEmpty())
+        if (!expectedLoggedValues.Any())
             infoOrHigherEntries.Should().BeEmpty("Log values should be empty");
         else
             infoOrHigherEntries.Should()
