@@ -46,6 +46,9 @@ public sealed record SCLBool : IComparableSCLObject
     }
 
     /// <inheritdoc />
+    public bool IsEmpty() => false;
+
+    /// <inheritdoc />
     public SchemaNode ToSchemaNode(
         string path,
         SchemaConversionOptions? schemaConversionOptions) => BooleanNode.Default;

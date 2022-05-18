@@ -81,4 +81,7 @@ public sealed record SCLEnum<T>(T Value) : ISCLEnum where T : struct, Enum
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<SCLEnum<T>>(this, location);
+
+    /// <inheritdoc />
+    public bool IsEmpty() => false;
 }

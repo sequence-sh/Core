@@ -188,8 +188,12 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
         return Maybe<T1>.None;
     }
 
+    /// <inheritdoc />
+    public override bool IsEmpty() => !List.Any();
+
     private Maybe<IArray> TryConvertMembers<TMember>() where TMember : ISCLObject
     {
+        //This METHOD is used with reflection
         var newList = new List<TMember>(this.List.Count);
 
         foreach (var sclObject in List)

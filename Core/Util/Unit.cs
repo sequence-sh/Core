@@ -35,6 +35,9 @@ public sealed record Unit : ISCLObject
     }
 
     /// <inheritdoc />
+    public bool IsEmpty() => true;
+
+    /// <inheritdoc />
     public SchemaNode ToSchemaNode(string path, SchemaConversionOptions? schemaConversionOptions)
     {
         return new NullNode();

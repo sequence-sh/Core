@@ -117,13 +117,11 @@ public interface ISCLObject : ISerializable
         indentationStringBuilder.Append(Serialize(SerializeOptions.Serialize));
     }
 
-    //FormatComponent ISerializable.GetFormatComponent(FormattingOptions options)
-    //{
-    //    return new FormatComponent.SingleValueComponent(
-    //        Serialize(SerializeOptions.Serialize),
-    //        ImmutableList<Comment>.Empty
-    //    );
-    //}
+    /// <summary>
+    /// Returns true if the value is not empty
+    /// </summary>
+    [Pure]
+    bool IsEmpty() => false;
 
     /// <summary>
     /// Gets the default value for a particular SCL Type

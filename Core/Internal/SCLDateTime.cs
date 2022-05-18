@@ -60,4 +60,7 @@ public sealed record SCLDateTime(DateTime Value) : IComparableSCLObject
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<SCLDateTime>(this, location);
+
+    /// <inheritdoc />
+    public bool IsEmpty() => false;
 }

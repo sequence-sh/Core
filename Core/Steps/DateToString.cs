@@ -25,7 +25,7 @@ public sealed class DateToString : CompoundStep<StringStream>
     [StepProperty(2)]
     [DefaultValueExplanation("yyyy/MM/dd HH:mm:ss")]
     [Example("O")]
-    public IStep<StringStream> Format { get; set; } =
+    public new IStep<StringStream> Format { get; set; } =
         new SCLConstant<StringStream>("yyyy/MM/dd HH:mm:ss");
 
     /// <inheritdoc />
