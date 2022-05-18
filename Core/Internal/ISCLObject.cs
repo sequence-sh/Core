@@ -121,7 +121,7 @@ public interface ISCLObject : ISerializable
     /// Returns true if the value is not empty
     /// </summary>
     [Pure]
-    bool IsEmpty();
+    bool IsEmpty() => false;
 
     /// <summary>
     /// Gets the default value for a particular SCL Type
