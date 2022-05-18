@@ -556,4 +556,9 @@ public sealed partial record Entity(
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<Entity>(this, location);
+
+    public bool IsEmpty()
+    {
+        return Dictionary.IsEmpty;
+    }
 }

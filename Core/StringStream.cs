@@ -63,7 +63,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
             /// <inheritdoc />
             public override (Stream stream, EncodingEnum encodingEnum) GetStream()
             {
-                byte[]       byteArray = Encoding.UTF8.GetBytes(Underlying);
+                var          byteArray = Encoding.UTF8.GetBytes(Underlying);
                 MemoryStream stream    = new(byteArray);
 
                 return (stream, EncodingEnum.UTF8);
@@ -350,4 +350,17 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<StringStream>(this, location);
+
+    /// <inheritdoc />
+    public bool IsEmpty()
+    {
+        return Value switch
+        {
+            StringStreamData.ConstantData constantData => string.IsNullOrWhiteSpace(
+                constantData.Underlying
+            ),
+            StringStreamData.StreamData => false,
+            _                           => throw new ArgumentOutOfRangeException(nameof(Value))
+        };
+    }
 }

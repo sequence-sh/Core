@@ -69,6 +69,9 @@ public abstract record Array<T> : IArray where T : ISCLObject
         Func<T, CancellationToken, ValueTask<Result<Unit, IError>>> func,
         CancellationToken cancellation);
 
+    /// <inheritdoc />
+    public abstract bool IsEmpty();
+
     /// <summary>
     /// Returns some number of elements
     /// </summary>

@@ -44,4 +44,7 @@ public record SCLNull : ISCLObject
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new NullConstant(location);
+
+    /// <inheritdoc />
+    public bool IsEmpty() => true;
 }

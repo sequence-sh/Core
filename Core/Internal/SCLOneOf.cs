@@ -54,6 +54,9 @@ public readonly record struct SCLOneOf<T0, T1>(OneOf<T0, T1> OneOf) : ISCLOneOf
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<SCLOneOf<T0, T1>>(this, location);
+
+    /// <inheritdoc />
+    public bool IsEmpty() => Value.IsEmpty();
 }
 
 /// <summary>
@@ -115,6 +118,9 @@ public readonly record struct SCLOneOf<T0, T1, T2>(OneOf<T0, T1, T2> OneOf) : IS
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<SCLOneOf<T0, T1, T2>>(this, location);
+
+    /// <inheritdoc />
+    public bool IsEmpty() => Value.IsEmpty();
 }
 
 /// <summary>
@@ -182,4 +188,7 @@ public readonly record struct SCLOneOf<T0, T1, T2, T3>(OneOf<T0, T1, T2, T3> One
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<SCLOneOf<T0, T1, T2, T3>>(this, location);
+
+    /// <inheritdoc />
+    public bool IsEmpty() => Value.IsEmpty();
 }

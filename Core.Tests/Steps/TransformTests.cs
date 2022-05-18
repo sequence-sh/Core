@@ -195,6 +195,31 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
             );
 
             yield return CreateCase(
+                "Transform empty string",
+                new List<Entity>()
+                {
+                    //Entity.Create(("boolProp", true)),
+                    Entity.Create(("boolProp", "")),
+                },
+                JsonSchema.FromText(
+                    @"{
+  ""title"": ""Schema"",
+  ""type"": ""object"",
+  ""additionalProperties"": false,
+  ""properties"": {
+    ""boolProp"": {
+      ""type"": ""boolean""
+    }
+  }
+}
+"
+                ),
+                _ => { },
+                //"('boolProp': True)",
+                "()"
+            );
+
+            yield return CreateCase(
                 "Transform DateTime as string with different formats with different props",
                 new List<Entity>
                 {

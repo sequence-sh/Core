@@ -51,7 +51,14 @@ public record EntityNode(
 
         foreach (var entityProperty in nestedEntity)
         {
-            if (EntityPropertiesData.Nodes.TryGetValue(entityProperty.Name, out var node))
+            if (entityProperty.Value.IsEmpty())
+            {
+                changed   = true;
+                newEntity = newEntity.RemoveProperty(entityProperty.Name);
+                continue;
+            }
+
+            else if (EntityPropertiesData.Nodes.TryGetValue(entityProperty.Name, out var node))
             {
                 var r = node.Node.TryTransform(
                     propertyName + "." + entityProperty.Name,

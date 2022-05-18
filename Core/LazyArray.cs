@@ -220,4 +220,7 @@ public sealed record LazyArray<T>
 
     /// <inheritdoc />
     public override bool IsEvaluated => false;
+
+    /// <inheritdoc />
+    public override bool IsEmpty() => false;
 }

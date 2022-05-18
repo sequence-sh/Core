@@ -60,4 +60,7 @@ public readonly record struct SCLInt(int Value) : IComparableSCLObject
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<SCLInt>(this, location);
+
+    /// <inheritdoc />
+    public bool IsEmpty() => false;
 }

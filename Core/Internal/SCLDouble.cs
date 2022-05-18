@@ -54,4 +54,7 @@ public readonly record struct SCLDouble(double Value) : IComparableSCLObject
     /// <inheritdoc />
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<SCLDouble>(this, location);
+
+    /// <inheritdoc />
+    public bool IsEmpty() => false;
 }
