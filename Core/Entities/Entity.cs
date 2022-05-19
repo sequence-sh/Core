@@ -63,7 +63,7 @@ public sealed partial record Entity(
         List<EntityProperty> properties = new();
         var                  enumerator = dictionary.GetEnumerator();
 
-        var i = 1;
+        var i = 0;
 
         while (enumerator.MoveNext())
         {

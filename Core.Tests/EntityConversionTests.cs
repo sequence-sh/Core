@@ -73,6 +73,18 @@ public class EntityConversionTests
         config.ShouldBeSuccessful();
     }
 
+    [Fact]
+    public void CreateFromDictionaryShouldSetOrderCorrectly()
+    {
+        var dict = new Dictionary<string, object>() { { "Foo", 1 }, { "Bar", "Two" } };
+
+        var entity = Entity.Create(dict);
+
+        var expected = Entity.Create(("Foo", 1), ("Bar", "Two"));
+
+        entity.Should().BeEquivalentTo(expected);
+    }
+
     private static Entity CreateEntityFromString(string s)
     {
         var sfs = StepFactoryStore.Create();
