@@ -33,10 +33,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
         {
             outputResult.ShouldBeSuccessful();
 
-            if (outputResult.Value is string sActual && Expected is string sExpected)
-                CompressSpaces(sActual).Should().Be(CompressSpaces(sExpected));
-            else if (outputResult.Value is StringStream sActualStream
-                  && Expected is StringStream sExpectedStream)
+            if (outputResult.Value is StringStream sActualStream
+             && Expected is StringStream sExpectedStream)
                 CompressSpaces(sActualStream.GetString())
                     .Should()
                     .Be(CompressSpaces(sExpectedStream.GetString()));
