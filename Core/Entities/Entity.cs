@@ -167,7 +167,7 @@ public sealed partial record Entity(
                 newValue2 = newValue;
             }
 
-            newProperty = new EntityProperty(ep.Name, newValue2, ep.Order);
+            newProperty = new EntityProperty(ep.Name, newValue2, order ?? ep.Order);
         }
         else
         {
@@ -538,12 +538,15 @@ public sealed partial record Entity(
         string path,
         SchemaConversionOptions? schemaConversionOptions)
     {
-        var dictionary = new Dictionary<string, (SchemaNode Node, bool Required)>();
+        var dictionary = new Dictionary<string, (SchemaNode Node, bool Required, int Order)>();
+
+        var order = 0;
 
         foreach (var (key, property) in Dictionary.OrderBy(x => x.Value.Order))
         {
             var node = property.Value.ToSchemaNode($"{path}/{key}", schemaConversionOptions);
-            dictionary[key] = (node, true);
+            dictionary[key] = (node, true, order);
+            order++;
         }
 
         return new EntityNode(
@@ -557,6 +560,7 @@ public sealed partial record Entity(
     public IConstantFreezableStep ToConstantFreezableStep(TextLocation location) =>
         new SCLConstantFreezable<Entity>(this, location);
 
+    /// <inheritdoc />
     public bool IsEmpty()
     {
         return Dictionary.IsEmpty;
