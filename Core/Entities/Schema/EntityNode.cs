@@ -58,7 +58,7 @@ public record EntityNode(
                 continue;
             }
 
-            else if (EntityPropertiesData.Nodes.TryGetValue(entityProperty.Name, out var node))
+            if (EntityPropertiesData.Nodes.TryGetValue(entityProperty.Name, out var node))
             {
                 var r = node.Node.TryTransform(
                     propertyName + "." + entityProperty.Name,
@@ -73,7 +73,17 @@ public record EntityNode(
                     newEntity = newEntity.WithProperty(
                         entityProperty.Name,
                         r.Value.GetValueOrThrow(),
-                        null
+                        node.Order
+                    );
+
+                    changed = true;
+                }
+                else if (entityProperty.Order != node.Order)
+                {
+                    newEntity = newEntity.WithProperty(
+                        entityProperty.Name,
+                        entityProperty.Value,
+                        node.Order
                     );
 
                     changed = true;

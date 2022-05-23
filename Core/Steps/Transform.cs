@@ -6,7 +6,9 @@ namespace Reductech.Sequence.Core.Steps;
 /// <summary>
 /// Attempts to transform entities in the stream so that they match the schema.
 ///
-/// Will transform strings into ints, datetimes, booleans, array, or nulls where appropriate
+/// Will transform strings into ints, datetimes, booleans, array, or nulls where appropriate.
+///
+/// The properties of the transformed entities will be in the same order as in the schema
 ///
 /// For more information on schemas please see the
 /// [documentation](https://docs.reductech.io/sequence/how-to/scl/schemas.html). 
