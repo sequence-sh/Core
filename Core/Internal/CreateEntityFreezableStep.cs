@@ -21,7 +21,7 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
     public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
     {
         var checkResult = callerMetadata.CheckAllows(
-                TypeReference.Actual.Entity,
+                TypeReference.Entity.NoSchema,
                 typeResolver
             )
             .MapError(x => x.WithLocation(this));
@@ -65,7 +65,7 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
         TypeResolver typeResolver)
     {
         var checkResult = callerMetadata.CheckAllows(
-                TypeReference.Actual.Entity,
+                TypeReference.Entity.NoSchema,
                 typeResolver
             )
             .MapError(x => x.WithLocation(this));
@@ -108,7 +108,7 @@ public record CreateEntityFreezableStep(FreezableEntityData FreezableEntityData)
     /// <inheritdoc />
     public Result<TypeReference, IError> TryGetOutputTypeReference(
         CallerMetadata callerMetadata,
-        TypeResolver typeResolver) => TypeReference.Actual.Entity;
+        TypeResolver typeResolver) => TypeReference.Entity.NoSchema;
 
     /// <inheritdoc />
     public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)

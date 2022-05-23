@@ -174,11 +174,6 @@ public abstract record TypeReference
         public static Actual Date { get; } = new TypedActual<SCLDateTime>();
 
         /// <summary>
-        /// An entity
-        /// </summary>
-        public static Actual Entity { get; } = new TypedActual<Entity>();
-
-        /// <summary>
         /// A null value
         /// </summary>
         public static Actual Null { get; } = new TypedActual<SCLNull>();
@@ -238,6 +233,51 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override string HumanReadableTypeName { get; } =
             TypeNameHelper.GetHumanReadableTypeName(typeof(Unit));
+    }
+
+    public sealed record Entity(Maybe<EntityNode> Schema) : TypeReference
+    {
+        /// <summary>
+        /// An entity type with no schema defined
+        /// </summary>
+        public static Entity NoSchema { get; } = new(Maybe<EntityNode>.None);
+
+        /// <inheritdoc />
+        public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
+            TypeResolver typeResolver)
+        {
+            return ErrorCode.CannotInferType.ToErrorBuilder($"{Name} is not an Array Type");
+        }
+
+        /// <inheritdoc />
+        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
+        {
+            return typeof(Core.Entity);
+        }
+
+        /// <inheritdoc />
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
+        {
+            other = typeResolver?.MaybeResolve(other) ?? other;
+
+            if (other is not TypeReference.Entity otherAsEntity)
+                return false;
+
+            ;
+
+            if (Schema.HasNoValue || otherAsEntity.Schema.HasNoValue)
+
+                if (Equals(other))
+                    return true;
+
+            return false;
+        }
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName => nameof(Core.Entity);
+
+        /// <inheritdoc />
+        public override string Name => nameof(Core.Entity);
     }
 
     /// <summary>
@@ -688,7 +728,7 @@ public abstract record TypeReference
             nameof(SCLDateTime)  => Actual.Date,
             nameof(SCLNull)      => Actual.Null,
             nameof(Unit)         => Unit.Instance,
-            nameof(Entity)       => Actual.Entity,
+            nameof(Entity)       => Entity.NoSchema,
             nameof(ISCLObject)   => Any.Instance,
             _                    => Unknown.Instance
         };

@@ -96,7 +96,7 @@ public class EntityConversionTests
                         new CallerMetadata(
                             nameof(EntityConversionTests),
                             nameof(Entity),
-                            TypeReference.Actual.Entity
+                            TypeReference.Entity.NoSchema
                         ),
                         sfs
                     )
