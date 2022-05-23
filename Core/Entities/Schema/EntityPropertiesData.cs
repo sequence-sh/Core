@@ -7,7 +7,8 @@ namespace Reductech.Sequence.Core.Entities.Schema;
 /// </summary>
 [Equatable]
 public partial record EntityPropertiesData(
-    [property: SetEquality] IReadOnlyDictionary<string, (SchemaNode Node, bool Required)> Nodes) :
+    [property: SetEquality]
+    IReadOnlyDictionary<string, (SchemaNode Node, bool Required, int Order)> Nodes) :
     NodeData<
         EntityPropertiesData>
 {
@@ -20,7 +21,8 @@ public partial record EntityPropertiesData(
         if (other == Empty)
             return this;
 
-        var newDict = new Dictionary<string, (SchemaNode Node, bool Required)>();
+        var newDict = new Dictionary<string, (SchemaNode Node, bool Required, int Order)>();
+        var order   = 0;
 
         foreach (var group in Nodes.Concat(other.Nodes)
                      .GroupBy(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase))
@@ -28,14 +30,19 @@ public partial record EntityPropertiesData(
             var key = group.Key;
 
             if (group.Count() == 1)
-                newDict[key] = (group.Single().Node, false);
+                newDict[key] = (group.Single().Node, false, order);
 
             else if (group.Count() == 2)
             {
                 var (first, second) = group.GetFirstTwo().GetValueOrThrow();
 
-                newDict[key] = (first.Node.Combine(second.Node), first.Required && second.Required);
+                newDict[key] = (first.Node.Combine(second.Node), first.Required && second.Required,
+                                order);
             }
+            else
+                throw new NotImplementedException("Group should have either one or two members");
+
+            order++;
         }
 
         return new EntityPropertiesData(newDict);
@@ -62,6 +69,6 @@ public partial record EntityPropertiesData(
     /// EntityPropertiesData with no Properties
     /// </summary>
     public static EntityPropertiesData Empty { get; } = new(
-        ImmutableDictionary<string, (SchemaNode Node, bool Required)>.Empty
+        ImmutableDictionary<string, (SchemaNode Node, bool Required, int Order)>.Empty
     );
 }

@@ -249,6 +249,26 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                 },
                 "('Foo': 1988-10-21T00:00:00.0000000 'Bar': 1990-01-06T00:00:00.0000000)"
             );
+
+            yield return CreateCase(
+                "Transform should reorder properties to be in the same order as in the schema",
+                new List<Entity>
+                {
+                    Entity.Create(
+                        ("Foo", 1),
+                        ("Bar", 2)
+                    )
+                },
+                new JsonSchemaBuilder()
+                    .Title(SchemaName)
+                    .AdditionalItems(false)
+                    .Properties(
+                        ("Bar", AnyInt),
+                        ("Foo", AnyInt)
+                    ),
+                _ => { },
+                "('Bar': 2 'Foo': 1)"
+            );
         }
     }
 

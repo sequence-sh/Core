@@ -176,13 +176,15 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
                         .SelectMany(x => x.Properties)
                         .ToHashSet() ?? new HashSet<string>();
 
+                var order = 0;
+
                 var nodes = schema.Keywords!.OfType<PropertiesKeyword>()
                     .SelectMany(x => x.Properties)
                     .ToDictionary(
                         x => x.Key,
                         x => (
                             Create(x.Value),
-                            requiredProperties.Contains(x.Key)),
+                            requiredProperties.Contains(x.Key), order++),
                         StringComparer.OrdinalIgnoreCase
                     );
 
