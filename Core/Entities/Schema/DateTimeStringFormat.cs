@@ -15,6 +15,12 @@ public record DateTimeStringFormat : StringFormat
     public static DateTimeStringFormat Instance { get; } = new();
 
     /// <inheritdoc />
+    public override bool IsSuperset(StringFormat other)
+    {
+        return other is DateTimeStringFormat;
+    }
+
+    /// <inheritdoc />
     public override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
         ISCLObject entityValue,

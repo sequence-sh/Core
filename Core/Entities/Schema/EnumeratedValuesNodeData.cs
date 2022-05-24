@@ -10,6 +10,29 @@ public partial record EnumeratedValuesNodeData(
     [property: OrderedEquality] IReadOnlyList<ISCLObject>? AllowedValues) : NodeData<
     EnumeratedValuesNodeData>
 {
+    /// <summary>
+    /// Are the allowed values a superset (not strict) of the allowed values of the other node.
+    /// </summary>
+    public bool IsSuperset(EnumeratedValuesNodeData other)
+    {
+        if (AllowedValues is null)
+            return true;
+
+        if (other.AllowedValues is null)
+            return false;
+
+        if (other.AllowedValues.Count > AllowedValues.Count)
+            return false;
+
+        foreach (var otherAllowedValue in other.AllowedValues)
+        {
+            if (!AllowedValues.Contains(otherAllowedValue))
+                return false;
+        }
+
+        return true;
+    }
+
     /// <inheritdoc />
     public override EnumeratedValuesNodeData Combine(EnumeratedValuesNodeData other)
     {

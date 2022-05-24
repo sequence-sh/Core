@@ -22,9 +22,11 @@ public record IntegerNode(
     public override SchemaValueType SchemaValueType => SchemaValueType.Integer;
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other)
+    public override bool IsSuperset(SchemaNode other)
     {
-        return false;
+        return other is IntegerNode integerNode
+            && EnumeratedValuesNodeData.IsSuperset(other.EnumeratedValuesNodeData)
+            && Restrictions.IsSuperset(integerNode.Restrictions);
     }
 
     /// <inheritdoc />

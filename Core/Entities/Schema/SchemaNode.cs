@@ -24,15 +24,15 @@ public abstract record SchemaNode<TData1, TData2>(
     /// <inheritdoc />
     public override SchemaNode Combine(SchemaNode other)
     {
-        if (other.IsMorePermissive(this))
+        if (other.IsSuperset(this))
             return other;
 
-        if (IsMorePermissive(other))
+        if (IsSuperset(other))
             return this;
 
         if (other is SchemaNode<TData1, TData2> otherNode)
         {
-            if (this.CanCombineWith(otherNode))
+            if (CanCombineWith(otherNode))
             {
                 var evndCombined =
                     EnumeratedValuesNodeData.Combine(otherNode.EnumeratedValuesNodeData);
@@ -47,7 +47,8 @@ public abstract record SchemaNode<TData1, TData2>(
                     Data2 = data2Combined
                 };
             }
-            else if (otherNode.CanCombineWith(this))
+
+            if (otherNode.CanCombineWith(this))
             {
                 var evndCombined =
                     otherNode.EnumeratedValuesNodeData.Combine(EnumeratedValuesNodeData);
@@ -88,10 +89,10 @@ public abstract record SchemaNode<TData1>(
     /// <inheritdoc />
     public override SchemaNode Combine(SchemaNode other)
     {
-        if (other.IsMorePermissive(this))
+        if (other.IsSuperset(this))
             return other;
 
-        if (IsMorePermissive(other))
+        if (IsSuperset(other))
             return this;
 
         if (other is SchemaNode<TData1> otherNode)
@@ -264,14 +265,15 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
     public abstract SchemaValueType SchemaValueType { get; }
 
     /// <summary>
-    /// Is this more general or equal to the other schema node
+    /// Are the allowed values a superset (not strict) of the allowed values of the other node.
     /// </summary>
     [Pure]
-    public abstract bool IsMorePermissive(SchemaNode other);
+    public abstract bool IsSuperset(SchemaNode other);
 
     /// <summary>
     /// Can this combine with the other node
     /// </summary>
+    [Pure]
     protected virtual bool CanCombineWith(SchemaNode other)
     {
         return GetType() == other.GetType();
@@ -283,10 +285,10 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
     [Pure]
     public virtual SchemaNode Combine(SchemaNode otherNode)
     {
-        if (otherNode.IsMorePermissive(this))
+        if (otherNode.IsSuperset(this))
             return otherNode;
 
-        if (IsMorePermissive(otherNode))
+        if (IsSuperset(otherNode))
             return this;
 
         if (CanCombineWith(otherNode))

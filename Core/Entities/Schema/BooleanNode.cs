@@ -25,9 +25,10 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
     public override SchemaValueType SchemaValueType => SchemaValueType.Boolean;
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other)
+    public override bool IsSuperset(SchemaNode other)
     {
-        return false;
+        return other is BooleanNode
+            && EnumeratedValuesNodeData.IsSuperset(EnumeratedValuesNodeData);
     }
 
     /// <inheritdoc />

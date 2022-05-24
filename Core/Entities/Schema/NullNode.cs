@@ -23,9 +23,9 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     public override SchemaValueType SchemaValueType => SchemaValueType.Null;
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other)
+    public override bool IsSuperset(SchemaNode other)
     {
-        return false;
+        return other is NullNode;
     }
 
     /// <inheritdoc />

@@ -12,6 +12,45 @@ public partial record EntityPropertiesData(
     NodeData<
         EntityPropertiesData>
 {
+    /// <summary>
+    /// Are the allowed values a superset (not strict) of the allowed values of the other node.
+    /// </summary>
+    public bool IsSuperset(EntityPropertiesData other, SchemaNode allowExtra)
+    {
+        /*This is a superset if:
+            Every required property is also required by other
+            Every property of other is either present and a subset or matched by allow extra
+        */
+
+        var remainingRequired = this.Nodes.Where(x => x.Value.Required)
+            .Select(x => x.Key)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (key, (otherNode, otherRequired, _)) in other.Nodes)
+        {
+            if (Nodes.TryGetValue(key, out var m))
+            {
+                if (!m.Node.IsSuperset(otherNode))
+                {
+                    if (!allowExtra.IsSuperset(otherNode))
+                        return false;
+                }
+
+                if (otherRequired)
+                    remainingRequired.Remove(key);
+            }
+            else if (!allowExtra.IsSuperset(otherNode))
+            {
+                return false;
+            }
+        }
+
+        if (remainingRequired.Any())
+            return false;
+
+        return true;
+    }
+
     /// <inheritdoc />
     public override EntityPropertiesData Combine(EntityPropertiesData other)
     {

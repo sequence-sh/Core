@@ -23,13 +23,24 @@ public record StringNode(
     );
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other)
+    public override bool IsSuperset(SchemaNode other)
     {
-        if (this != Default)
+        if (!EnumeratedValuesNodeData.IsSuperset(other.EnumeratedValuesNodeData))
             return false;
 
-        if (other is NumberNode or IntegerNode or StringNode or NullNode)
-            return true;
+        if (other is StringNode otherStringNode)
+        {
+            var r = Format.IsSuperset(otherStringNode.Format)
+                 && StringRestrictions.IsSuperset(otherStringNode.StringRestrictions);
+
+            return r;
+        }
+
+        if (Format is AnyStringFormat && StringRestrictions == StringRestrictions.NoRestrictions)
+        {
+            if (other is NumberNode or IntegerNode or NullNode)
+                return true;
+        }
 
         return false;
     }

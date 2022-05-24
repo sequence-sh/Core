@@ -10,6 +10,30 @@ public partial record ItemsData(
     [property: OrderedEquality] IReadOnlyList<SchemaNode> PrefixItems,
     SchemaNode AdditionalItems) : NodeData<ItemsData>
 {
+    /// <summary>
+    /// Are the allowed values a superset (not strict) of the allowed values of the other node.
+    /// </summary>
+    public bool IsSuperset(ItemsData other)
+    {
+        if (!AdditionalItems.IsSuperset(other.AdditionalItems))
+            return false;
+
+        if (other.PrefixItems.Count < PrefixItems.Count)
+            return false;
+
+        for (var index = 0; index < other.PrefixItems.Count; index++)
+        {
+            var otherPrefix = other.PrefixItems[index];
+
+            var thisPrefix = PrefixItems.Count > index ? PrefixItems[index] : AdditionalItems;
+
+            if (!thisPrefix.IsSuperset(otherPrefix))
+                return false;
+        }
+
+        return true;
+    }
+
     /// <inheritdoc />
     public override ItemsData Combine(ItemsData other)
     {

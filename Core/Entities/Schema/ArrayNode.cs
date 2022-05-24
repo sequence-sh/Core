@@ -15,9 +15,12 @@ public record ArrayNode(
     public override SchemaValueType SchemaValueType => SchemaValueType.Array;
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other)
+    public override bool IsSuperset(SchemaNode other)
     {
-        return false;
+        return
+            other is ArrayNode an &&
+            EnumeratedValuesNodeData.IsSuperset(other.EnumeratedValuesNodeData)
+         && ItemsData.IsSuperset(an.ItemsData);
     }
 
     /// <inheritdoc />

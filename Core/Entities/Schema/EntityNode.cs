@@ -17,7 +17,28 @@ public record EntityNode(
     public override SchemaValueType SchemaValueType => SchemaValueType.Object;
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other) => false;
+    public override bool IsSuperset(SchemaNode other)
+    {
+        if (other is not EntityNode en)
+        {
+            return false;
+        }
+
+        if (!EnumeratedValuesNodeData.IsSuperset(en.EnumeratedValuesNodeData))
+            return false;
+
+        if (!EntityAdditionalItems.AdditionalItems.IsSuperset(
+                en.EntityAdditionalItems.AdditionalItems
+            ))
+            return false;
+
+        var r = EntityPropertiesData.IsSuperset(
+            en.EntityPropertiesData,
+            EntityAdditionalItems.AdditionalItems
+        );
+
+        return r;
+    }
 
     /// <inheritdoc />
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(

@@ -20,8 +20,19 @@ public record NumberNode(
     public override SchemaValueType SchemaValueType => SchemaValueType.Number;
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other)
+    public override bool IsSuperset(SchemaNode other)
     {
+        if (other is NumberNode numberNode
+         && EnumeratedValuesNodeData.IsSuperset(other.EnumeratedValuesNodeData)
+         && Restrictions.IsSuperset(numberNode.Restrictions)
+           )
+            return true;
+
+        if (other is IntegerNode integerNode
+         && EnumeratedValuesNodeData.IsSuperset(other.EnumeratedValuesNodeData)
+         && Restrictions.IsSuperset(integerNode.Restrictions))
+            return true;
+
         return false;
     }
 

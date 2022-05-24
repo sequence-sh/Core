@@ -11,6 +11,37 @@ public record NumberRestrictions(
     double? MultipleOf = null) : NodeData<NumberRestrictions>
 {
     /// <summary>
+    /// Are the allowed values a superset (not strict) of the allowed values of the other node.
+    /// </summary>
+    public bool IsSuperset(NumberRestrictions other)
+    {
+        if (this == NoRestrictions)
+            return true;
+
+        if (other == NoRestrictions)
+            return false;
+
+        if (Min.HasValue && (other.Min is null || other.Min < Min))
+            return false;
+
+        if (Max.HasValue && (other.Max is null || other.Max > Max))
+            return false;
+
+        if (ExclusiveMin.HasValue
+         && (other.ExclusiveMin is null || other.ExclusiveMin < ExclusiveMin))
+            return false;
+
+        if (ExclusiveMax.HasValue
+         && (other.ExclusiveMax is null || other.ExclusiveMax > ExclusiveMax))
+            return false;
+
+        if (MultipleOf.HasValue && (other.MultipleOf is null || other.MultipleOf % MultipleOf != 0))
+            return false;
+
+        return true;
+    }
+
+    /// <summary>
     /// Create a new NumberRestrictions
     /// </summary>
     public static NumberRestrictions Create(JsonSchema schema)
@@ -50,7 +81,7 @@ public record NumberRestrictions(
     /// <summary>
     /// No Number Restrictions
     /// </summary>
-    public static readonly NumberRestrictions NoRestrictions = new(null, null, null, null, null);
+    public static readonly NumberRestrictions NoRestrictions = new();
 
     /// <summary>
     /// Test if these restrictions are met

@@ -1,14 +1,14 @@
 ﻿namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
-/// Schema is always valid
+/// Schema is never valid
 /// </summary>
-public record TrueNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
+public record FalseNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
 {
     /// <summary>
     /// The instance
     /// </summary>
-    public static TrueNode Instance { get; } = new();
+    public static FalseNode Instance { get; } = new();
 
     /// <inheritdoc />
     public override IEnumerable<INodeData> NodeData
@@ -23,10 +23,7 @@ public record TrueNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     public override SchemaValueType SchemaValueType => SchemaValueType.Object;
 
     /// <inheritdoc />
-    public override bool IsSuperset(SchemaNode other)
-    {
-        return true;
-    }
+    public override bool IsSuperset(SchemaNode other) => other is FalseNode;
 
     /// <inheritdoc />
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
@@ -34,6 +31,6 @@ public record TrueNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
         ISCLObject value,
         TransformSettings transformSettings)
     {
-        return Maybe<ISCLObject>.None;
+        return ErrorCode.SchemaViolation.ToErrorBuilder("Always False", propertyName);
     }
 }
