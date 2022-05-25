@@ -8,6 +8,7 @@ public class CompletionTest
     [Theory]
     [InlineData("- ",                                         0, 2,  null,          null)]
     [InlineData("(Foo: 1).Fo",                                0, 10, "Foo",         9)]
+    [InlineData("(Foo: (bar:1, baz: 2)).Fo",                  0, 25, "Foo.bar",     23)]
     [InlineData("- Print  ",                                  0, 11, "Value",       null)]
     [InlineData("Print  ",                                    0, 9,  "Value",       null)]
     [InlineData("Print Value:123",                            0, 9,  null,          null)]

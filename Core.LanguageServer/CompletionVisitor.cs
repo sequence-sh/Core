@@ -283,8 +283,8 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
 
             return new CompletionItem(
                 key.AsString,
-                key.AsString,
                 type,
+                $"`type`",
                 false,
                 new SCLTextEdit(key.AsString, range)
             );
