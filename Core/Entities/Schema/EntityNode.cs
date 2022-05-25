@@ -16,6 +16,26 @@ public record EntityNode(
     /// <inheritdoc />
     public override SchemaValueType SchemaValueType => SchemaValueType.Object;
 
+    /// <summary>
+    /// Gets possible keys into this entity
+    /// </summary>
+    public IEnumerable<(EntityPropertyKey, SchemaNode)> GetKeyNodePairs()
+    {
+        foreach (var node in EntityPropertiesData.Nodes)
+        {
+            yield return (new EntityPropertyKey(node.Key), node.Value.Node);
+
+            if (node.Value.Node is EntityNode nested)
+            {
+                foreach (var (nestedKey, nestedNode) in nested.GetKeyNodePairs())
+                {
+                    yield return (new EntityPropertyKey(nestedKey.KeyNames.Prepend(node.Key)),
+                                  nestedNode);
+                }
+            }
+        }
+    }
+
     /// <inheritdoc />
     public override bool IsSuperset(SchemaNode other)
     {

@@ -1,5 +1,4 @@
-﻿using OneOf.Types;
-using Reductech.Sequence.Core.Internal.Documentation;
+﻿using Reductech.Sequence.Core.Internal.Documentation;
 
 namespace Reductech.Sequence.Core.Internal;
 

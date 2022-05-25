@@ -1,17 +1,25 @@
 ﻿namespace Reductech.Sequence.Core.LanguageServer;
 
+/// <summary>
+/// Helper for getting QuickInfo (hover) for SCL
+/// </summary>
 public static class QuickInfoHelper
 {
+    /// <summary>
+    /// Get QuickInfo (hover) for SCL
+    /// </summary>
     public static QuickInfoResponse GetQuickInfoAsync(
         string code,
         LinePosition position,
         StepFactoryStore stepFactoryStore,
         IReadOnlyDictionary<VariableName, ISCLObject>? injectedVariables = null)
     {
-        var lazyTypeResolver = QuickInfoVisitor.CreateLazyTypeResolver(
-            code,
-            stepFactoryStore,
-            injectedVariables
+        var lazyTypeResolver = new Lazy<TypeResolver>(
+            () => SCLParsing.CreateTypeResolver(
+                code,
+                stepFactoryStore,
+                injectedVariables
+            )
         );
 
         var command = Helpers.GetCommand(code, position);

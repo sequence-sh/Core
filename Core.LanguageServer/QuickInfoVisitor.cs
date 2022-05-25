@@ -13,36 +13,11 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     public QuickInfoVisitor(
         LinePosition position,
         StepFactoryStore stepFactoryStore,
-        Lazy<Result<TypeResolver, IError>> lazyTypeResolver)
+        Lazy<TypeResolver> lazyTypeResolver)
     {
         LinePosition     = position;
         StepFactoryStore = stepFactoryStore;
         LazyTypeResolver = lazyTypeResolver;
-    }
-
-    /// <summary>
-    /// Creates a type resolver lazily
-    /// </summary>
-    public static Lazy<Result<TypeResolver, IError>> CreateLazyTypeResolver(
-        string fullSCL,
-        StepFactoryStore stepFactoryStore,
-        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
-    {
-        var resolver = new Lazy<Result<TypeResolver, IError>>(
-            () =>
-                SCLParsing.TryParseStep(fullSCL)
-                    .Bind(
-                        x => TypeResolver.TryCreate(
-                            stepFactoryStore,
-                            SCLRunner.RootCallerMetadata,
-                            Maybe<VariableName>.None,
-                            x,
-                            variablesToInject
-                        )
-                    )
-        );
-
-        return resolver;
     }
 
     /// <summary>
@@ -58,7 +33,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     /// <summary>
     /// A Lazy Type Resolver
     /// </summary>
-    public Lazy<Result<TypeResolver, IError>> LazyTypeResolver { get; }
+    public Lazy<TypeResolver> LazyTypeResolver { get; }
 
     /// <inheritdoc />
     protected override bool ShouldVisitNextChild(IRuleNode node, QuickInfoResponse? currentResult)
@@ -286,16 +261,9 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
         if (!context.ContainsPosition(LinePosition))
             return null;
 
-        if (LazyTypeResolver.Value.IsFailure)
-            return Description(
-                context.GetText(),
-                nameof(VariableName),
-                null
-            );
-
         var vn = new VariableName(context.GetText().TrimStart('<').TrimEnd('>'));
 
-        if (LazyTypeResolver.Value.Value.Dictionary.TryGetValue(vn, out var tr))
+        if (LazyTypeResolver.Value.Dictionary.TryGetValue(vn, out var tr))
         {
             return Description(
                 context.GetText(),
@@ -343,16 +311,9 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         var text = variableNameNode.GetText();
 
-        if (LazyTypeResolver.Value.IsFailure)
-            return Description(
-                text,
-                nameof(VariableName),
-                null
-            );
-
         var vn = new VariableName(text.TrimStart('<').TrimEnd('>'));
 
-        if (LazyTypeResolver.Value.Value.Dictionary.TryGetValue(vn, out var tr))
+        if (LazyTypeResolver.Value.Dictionary.TryGetValue(vn, out var tr))
         {
             return Description(
                 text,
@@ -434,14 +395,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         Result<IStep, IError> freezeResult;
 
-        if (LazyTypeResolver.Value.IsFailure)
-            freezeResult = step.Value.TryFreeze(
-                callerMetadata,
-                StepFactoryStore,
-                ImmutableDictionary<VariableName, ISCLObject>.Empty
-            );
-        else
-            freezeResult = step.Value.TryFreeze(callerMetadata, LazyTypeResolver.Value.Value);
+        freezeResult = step.Value.TryFreeze(callerMetadata, LazyTypeResolver.Value);
 
         if (freezeResult.IsFailure)
             return Error(freezeResult.Error.AsString);

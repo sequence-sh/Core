@@ -11,9 +11,18 @@ public static class CompletionHelper
     public static CompletionResponse GetCompletionResponse(
         string code,
         LinePosition position,
-        StepFactoryStore stepFactoryStore)
+        StepFactoryStore stepFactoryStore,
+        IReadOnlyDictionary<VariableName, ISCLObject>? injectedVariables = null)
     {
-        var visitor = new CompletionVisitor(position, stepFactoryStore);
+        var lazyTypeResolver = new Lazy<TypeResolver>(
+            () => SCLParsing.CreateTypeResolver(
+                code,
+                stepFactoryStore,
+                injectedVariables
+            )
+        );
+
+        var visitor = new CompletionVisitor(position, stepFactoryStore, lazyTypeResolver);
 
         var completionResponse = visitor.LexParseAndVisit(
             code,
@@ -30,7 +39,8 @@ public static class CompletionHelper
         {
             visitor = new CompletionVisitor(
                 command.Value.newPosition,
-                stepFactoryStore
+                stepFactoryStore,
+                lazyTypeResolver
             );
 
             var lineCompletionResponse = visitor.LexParseAndVisit(

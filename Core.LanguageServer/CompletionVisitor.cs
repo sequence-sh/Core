@@ -1,4 +1,6 @@
-﻿namespace Reductech.Sequence.Core.LanguageServer;
+﻿using Reductech.Sequence.Core.Entities.Schema;
+
+namespace Reductech.Sequence.Core.LanguageServer;
 
 /// <summary>
 /// Visits SCL for completion
@@ -8,10 +10,14 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     /// <summary>
     /// Creates a new Completion Visitor
     /// </summary>
-    public CompletionVisitor(LinePosition position, StepFactoryStore stepFactoryStore)
+    public CompletionVisitor(
+        LinePosition position,
+        StepFactoryStore stepFactoryStore,
+        Lazy<TypeResolver> lazyTypeResolver)
     {
         Position         = position;
         StepFactoryStore = stepFactoryStore;
+        LazyTypeResolver = lazyTypeResolver;
     }
 
     /// <summary>
@@ -23,6 +29,11 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     /// The Step Factory Store
     /// </summary>
     public StepFactoryStore StepFactoryStore { get; }
+
+    /// <summary>
+    /// A Lazy Type Resolver
+    /// </summary>
+    public Lazy<TypeResolver> LazyTypeResolver { get; }
 
     /// <inheritdoc />
     public override CompletionResponse? VisitChildren(IRuleNode node)
@@ -64,6 +75,42 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
         }
 
         return null;
+    }
+
+    /// <inheritdoc />
+    public override CompletionResponse? VisitEntityGetValue(SCLParser.EntityGetValueContext context)
+    {
+        if (context.indexer.ContainsPosition(Position))
+        {
+            var callerMetadata = new CallerMetadata(
+                nameof(EntityGetValue<ISCLObject>),
+                nameof(EntityGetValue<ISCLObject>.Entity),
+                TypeReference.Entity.NoSchema
+            );
+
+            var visitor = new SCLParsing.Visitor();
+
+            var typeReference = visitor.Visit(context.accessedEntity)
+                .Map(x => x.ConvertToStep())
+                .Bind(x => x.TryGetOutputTypeReference(callerMetadata, LazyTypeResolver.Value));
+
+            if (typeReference.IsSuccess && typeReference.Value is TypeReference.Entity
+                {
+                    Schema.HasValue: true
+                } entityTypeReference)
+            {
+                var completionItems = entityTypeReference.Schema.Value.GetKeyNodePairs();
+
+                var response = EntityPropertiesCompletionResponse(
+                    completionItems,
+                    context.indexer.GetRange()
+                );
+
+                return response;
+            }
+        }
+
+        return base.VisitEntityGetValue(context);
     }
 
     /// <inheritdoc />
@@ -224,10 +271,32 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
         }
     }
 
+    private static CompletionResponse EntityPropertiesCompletionResponse(
+        IEnumerable<(EntityPropertyKey, SchemaNode)> pairs,
+        TextRange range)
+    {
+        var items = pairs.Select(x => CreateCompletionItem(x.Item1, x.Item2)).ToList();
+
+        CompletionItem CreateCompletionItem(EntityPropertyKey key, SchemaNode node)
+        {
+            var type = node.ToTypeReference().Match(x => x.HumanReadableTypeName, () => "Unknown");
+
+            return new CompletionItem(
+                key.AsString,
+                key.AsString,
+                type,
+                false,
+                new SCLTextEdit(key.AsString, range)
+            );
+        }
+
+        return new CompletionResponse(false, items);
+    }
+
     /// <summary>
     /// Gets the step parameter completion list
     /// </summary>
-    public static CompletionResponse StepParametersCompletionResponse(
+    private static CompletionResponse StepParametersCompletionResponse(
         IStepFactory stepFactory,
         TextRange range,
         SCLParser.FunctionContext functionContext)

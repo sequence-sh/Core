@@ -19,6 +19,14 @@ public sealed class TypeResolver
     }
 
     /// <summary>
+    /// A type resolver with no types
+    /// </summary>
+    public static TypeResolver Create(StepFactoryStore stepFactoryStore)
+    {
+        return new TypeResolver(stepFactoryStore, Maybe<VariableName>.None);
+    }
+
+    /// <summary>
     /// Copy this type resolver.
     /// </summary>
     public TypeResolver Copy()
@@ -92,7 +100,7 @@ public sealed class TypeResolver
         StepFactoryStore stepFactoryStore,
         CallerMetadata callerMetadata,
         Maybe<VariableName> automaticVariableName,
-        IFreezableStep topLevelStep,
+        IFreezableStep? topLevelStep,
         IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject)
     {
         var typeResolver = new TypeResolver(stepFactoryStore, automaticVariableName);
@@ -107,10 +115,13 @@ public sealed class TypeResolver
                     .MapError(x => x.WithLocation(ErrorLocation.EmptyLocation));
         }
 
-        var r = typeResolver.TryAddTypeHierarchy(callerMetadata, topLevelStep);
+        if (topLevelStep is not null)
+        {
+            var r = typeResolver.TryAddTypeHierarchy(callerMetadata, topLevelStep);
 
-        if (r.IsFailure)
-            return r.ConvertFailure<TypeResolver>();
+            if (r.IsFailure)
+                return r.ConvertFailure<TypeResolver>();
+        }
 
         return typeResolver;
     }
