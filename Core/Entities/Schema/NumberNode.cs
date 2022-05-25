@@ -43,6 +43,20 @@ public record NumberNode(
     }
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return LazyTypeReference.Value;
+    }
+
+    private static readonly Lazy<TypeReference> LazyTypeReference =
+        new(
+            () =>
+                new TypeReference.OneOf(
+                    new[] { TypeReference.Actual.Integer, TypeReference.Actual.Double, }
+                )
+        );
+
+    /// <inheritdoc />
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,

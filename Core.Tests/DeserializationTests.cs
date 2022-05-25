@@ -428,11 +428,6 @@ Log 'Comments!'",
             );
 
             yield return new DeserializationTestInstance(
-                "(Foo: 1)['Foo'] == (Foo: '1')['Foo']",
-                true
-            );
-
-            yield return new DeserializationTestInstance(
                 "(Foo: 1)['Foo'] < (Foo: 2)['Foo']",
                 true
             );

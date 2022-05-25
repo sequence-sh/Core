@@ -21,6 +21,12 @@ public record DateTimeStringFormat : StringFormat
     }
 
     /// <inheritdoc />
+    public override TypeReference GetTypeReference(StringRestrictions restrictions)
+    {
+        return TypeReference.Actual.Date;
+    }
+
+    /// <inheritdoc />
     public override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
         ISCLObject entityValue,

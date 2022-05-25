@@ -130,6 +130,11 @@ public abstract record SchemaNode<TData1>(
 public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeData)
 {
     /// <summary>
+    /// Convert this SchemaNode to a type reference. Returns None if this is a False Node
+    /// </summary>
+    public abstract Maybe<TypeReference> ToTypeReference();
+
+    /// <summary>
     /// Create a schema node from a Json Schema
     /// </summary>
     [Pure]

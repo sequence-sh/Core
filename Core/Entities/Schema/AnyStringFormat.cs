@@ -25,6 +25,15 @@ public record AnyStringFormat : StringFormat
     public override bool IsSuperset(StringFormat other) => true;
 
     /// <inheritdoc />
+    public override TypeReference GetTypeReference(StringRestrictions restrictions)
+    {
+        if (restrictions == StringRestrictions.NoRestrictions)
+            return TypeReference.Any.Instance;
+
+        return TypeReference.Actual.String;
+    }
+
+    /// <inheritdoc />
     public override void SetBuilder(JsonSchemaBuilder builder)
     {
         //Do nothing

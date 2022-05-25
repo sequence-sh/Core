@@ -41,6 +41,35 @@ public record EntityNode(
     }
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference() => new TypeReference.Entity(this);
+
+    /// <summary>
+    /// Gets the type reference of a particular property
+    /// </summary>
+    public Maybe<TypeReference> GetPropertyTypeReference(EntityPropertyKey epk)
+    {
+        var (key, remainder) = epk.Split();
+
+        var childNode = EntityPropertiesData.Nodes.TryGetValue(key, out var child)
+            ? child.Node
+            : EntityAdditionalItems.AdditionalItems;
+
+        if (remainder.HasValue)
+        {
+            return childNode switch
+            {
+                EntityNode en => en.GetPropertyTypeReference(remainder.Value),
+                TrueNode      => TypeReference.Dynamic.Instance,
+                _             => Maybe<TypeReference>.None
+            };
+        }
+        else
+        {
+            return childNode.ToTypeReference();
+        }
+    }
+
+    /// <inheritdoc />
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,

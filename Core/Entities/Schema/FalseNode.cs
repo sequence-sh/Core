@@ -11,6 +11,12 @@ public record FalseNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     public static FalseNode Instance { get; } = new();
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return Maybe<TypeReference>.None;
+    }
+
+    /// <inheritdoc />
     public override IEnumerable<INodeData> NodeData
     {
         get

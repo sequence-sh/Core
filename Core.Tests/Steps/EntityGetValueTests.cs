@@ -9,11 +9,17 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStr
         {
             yield return new StepCase(
                 "Get List Property",
-                new EntityGetValue<StringStream>
+                new Log()
                 {
-                    Entity   = Constant(Entity.Create(("Foo", new[] { "Hello", "World" }))),
-                    Property = Constant("Foo")
+                    Value = new EntityGetValue<Array<StringStream>>
+                    {
+                        Entity = Constant(
+                            Entity.Create(("Foo", new[] { "Hello", "World" }))
+                        ),
+                        Property = Constant("Foo")
+                    }
                 },
+                Unit.Default,
                 "[\"Hello\", \"World\"]"
             );
 

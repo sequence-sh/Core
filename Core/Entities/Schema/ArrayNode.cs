@@ -24,6 +24,29 @@ public record ArrayNode(
     }
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        TypeReference current = TypeReference.Any.Instance;
+
+        foreach (var prefix in ItemsData.PrefixItems.Append(ItemsData.AdditionalItems))
+        {
+            var p = prefix.ToTypeReference();
+
+            if (p.HasNoValue)
+                return Maybe<TypeReference>.None;
+
+            var combined = current.TryCombine(p.Value, null);
+
+            if (combined.IsFailure)
+                return Maybe<TypeReference>.None;
+
+            current = combined.Value;
+        }
+
+        return new TypeReference.Array(current);
+    }
+
+    /// <inheritdoc />
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,

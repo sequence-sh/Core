@@ -423,5 +423,10 @@ public sealed record ErrorCode : ErrorCodeBase
     /// </summary>
     public static readonly ErrorCode TypesIncompatible = new(nameof(TypesIncompatible));
 
+    /// <summary>
+    /// The entity can never have a property named '{0}'.
+    /// </summary>
+    public static readonly ErrorCode EntityPropertyNever = new(nameof(EntityPropertyNever));
+
 #endregion
 }

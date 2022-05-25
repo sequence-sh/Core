@@ -19,6 +19,12 @@ public record IntegerNode(
     );
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return TypeReference.Actual.Integer;
+    }
+
+    /// <inheritdoc />
     public override SchemaValueType SchemaValueType => SchemaValueType.Integer;
 
     /// <inheritdoc />

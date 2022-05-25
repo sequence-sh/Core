@@ -11,6 +11,12 @@ public record TrueNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     public static TrueNode Instance { get; } = new();
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return TypeReference.Any.Instance;
+    }
+
+    /// <inheritdoc />
     public override IEnumerable<INodeData> NodeData
     {
         get

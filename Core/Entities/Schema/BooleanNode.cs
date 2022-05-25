@@ -13,6 +13,12 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
     public static BooleanNode Default { get; } = new(EnumeratedValuesNodeData.Empty);
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return TypeReference.Actual.Bool;
+    }
+
+    /// <inheritdoc />
     public override IEnumerable<INodeData> NodeData
     {
         get

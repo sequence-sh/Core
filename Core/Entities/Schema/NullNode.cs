@@ -11,6 +11,12 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     public static NullNode Instance { get; } = new();
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return TypeReference.Actual.Null;
+    }
+
+    /// <inheritdoc />
     public override IEnumerable<INodeData> NodeData
     {
         get

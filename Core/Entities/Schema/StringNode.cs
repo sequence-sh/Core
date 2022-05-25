@@ -70,5 +70,11 @@ public record StringNode(
     }
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return Format.GetTypeReference(StringRestrictions);
+    }
+
+    /// <inheritdoc />
     public override SchemaValueType SchemaValueType => SchemaValueType.String;
 }

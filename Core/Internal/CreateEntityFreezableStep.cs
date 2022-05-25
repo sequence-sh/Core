@@ -186,23 +186,33 @@ public sealed record CreateEntityFreezableStep
             {
                 var (start, remaining) = key.Split();
 
+                var dict =
+                    node.EntityPropertiesData.Nodes.ToDictionary(x => x.Key, x => x.Value);
+
                 if (remaining.HasNoValue)
                 {
-                    var dict =
-                        node.EntityPropertiesData.Nodes.ToDictionary(x => x.Key, x => x.Value);
-
                     dict[start] = (schemaNode, true, dict.Count);
-
-                    node = new EntityNode(
-                        node.EnumeratedValuesNodeData,
-                        node.EntityAdditionalItems,
-                        new EntityPropertiesData(dict)
+                }
+                else
+                {
+                    var childNode = new EntityNode(
+                        EnumeratedValuesNodeData.Empty,
+                        new EntityAdditionalItems(FalseNode.Instance),
+                        EntityPropertiesData.Empty
                     );
 
-                    return node;
+                    childNode = UpdateEntityNode(childNode, remaining.Value, schemaNode);
+
+                    dict[start] = (childNode, true, dict.Count);
                 }
 
-                return UpdateEntityNode(node, remaining.Value, schemaNode);
+                node = new EntityNode(
+                    node.EnumeratedValuesNodeData,
+                    node.EntityAdditionalItems,
+                    new EntityPropertiesData(dict)
+                );
+
+                return node;
             }
         }
 

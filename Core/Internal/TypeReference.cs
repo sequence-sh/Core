@@ -1,4 +1,5 @@
-﻿using Reductech.Sequence.Core.Internal.Documentation;
+﻿using OneOf.Types;
+using Reductech.Sequence.Core.Internal.Documentation;
 
 namespace Reductech.Sequence.Core.Internal;
 
@@ -44,10 +45,10 @@ public abstract record TypeReference
         TypeReference other,
         TypeResolver? typeResolver)
     {
-        if (this is Unknown)
+        if (this is Unknown or Any)
             return other;
 
-        if (other is Unknown)
+        if (other is Unknown or Any)
             return this;
 
         if (this is Array thisArray)

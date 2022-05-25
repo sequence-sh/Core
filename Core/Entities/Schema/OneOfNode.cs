@@ -9,6 +9,21 @@ public record OneOfNode(OneOfNodeData Data) : SchemaNode<OneOfNodeData>(
 )
 {
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        var options =
+            Data.Options.Select(x => x.ToTypeReference())
+                .SelectMany(x => x.ToEnumerable())
+                .Distinct()
+                .ToArray();
+
+        if (!options.Any())
+            return Maybe<TypeReference>.None;
+
+        return new TypeReference.OneOf(options);
+    }
+
+    /// <inheritdoc />
     public override IEnumerable<INodeData> NodeData
     {
         get
