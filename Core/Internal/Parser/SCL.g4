@@ -33,7 +33,7 @@ number              : NUMBER ;
 boolean				: TRUE | FALSE ;
 dateTime			: DATETIME ;
 interpolatedString	: OPENISTRING step (ISTRINGSEGMENT step)* CLOSEISTRING;
-quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING | SIMPLEISTRING ;
+quotedString		: MULTILINESTRING | DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING | SIMPLEISTRING ;
 enumeration			: NAME DOT NAME ;
 nullValue           : NULLVALUE ;
 
@@ -120,6 +120,7 @@ ISTRINGSEGMENT		: CLOSEBRACE ISTRINGCHAR* OPENBRACE;
 CLOSEISTRING		: CLOSEBRACE ISTRINGCHAR* '"';
 SIMPLEISTRING		: DOLLAR '"' ISTRINGCHAR* '"';
 fragment DQSCHAR	: (~('"' | '\\' | '\r' | '\n' | '\t') | '\\' ('"' | '\\' | 'r' | 'n' | 't'));
+MULTILINESTRING     : '"''"''"' .*? '"''"''"' ;
 DOUBLEQUOTEDSTRING	: '"' DQSCHAR* '"' ;
 SINGLEQUOTEDSTRING	: '\'' (~('\'') | '\'\'')* '\'' ;
 TRUE				: [Tt] [Rr] [Uu] [Ee];

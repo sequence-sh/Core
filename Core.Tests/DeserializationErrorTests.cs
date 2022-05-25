@@ -34,7 +34,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "1/",
-                ("Syntax Error: mismatched input '<EOF>' expecting {'(', '[', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NULLVALUE, NAME}",
+                ("Syntax Error: mismatched input '<EOF>' expecting {'(', '[', AUTOMATICVARIABLE, VARIABLENAME, DATETIME, NUMBER, OPENISTRING, SIMPLEISTRING, MULTILINESTRING, DOUBLEQUOTEDSTRING, SINGLEQUOTEDSTRING, TRUE, FALSE, NULLVALUE, NAME}",
                  "Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 1, Idx: 1 Text: <EOF>")
             );
 

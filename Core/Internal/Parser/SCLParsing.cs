@@ -466,6 +466,8 @@ public static class SCLParsing
                 s = UnescapeSingleQuoted(context.SINGLEQUOTEDSTRING().GetText());
             else if (context.SIMPLEISTRING() != null)
                 s = UnescapeInterpolated(context.SIMPLEISTRING().GetText(), true);
+            else if (context.MULTILINESTRING() != null)
+                s = UnescapeMultiline(context.MULTILINESTRING().GetText());
             else
                 throw new Exception($"Could not parse {context}");
 
@@ -537,6 +539,8 @@ public static class SCLParsing
 
             return new FreezableStepProperty.Step(freezableStep, new TextLocation(context));
         }
+
+        static string UnescapeMultiline(string txt) => txt.Substring(3, txt.Length - 6);
 
         static string UnescapeInterpolated(string txt, bool removeDollar)
         {
