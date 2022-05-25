@@ -11,10 +11,10 @@ namespace Reductech.Sequence.Core.Internal;
 public static class FreezableFactory
 {
     /// <summary>
-    /// Create a new Freezable EntityGetValue
+    /// Create a new Freezable EntityGetValue or ArrayElementAtIndex
     /// </summary>
-    public static IFreezableStep CreateFreezableArrayAccess(
-        IFreezableStep entityOrArray,
+    public static IFreezableStep CreateFreezableEntityGetValue(
+        IFreezableStep entity,
         IFreezableStep indexer,
         TextLocation location)
     {
@@ -22,7 +22,7 @@ public static class FreezableFactory
         {
             {
                 new StepParameterReference.Named(nameof(EntityGetValue<SCLInt>.Entity)),
-                new FreezableStepProperty.Step(entityOrArray, location)
+                new FreezableStepProperty.Step(entity, location)
             },
             {
                 new StepParameterReference.Named(nameof(EntityGetValue<SCLInt>.Property)),
@@ -37,6 +37,19 @@ public static class FreezableFactory
             entityGetValueData,
             location
         );
+
+        return entityGetValueStep;
+    }
+
+    /// <summary>
+    /// Create a new Freezable EntityGetValue or ArrayElementAtIndex
+    /// </summary>
+    public static IFreezableStep CreateFreezableArrayAccess(
+        IFreezableStep entityOrArray,
+        IFreezableStep indexer,
+        TextLocation location)
+    {
+        var entityGetValueStep = CreateFreezableEntityGetValue(entityOrArray, indexer, location);
 
         var elementAtIndexDict = new StepParameterDict
         {

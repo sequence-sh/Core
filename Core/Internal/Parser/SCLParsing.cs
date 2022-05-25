@@ -237,6 +237,30 @@ public static class SCLParsing
         }
 
         /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitEntityGetValue(
+            SCLParser.EntityGetValueContext context)
+        {
+            var entityResult = Visit(context.accessedEntity).Map(x => x.ConvertToStep());
+
+            if (entityResult.IsFailure)
+                return entityResult.ConvertFailure<FreezableStepProperty>();
+
+            //var indexerResult = Visit(context.indexer).Map(x => x.ConvertToStep());
+            var indexer = new SCLConstantFreezable<StringStream>(
+                context.indexer.Text,
+                new TextLocation(context.indexer)
+            );
+
+            var step = CreateFreezableEntityGetValue(
+                entityResult.Value,
+                indexer,
+                new TextLocation(context)
+            );
+
+            return new FreezableStepProperty.Step(step, new TextLocation(context));
+        }
+
+        /// <inheritdoc />
         public override Result<FreezableStepProperty, IError> VisitBracketedStep(
             SCLParser.BracketedStepContext context) => Visit(context.step())
             .Map(x => x with { StepMetadata = x.StepMetadata with { Bracketed = true } });
