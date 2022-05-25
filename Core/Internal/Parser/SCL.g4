@@ -29,16 +29,17 @@ function			: NAME (term)* (namedArgument)* ;
 entity				: OPENBRACKET (entityProperty COMMA?)*  CLOSEBRACKET ;
 bracketedStep		: OPENBRACKET step CLOSEBRACKET ;
 lambda              : OPENBRACKET (VARIABLENAME | AUTOMATICVARIABLE) ARROW step CLOSEBRACKET ;
+number              : NUMBER ;
 boolean				: TRUE | FALSE ;
 dateTime			: DATETIME ;
 interpolatedString	: OPENISTRING step (ISTRINGSEGMENT step)* CLOSEISTRING;
 quotedString		: DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING | SIMPLEISTRING ;
-number              : NUMBER (DOT NUMBER)? ;
 enumeration			: NAME DOT NAME ;
 nullValue           : NULLVALUE ;
 
 infixableTerm       : sclObjectTerm #SclObjectTerm1                                   					
                     | arrayOrEntity=infixableTerm OPENSQUAREBRACKET indexer=indexerTerm CLOSESQUAREBRACKET #ArrayAccess
+                    | accessedEntity=infixableTerm DOT indexer=NAME #EntityGetValue
                     | bracketedStep  #BracketedStep1   
                     ;
 
@@ -112,7 +113,7 @@ fragment DIGIT		: [0-9];
 AUTOMATICVARIABLE   : LESSTHAN GREATERTHAN ;
 VARIABLENAME		: LESSTHAN [a-zA-Z0-9_]+ GREATERTHAN ;
 DATETIME			: DIGIT DIGIT DIGIT DIGIT DASH DIGIT DIGIT DASH DIGIT DIGIT ([Tt] DIGIT DIGIT COLON DIGIT DIGIT COLON DIGIT DIGIT ('.' DIGIT+)?)? ;
-NUMBER				: DASH? DIGIT+ ;
+NUMBER				: DASH? DIGIT+ (DOT DIGIT*)? ;
 fragment ISTRINGCHAR: (~('"' | '\\' | '\r' | '\n' | '\t' | '{' | '}') | '\\' ('"' | '\\' | 'r' | 'n' | 't' | '{{' | '}}'));
 OPENISTRING         : DOLLAR '"' ISTRINGCHAR* OPENBRACE;
 ISTRINGSEGMENT		: CLOSEBRACE ISTRINGCHAR* OPENBRACE;

@@ -7,7 +7,9 @@ namespace Reductech.Sequence.Core.Steps;
 /// </summary>
 [Alias("From")]
 [SCLExample("(foo: 123)['foo']",                           "123")]
+[SCLExample("(foo: 123).foo",                              "123")]
 [SCLExample("(foo: (bar: 123))['foo.bar']",                "123")]
+[SCLExample("(foo: (bar: 123)).foo.bar",                   "123")]
 [SCLExample("From ('type': 'C', 'value': 1) Get: 'value'", "1")]
 [SCLExample(
     "- <myVar> = ('a':[1,2,3])['a']\r\n- <myVar> | Foreach (log (<>))",

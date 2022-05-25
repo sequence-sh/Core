@@ -30,6 +30,44 @@ public static class SCLParsing
         return r;
     }
 
+    /// <summary>
+    /// Creates a type resolver lazily
+    /// </summary>
+    public static TypeResolver CreateTypeResolver(
+        string fullSCL,
+        StepFactoryStore stepFactoryStore,
+        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
+    {
+        var fullResult =
+            TryParseStep(fullSCL)
+                .Bind(
+                    x => TypeResolver.TryCreate(
+                        stepFactoryStore,
+                        SCLRunner.RootCallerMetadata,
+                        Maybe<VariableName>.None,
+                        x,
+                        variablesToInject
+                    )
+                );
+
+        if (fullResult.IsSuccess)
+            return fullResult.Value;
+
+        var partialResult1 =
+            TypeResolver.TryCreate(
+                stepFactoryStore,
+                SCLRunner.RootCallerMetadata,
+                Maybe<VariableName>.None,
+                null,
+                variablesToInject
+            );
+
+        if (partialResult1.IsSuccess)
+            return partialResult1.Value;
+
+        return TypeResolver.Create(stepFactoryStore);
+    }
+
     private static Result<FreezableStepProperty, IError> TryParse(string text)
     {
         var inputStream       = new AntlrInputStream(text);
@@ -85,7 +123,10 @@ public static class SCLParsing
         }
     }
 
-    private class Visitor : SCLBaseVisitor<Result<FreezableStepProperty, IError>>
+    /// <summary>
+    /// Visitor for parsing SCL
+    /// </summary>
+    public class Visitor : SCLBaseVisitor<Result<FreezableStepProperty, IError>>
     {
         /// <inheritdoc />
         public override Result<FreezableStepProperty, IError> VisitFullSequence(
@@ -230,6 +271,30 @@ public static class SCLParsing
             var step = CreateFreezableArrayAccess(
                 arrayResult.Value,
                 indexerResult.Value,
+                new TextLocation(context)
+            );
+
+            return new FreezableStepProperty.Step(step, new TextLocation(context));
+        }
+
+        /// <inheritdoc />
+        public override Result<FreezableStepProperty, IError> VisitEntityGetValue(
+            SCLParser.EntityGetValueContext context)
+        {
+            var entityResult = Visit(context.accessedEntity).Map(x => x.ConvertToStep());
+
+            if (entityResult.IsFailure)
+                return entityResult.ConvertFailure<FreezableStepProperty>();
+
+            //var indexerResult = Visit(context.indexer).Map(x => x.ConvertToStep());
+            var indexer = new SCLConstantFreezable<StringStream>(
+                context.indexer.Text,
+                new TextLocation(context.indexer)
+            );
+
+            var step = CreateFreezableEntityGetValue(
+                entityResult.Value,
+                indexer,
                 new TextLocation(context)
             );
 

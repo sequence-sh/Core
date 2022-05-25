@@ -19,9 +19,7 @@ public static class FormattingHelper
 
         var commands = Helpers.SplitIntoCommands(scl);
 
-        var typeResolver = QuickInfoVisitor
-            .CreateLazyTypeResolver(scl, stepFactoryStore, injectedVariables)
-            .Value;
+        var typeResolver = SCLParsing.CreateTypeResolver(scl, stepFactoryStore, injectedVariables);
 
         var textEdits             = new List<SCLTextEdit>();
         var commandCallerMetadata = new CallerMetadata("Command", "", TypeReference.Any.Instance);
@@ -32,23 +30,10 @@ public static class FormattingHelper
 
             if (stepParseResult.IsSuccess)
             {
-                Result<IStep, IError> freezeResult;
-
-                if (typeResolver.IsSuccess)
-                {
-                    freezeResult = stepParseResult.Value.TryFreeze(
-                        commandCallerMetadata,
-                        typeResolver.Value
-                    );
-                }
-                else
-                {
-                    freezeResult = stepParseResult.Value.TryFreeze(
-                        commandCallerMetadata,
-                        stepFactoryStore,
-                        injectedVariables ?? ImmutableDictionary<VariableName, ISCLObject>.Empty
-                    );
-                }
+                var freezeResult = stepParseResult.Value.TryFreeze(
+                    commandCallerMetadata,
+                    typeResolver
+                );
 
                 if (freezeResult.IsSuccess)
                 {
