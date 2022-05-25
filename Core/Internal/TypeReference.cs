@@ -1,4 +1,5 @@
-﻿using Reductech.Sequence.Core.Internal.Documentation;
+﻿using OneOf.Types;
+using Reductech.Sequence.Core.Internal.Documentation;
 
 namespace Reductech.Sequence.Core.Internal;
 
@@ -32,16 +33,22 @@ public abstract record TypeReference
     public abstract string HumanReadableTypeName { get; }
 
     /// <summary>
+    /// Create a schema node which accepts objects of this type
+    /// </summary>
+    /// <returns></returns>
+    public abstract SchemaNode ToSchemaNode(TypeResolver typeResolver);
+
+    /// <summary>
     /// Try to combine this type reference with another
     /// </summary>
     public Result<TypeReference, IErrorBuilder> TryCombine(
         TypeReference other,
         TypeResolver? typeResolver)
     {
-        if (this is Unknown)
+        if (this is Unknown or Any)
             return other;
 
-        if (other is Unknown)
+        if (other is Unknown or Any)
             return this;
 
         if (this is Array thisArray)
@@ -65,6 +72,19 @@ public abstract record TypeReference
         else if (other is Array) //Flip to get the array logic in the other direction
         {
             return other.TryCombine(this, typeResolver);
+        }
+
+        if (this is Entity e1 && other is Entity e2)
+        {
+            if (e2.Schema.HasNoValue)
+                return e1;
+
+            if (e1.Schema.HasNoValue)
+                return e2;
+
+            var combined = (EntityNode)e1.Schema.Value.Combine(e2.Schema.Value);
+
+            return new Entity(combined);
         }
 
         if (other.Allow(this, typeResolver))
@@ -124,6 +144,9 @@ public abstract record TypeReference
 
         /// <inheritdoc />
         public override string HumanReadableTypeName => "any";
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver) => TrueNode.Instance;
     }
 
     /// <summary>
@@ -151,39 +174,51 @@ public abstract record TypeReference
         /// <summary>
         /// A string
         /// </summary>
-        public static Actual String { get; } = new TypedActual<StringStream>();
+        public static Actual String { get; } = new TypedActual<StringStream>(
+            new StringNode(
+                EnumeratedValuesNodeData.Empty,
+                AnyStringFormat.Instance,
+                StringRestrictions.NoRestrictions
+            )
+        );
 
         /// <summary>
         /// An integer
         /// </summary>
-        public static Actual Integer { get; } = new TypedActual<SCLInt>();
+        public static Actual Integer { get; } = new TypedActual<SCLInt>(
+            new IntegerNode(EnumeratedValuesNodeData.Empty, NumberRestrictions.NoRestrictions)
+        );
 
         /// <summary>
         /// A double
         /// </summary>
-        public static Actual Double { get; } = new TypedActual<SCLDouble>();
+        public static Actual Double { get; } = new TypedActual<SCLDouble>(
+            new NumberNode(EnumeratedValuesNodeData.Empty, NumberRestrictions.NoRestrictions)
+        );
 
         /// <summary>
         /// A boolean
         /// </summary>
-        public static Actual Bool { get; } = new TypedActual<SCLBool>();
+        public static Actual Bool { get; } =
+            new TypedActual<SCLBool>(new BooleanNode(EnumeratedValuesNodeData.Empty));
 
         /// <summary>
         /// A date
         /// </summary>
-        public static Actual Date { get; } = new TypedActual<SCLDateTime>();
-
-        /// <summary>
-        /// An entity
-        /// </summary>
-        public static Actual Entity { get; } = new TypedActual<Entity>();
+        public static Actual Date { get; } = new TypedActual<SCLDateTime>(
+            new StringNode(
+                EnumeratedValuesNodeData.Empty,
+                DateTimeStringFormat.Instance,
+                StringRestrictions.NoRestrictions
+            )
+        );
 
         /// <summary>
         /// A null value
         /// </summary>
-        public static Actual Null { get; } = new TypedActual<SCLNull>();
+        public static Actual Null { get; } = new TypedActual<SCLNull>(NullNode.Instance);
 
-        private sealed record TypedActual<T> : Actual where T : ISCLObject
+        private sealed record TypedActual<T>(SchemaNode SchemaNode) : Actual where T : ISCLObject
         {
             /// <inheritdoc />
             public override string Name => typeof(T).Name;
@@ -196,6 +231,9 @@ public abstract record TypeReference
             /// <inheritdoc />
             public override string HumanReadableTypeName { get; } =
                 TypeNameHelper.GetHumanReadableTypeName(typeof(T));
+
+            /// <inheritdoc />
+            public override SchemaNode ToSchemaNode(TypeResolver typeResolver) => SchemaNode;
         }
     }
 
@@ -233,11 +271,70 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver) => NullNode.Instance;
+
+        /// <inheritdoc />
         public override string Name => nameof(Unit);
 
         /// <inheritdoc />
         public override string HumanReadableTypeName { get; } =
             TypeNameHelper.GetHumanReadableTypeName(typeof(Unit));
+    }
+
+    /// <summary>
+    /// An entity type reference
+    /// </summary>
+    public sealed record Entity(Maybe<EntityNode> Schema) : TypeReference
+    {
+        /// <summary>
+        /// An entity type with no schema defined
+        /// </summary>
+        public static Entity NoSchema { get; } = new(Maybe<EntityNode>.None);
+
+        /// <inheritdoc />
+        public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
+            TypeResolver typeResolver)
+        {
+            return ErrorCode.CannotInferType.ToErrorBuilder($"{Name} is not an Array Type");
+        }
+
+        /// <inheritdoc />
+        public override Result<Type, IErrorBuilder> TryGetType(TypeResolver typeResolver)
+        {
+            return typeof(Core.Entity);
+        }
+
+        /// <inheritdoc />
+        public override bool Allow(TypeReference other, TypeResolver? typeResolver)
+        {
+            other = typeResolver?.MaybeResolve(other) ?? other;
+
+            if (other is not Entity otherAsEntity)
+                return false;
+
+            if (Schema.HasNoValue || otherAsEntity.Schema.HasNoValue)
+                return true;
+
+            if (Schema.Value.IsSuperset(otherAsEntity.Schema.Value))
+                return true;
+
+            return false;
+        }
+
+        /// <inheritdoc />
+        public override string HumanReadableTypeName => nameof(Core.Entity);
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver)
+        {
+            if (Schema.HasValue)
+                return Schema.Value;
+
+            return TrueNode.Instance;
+        }
+
+        /// <inheritdoc />
+        public override string Name => nameof(Core.Entity);
     }
 
     /// <summary>
@@ -270,6 +367,21 @@ public abstract record TypeReference
         /// <inheritdoc />
         public override string HumanReadableTypeName { get; } =
             TypeNameHelper.GetHumanReadableTypeName(EnumType);
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver)
+        {
+            var instance =
+                (ISCLEnum)Activator.CreateInstance(typeof(SCLEnum<>).MakeGenericType(EnumType))!;
+
+            var values = instance.GetAllValues().ToList();
+
+            return new StringNode(
+                new EnumeratedValuesNodeData(values),
+                AnyStringFormat.Instance,
+                StringRestrictions.NoRestrictions
+            );
+        }
     }
 
     /// <summary>
@@ -364,6 +476,16 @@ public abstract record TypeReference
             " or ",
             Options.Select(x => x.HumanReadableTypeName)
         );
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver)
+        {
+            return new OneOfNode(
+                new OneOfNodeData(
+                    Options.Select(x => x.ToSchemaNode(typeResolver)).Distinct().ToArray()
+                )
+            );
+        }
     }
 
     /// <summary>
@@ -398,6 +520,9 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver) => TrueNode.Instance;
+
+        /// <inheritdoc />
         public override string Name => "Dynamic";
 
         /// <inheritdoc />
@@ -426,6 +551,17 @@ public abstract record TypeReference
             other = typeResolver?.MaybeResolve(other) ?? other;
 
             return other is Array array && MemberType.Allow(array.MemberType, typeResolver);
+        }
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver)
+        {
+            var member = MemberType.ToSchemaNode(typeResolver);
+
+            return new ArrayNode(
+                EnumeratedValuesNodeData.Empty,
+                new ItemsData(ArraySegment<SchemaNode>.Empty, member)
+            );
         }
 
         /// <inheritdoc />
@@ -501,6 +637,23 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver)
+        {
+            if (typeResolver.AutomaticVariableName.HasNoValue)
+                return TrueNode.Instance;
+
+            if (typeResolver.Dictionary.TryGetValue(
+                    typeResolver.AutomaticVariableName.GetValueOrThrow(),
+                    out var tr
+                ))
+            {
+                return tr.ToSchemaNode(typeResolver);
+            }
+
+            return TrueNode.Instance;
+        }
+
+        /// <inheritdoc />
         public override string Name => nameof(AutomaticVariable);
 
         /// <inheritdoc />
@@ -517,7 +670,7 @@ public abstract record TypeReference
         public override Result<TypeReference, IErrorBuilder> TryGetArrayMemberTypeReference(
             TypeResolver typeResolver)
         {
-            Variable vtr = this;
+            var vtr = this;
 
             HashSet<TypeReference> typeReferences = new(); //prevent circular references
 
@@ -568,6 +721,20 @@ public abstract record TypeReference
         }
 
         /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver)
+        {
+            if (typeResolver.Dictionary.TryGetValue(
+                    VariableName,
+                    out var tr
+                ))
+            {
+                return tr.ToSchemaNode(typeResolver);
+            }
+
+            return TrueNode.Instance;
+        }
+
+        /// <inheritdoc />
         public override string Name => VariableName.Serialize(SerializeOptions.Serialize);
 
         /// <inheritdoc />
@@ -606,6 +773,9 @@ public abstract record TypeReference
         {
             return true;
         }
+
+        /// <inheritdoc />
+        public override SchemaNode ToSchemaNode(TypeResolver typeResolver) => TrueNode.Instance;
 
         /// <inheritdoc />
         public override string Name => nameof(Unknown);
@@ -688,7 +858,7 @@ public abstract record TypeReference
             nameof(SCLDateTime)  => Actual.Date,
             nameof(SCLNull)      => Actual.Null,
             nameof(Unit)         => Unit.Instance,
-            nameof(Entity)       => Actual.Entity,
+            nameof(Entity)       => Entity.NoSchema,
             nameof(ISCLObject)   => Any.Instance,
             _                    => Unknown.Instance
         };

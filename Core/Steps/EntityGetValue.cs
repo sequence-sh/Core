@@ -7,7 +7,6 @@ namespace Reductech.Sequence.Core.Steps;
 /// </summary>
 [Alias("From")]
 [SCLExample("(foo: 123)['foo']",                           "123")]
-[SCLExample("(foo: 123)['bar']",                           "")]
 [SCLExample("(foo: (bar: 123))['foo.bar']",                "123")]
 [SCLExample("From ('type': 'C', 'value': 1) Get: 'value'", "1")]
 [SCLExample(
@@ -116,6 +115,96 @@ public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
+            var entityStep = freezableStepData.TryGetStep(
+                nameof(EntityGetValue<ISCLObject>.Entity),
+                StepType
+            );
+
+            if (entityStep.IsFailure)
+                return entityStep.ConvertFailure<TypeReference>();
+
+            var propertyStep = freezableStepData.TryGetStep(
+                nameof(EntityGetValue<ISCLObject>.Property),
+                StepType
+            );
+
+            if (propertyStep.IsFailure)
+                return entityStep.ConvertFailure<TypeReference>();
+
+            var entityTypeReference =
+                entityStep.Value.TryGetOutputTypeReference(callerMetadata, typeResolver);
+
+            if (entityTypeReference.IsSuccess)
+            {
+                var etrNode = entityTypeReference.Value.ToSchemaNode(typeResolver);
+
+                if (etrNode is EntityNode currentNode)
+                {
+                    var frozenPropertyStep = propertyStep.Value.TryFreeze(
+                        new CallerMetadata(
+                            TypeName,
+                            nameof(EntityGetValue<ISCLObject>.Property),
+                            TypeReference.Actual.String
+                        ),
+                        typeResolver.StepFactoryStore
+                    );
+
+                    if (frozenPropertyStep.IsSuccess)
+                    {
+                        if (frozenPropertyStep.Value.HasConstantValue(
+                                ArraySegment<VariableName>.Empty
+                            ))
+                        {
+                            var propNameMaybe =
+                                frozenPropertyStep.Value.TryGetConstantValueAsync(
+                                        ImmutableDictionary<VariableName, ISCLObject>.Empty,
+                                        typeResolver.StepFactoryStore
+                                    )
+                                    .Result;
+
+                            if (propNameMaybe.HasValue
+                             && propNameMaybe.Value is StringStream propName)
+                            {
+                                var epk = EntityPropertyKey.Create(propName.GetString());
+
+                                var typeReference = currentNode.GetPropertyTypeReference(epk);
+
+                                if (typeReference.HasNoValue)
+                                    return ErrorCode.EntityPropertyNever
+                                        .ToErrorBuilder(propName.GetString())
+                                        .WithLocationSingle(freezableStepData.Location);
+
+                                var combinedType =
+                                    callerMetadata.ExpectedType.TryCombine(
+                                        typeReference.Value,
+                                        typeResolver
+                                    );
+
+                                if (combinedType.IsSuccess)
+                                {
+                                    if (combinedType.Value.IsUnknown || combinedType.Value
+                                     == TypeReference.Any.Instance)
+                                        return TypeReference.Dynamic.Instance;
+
+                                    return combinedType.Value;
+                                }
+
+                                return ErrorCode.WrongType.ToErrorBuilder(
+                                        callerMetadata.StepName,
+                                        callerMetadata.ExpectedType.Name,
+                                        callerMetadata.ParameterName,
+                                        $"Entity['{propName.GetString()}']",
+                                        typeReference.Value.Name
+                                    )
+                                    .WithLocationSingle(freezableStepData.Location);
+                            }
+                        }
+                    }
+                }
+            }
+
+            //We are unable to get full type information. Resolve dynamically
+
             if (callerMetadata.ExpectedType.IsUnknown
              || callerMetadata.ExpectedType == TypeReference.Any.Instance)
             {

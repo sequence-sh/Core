@@ -35,7 +35,7 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>> where T : ISCL
                 stateMonad,
                 currentState,
                 Function.VariableNameOrItem,
-                new KeyValuePair<VariableName, ISCLObject>(Function.VariableNameOrItem, record!)
+                new KeyValuePair<VariableName, ISCLObject>(Function.VariableNameOrItem, record)
             );
 
             var result = await Function.StepTyped.Run(scopedMonad, cancellationToken);
@@ -84,7 +84,7 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>> where T : ISCL
         /// <inheritdoc />
         public override TypeReference GetOutputTypeReference(TypeReference memberTypeReference)
         {
-            return new TypeReference.Array(TypeReference.Actual.Entity);
+            return new TypeReference.Array(TypeReference.Entity.NoSchema);
         }
 
         /// <inheritdoc />
@@ -92,14 +92,14 @@ public sealed class ArrayGroupBy<T> : CompoundStep<Array<Entity>> where T : ISCL
             CallerMetadata callerMetadata)
         {
             var r = callerMetadata.CheckAllows(
-                new TypeReference.Array(TypeReference.Actual.Entity),
+                new TypeReference.Array(TypeReference.Entity.NoSchema),
                 null
             );
 
             if (r.IsFailure)
                 return r.ConvertFailure<TypeReference>();
 
-            return new TypeReference.Array(TypeReference.Any.Instance);
+            return new TypeReference.Array(TypeReference.Any.Instance); //TODO
         }
 
         /// <inheritdoc />

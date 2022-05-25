@@ -158,6 +158,12 @@ public partial class DeserializationErrorTests
                 ("Variable '<a>' does not exist.",
                  "Line: 2, Col: 27, Idx: 40 - Line: 2, Col: 29, Idx: 42 Text: <a>")
             );
+
+            yield return new DeserializationErrorCase(
+                "(Foo: 1)['bar']",
+                ("The entity can never have a property named 'bar'.",
+                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 14, Idx: 14 Text: (Foo: 1)['bar']")
+            );
         }
     }
 

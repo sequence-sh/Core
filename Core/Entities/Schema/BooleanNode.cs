@@ -13,6 +13,12 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
     public static BooleanNode Default { get; } = new(EnumeratedValuesNodeData.Empty);
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return TypeReference.Actual.Bool;
+    }
+
+    /// <inheritdoc />
     public override IEnumerable<INodeData> NodeData
     {
         get
@@ -25,9 +31,10 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
     public override SchemaValueType SchemaValueType => SchemaValueType.Boolean;
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other)
+    public override bool IsSuperset(SchemaNode other)
     {
-        return false;
+        return other is BooleanNode
+            && EnumeratedValuesNodeData.IsSuperset(EnumeratedValuesNodeData);
     }
 
     /// <inheritdoc />

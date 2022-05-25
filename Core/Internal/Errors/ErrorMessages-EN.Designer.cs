@@ -232,6 +232,15 @@ namespace Reductech.Sequence.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The entity can never have a property named &apos;{0}&apos;..
+        /// </summary>
+        internal static string EntityPropertyNever {
+            get {
+                return ResourceManager.GetString("EntityPropertyNever", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to External Process Failed: &apos;{0}&apos;.
         /// </summary>
         internal static string ExternalProcessError {

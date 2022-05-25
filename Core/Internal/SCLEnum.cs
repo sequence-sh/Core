@@ -14,6 +14,12 @@ public interface ISCLEnum : IComparableSCLObject
     /// The enum value
     /// </summary>
     string EnumValue { get; }
+
+    /// <summary>
+    /// Gets all possible values of this enum
+    /// </summary>
+    /// <returns></returns>
+    IEnumerable<ISCLObject> GetAllValues();
 }
 
 /// <summary>
@@ -84,4 +90,8 @@ public sealed record SCLEnum<T>(T Value) : ISCLEnum where T : struct, Enum
 
     /// <inheritdoc />
     public bool IsEmpty() => false;
+
+    /// <inheritdoc />
+    public IEnumerable<ISCLObject> GetAllValues() =>
+        Enum.GetValues<T>().Select(x => new SCLEnum<T>(x));
 }

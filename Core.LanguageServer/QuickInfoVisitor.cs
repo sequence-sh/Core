@@ -217,7 +217,7 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         return Description(
             context.GetText(),
-            TypeReference.Actual.Entity,
+            TypeReference.Entity.NoSchema,
             null
         );
     }

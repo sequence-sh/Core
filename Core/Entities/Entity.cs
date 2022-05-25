@@ -37,7 +37,7 @@ public sealed partial record Entity(
     public static Entity Empty { get; } = new(new List<EntityProperty>());
 
     /// <inheritdoc />
-    public TypeReference GetTypeReference() => TypeReference.Actual.Entity;
+    public TypeReference GetTypeReference() => TypeReference.Entity.NoSchema;
 
     /// <summary>
     /// The default property name if the Entity represents a single primitive.

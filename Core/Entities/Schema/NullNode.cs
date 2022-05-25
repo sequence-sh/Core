@@ -11,6 +11,12 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     public static NullNode Instance { get; } = new();
 
     /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return TypeReference.Actual.Null;
+    }
+
+    /// <inheritdoc />
     public override IEnumerable<INodeData> NodeData
     {
         get
@@ -23,9 +29,9 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     public override SchemaValueType SchemaValueType => SchemaValueType.Null;
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other)
+    public override bool IsSuperset(SchemaNode other)
     {
-        return false;
+        return other is NullNode;
     }
 
     /// <inheritdoc />

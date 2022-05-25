@@ -88,7 +88,7 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity> where T : ISCLObjec
         /// <inheritdoc />
         public override TypeReference
             GetOutputTypeReference(TypeReference memberTypeReference) =>
-            TypeReference.Actual.Entity;
+            TypeReference.Entity.NoSchema;
 
         /// <inheritdoc />
         protected override Result<TypeReference, IError> GetGenericTypeParameter(
@@ -96,7 +96,8 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity> where T : ISCLObjec
             FreezableStepData freezableStepData,
             TypeResolver typeResolver)
         {
-            var allowResult = callerMetadata.CheckAllows(TypeReference.Actual.Entity, typeResolver)
+            var allowResult = callerMetadata
+                .CheckAllows(TypeReference.Entity.NoSchema, typeResolver)
                 .MapError(x => x.WithLocation(freezableStepData));
 
             if (allowResult.IsFailure)

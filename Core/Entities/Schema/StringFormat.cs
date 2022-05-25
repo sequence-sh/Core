@@ -36,4 +36,14 @@ public abstract record StringFormat : NodeData<StringFormat>
 
         return AnyStringFormat.Instance;
     }
+
+    /// <summary>
+    /// Are the allowed values a superset (not strict) of the allowed values of the other node.
+    /// </summary>
+    public abstract bool IsSuperset(StringFormat other);
+
+    /// <summary>
+    /// Get the type reference
+    /// </summary>
+    public abstract TypeReference GetTypeReference(StringRestrictions restrictions);
 }

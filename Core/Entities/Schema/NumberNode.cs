@@ -20,8 +20,19 @@ public record NumberNode(
     public override SchemaValueType SchemaValueType => SchemaValueType.Number;
 
     /// <inheritdoc />
-    public override bool IsMorePermissive(SchemaNode other)
+    public override bool IsSuperset(SchemaNode other)
     {
+        if (other is NumberNode numberNode
+         && EnumeratedValuesNodeData.IsSuperset(other.EnumeratedValuesNodeData)
+         && Restrictions.IsSuperset(numberNode.Restrictions)
+           )
+            return true;
+
+        if (other is IntegerNode integerNode
+         && EnumeratedValuesNodeData.IsSuperset(other.EnumeratedValuesNodeData)
+         && Restrictions.IsSuperset(integerNode.Restrictions))
+            return true;
+
         return false;
     }
 
@@ -30,6 +41,20 @@ public record NumberNode(
     {
         return other is NumberNode or IntegerNode;
     }
+
+    /// <inheritdoc />
+    public override Maybe<TypeReference> ToTypeReference()
+    {
+        return LazyTypeReference.Value;
+    }
+
+    private static readonly Lazy<TypeReference> LazyTypeReference =
+        new(
+            () =>
+                new TypeReference.OneOf(
+                    new[] { TypeReference.Actual.Integer, TypeReference.Actual.Double, }
+                )
+        );
 
     /// <inheritdoc />
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(

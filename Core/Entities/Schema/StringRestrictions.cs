@@ -3,40 +3,38 @@
 namespace Reductech.Sequence.Core.Entities.Schema;
 
 /// <summary>
-/// Data for a node
-/// </summary>
-public interface INodeData
-{
-    /// <summary>
-    /// Set the schema builder with this node data
-    /// </summary>
-    /// <param name="builder"></param>
-    void SetBuilder(JsonSchemaBuilder builder);
-}
-
-/// <summary>
-/// Contains additional data about a node
-/// </summary>
-public abstract record NodeData<T> : INodeData where T : NodeData<T>
-{
-    /// <summary>
-    /// Try to combine with another NodeData of the same type
-    /// </summary>
-    [Pure]
-    public abstract T Combine(T other);
-
-    /// <summary>
-    /// Set a JsonSchemaBuilder with this data
-    /// </summary>
-    public abstract void SetBuilder(JsonSchemaBuilder builder);
-}
-
-/// <summary>
 /// Restrictions on a String Node
 /// </summary>
 public record StringRestrictions
     (uint? MinLength, uint? MaxLength, Regex? PatternRegex) : NodeData<StringRestrictions>
 {
+    /// <summary>
+    /// Are the allowed values a superset (not strict) of the allowed values of the other node.
+    /// </summary>
+    public bool IsSuperset(StringRestrictions other)
+    {
+        if (this == NoRestrictions)
+            return true;
+
+        if (other == NoRestrictions)
+            return false;
+
+        if (MinLength.HasValue && (!other.MinLength.HasValue || other.MinLength > MinLength))
+            return false;
+
+        if (MaxLength.HasValue && (!other.MaxLength.HasValue || other.MaxLength < MaxLength))
+            return false;
+
+        if (PatternRegex is not null
+         && (other.PatternRegex is null || other.PatternRegex != PatternRegex))
+        {
+            //In principle this could be improved but I'm not going to
+            return false;
+        }
+
+        return true;
+    }
+
     /// <inheritdoc />
     public override StringRestrictions Combine(StringRestrictions other)
     {

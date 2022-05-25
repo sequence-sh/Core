@@ -15,10 +15,22 @@ public record AnyStringFormat : StringFormat
     /// <inheritdoc />
     public override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
-        ISCLObject ISCLObject,
+        ISCLObject isclObject,
         TransformSettings transformSettings)
     {
         return Maybe<ISCLObject>.None;
+    }
+
+    /// <inheritdoc />
+    public override bool IsSuperset(StringFormat other) => true;
+
+    /// <inheritdoc />
+    public override TypeReference GetTypeReference(StringRestrictions restrictions)
+    {
+        if (restrictions == StringRestrictions.NoRestrictions)
+            return TypeReference.Any.Instance;
+
+        return TypeReference.Actual.String;
     }
 
     /// <inheritdoc />
