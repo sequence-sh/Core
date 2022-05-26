@@ -2,10 +2,6 @@
 
 ## Summary of Changes
 
-### Steps
-
-- `Transform` can transform empty strings into missing properties
-
 ### Sequence Configuration Language
 
 - You can now use `"""` to indicate a multiline string with no escapes.
