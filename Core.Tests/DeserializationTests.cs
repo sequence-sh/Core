@@ -740,6 +740,11 @@ Log 'Comments!'",
                 "- <myArray> = [1,2,3]\r\n- log (<myArray>[0])",
                 1
             );
+
+            yield return new DeserializationTestInstance(
+                "\"\"\"multi\r\nline\r\nstring\"\"\"",
+                "multi\r\nline\r\nstring"
+            );
         }
     }
 }
