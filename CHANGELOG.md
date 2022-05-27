@@ -1,3 +1,43 @@
+# v0.15.0 (2022-05-27)
+
+## Summary of Changes
+
+### Sequence Configuration Language
+
+- You can now use `"""` to indicate a multiline string with no escapes.
+```scl
+"""
+{
+  "Json" : "Value"
+}
+"""
+```
+- Entity Properties can now be accessed using dot notation
+```scl
+- <entity> = (foo: (bar: 1, baz: 2))
+- Print <entity>.foo.bar
+# Returns: 1
+```
+
+- Added code completion for entity property access by dot notation
+- Entity type references now optionally have an associated schema which can be set by the steps which create entities and checked by steps which use those entities.
+- SCL like `(foo: 1)['bar']` now results in an error when the SCL is validated, rather than when it's running
+
+## Issues Closed in this Release
+
+### New Features
+
+- Support inline json by allowing multiline stings which don't require quotes to escape #418
+- Use dot notation for entity property access #432
+- Steps which return Entities or Arrays of Entities with a fixed schema should make that schema available #275
+- Add steps to convert between various units of measurement #394
+- Transform should treat empty strings as missing properties. #411
+
+### Bug Fixes
+
+- Transform should reorder properties to be in the same order as the schema #419
+- Creating an entity from a dictionary sets the wrong indexes #428
+
 # v0.14.0 (2022-03-25)
 
 ## Summary of Changes
@@ -891,5 +931,6 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
+
 
 
