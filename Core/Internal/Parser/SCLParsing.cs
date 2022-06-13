@@ -540,7 +540,23 @@ public static class SCLParsing
             return new FreezableStepProperty.Step(freezableStep, new TextLocation(context));
         }
 
-        static string UnescapeMultiline(string txt) => txt.Substring(3, txt.Length - 6);
+        static string UnescapeMultiline(string txt) =>
+            TrimStartNewLine(txt.Substring(3, txt.Length - 6));
+
+        static string TrimStartNewLine(string txt)
+        {
+            if (txt.StartsWith("\r\n"))
+            {
+                return txt.Substring(2);
+            }
+
+            if (txt.StartsWith("\n"))
+            {
+                return txt.Substring(1);
+            }
+
+            return txt;
+        }
 
         static string UnescapeInterpolated(string txt, bool removeDollar)
         {

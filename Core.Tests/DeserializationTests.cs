@@ -745,6 +745,16 @@ Log 'Comments!'",
                 "\"\"\"multi\r\nline\r\nstring\"\"\"",
                 "multi\r\nline\r\nstring"
             );
+
+            yield return new DeserializationTestInstance(
+                "\"\"\"\r\nmulti\r\nline\r\nstring\"\"\"", //Check that first newline is ignored
+                "multi\r\nline\r\nstring"
+            );
+
+            yield return new DeserializationTestInstance(
+                "\"\"\"\nmulti\r\nline\r\nstring\"\"\"", //Check that first newline is ignored
+                "multi\r\nline\r\nstring"
+            );
         }
     }
 }
