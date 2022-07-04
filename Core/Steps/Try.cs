@@ -6,7 +6,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// Tries to execute a step and recovers if that step results in failure.
 /// </summary>
 [SCLExample(
-    "Try (1 / 0) 0",
+    "Try (1 / 0) OnError: 0",
     "0",
     ExpectedLogs = new[] { "Error Caught in Divide: Attempt to Divide by Zero." }
 )]
@@ -18,12 +18,21 @@ namespace Reductech.Sequence.Core.Steps;
     ExpectedLogs = new[] { "Error Caught in Divide: Attempt to Divide by Zero." }
 )]
 [SCLExample(
-    "Try (ArrayElementAtIndex [0,1,2,3] 4 ) 4",
+    "Try (ArrayElementAtIndex [0,1,2,3] 4 ) OnError: 4",
     "4",
     ExpectedLogs = new[]
     {
         "Error Caught in ArrayElementAtIndex: Index was outside the bounds of the array."
     }
+)]
+[SCLExample(
+    @"Try (
+- log 123
+- log 1 / 0
+- 4
+) OnError: 5",
+    "5",
+    ExpectedLogs = new[] { "123", "Error Caught in Sequence: Attempt to Divide by Zero." }
 )]
 public sealed class Try<T> : CompoundStep<T> where T : ISCLObject
 {
@@ -37,17 +46,31 @@ public sealed class Try<T> : CompoundStep<T> where T : ISCLObject
         if (statementResult.IsSuccess)
             return statementResult.Value;
 
+        var message = statementResult.Error.AsString;
+
         LogSituation.StepErrorWasCaught.Log(
             stateMonad,
             this,
             Statement.Name,
-            statementResult.Error.AsString
+            message
         );
 
-        if (Alternative is not null)
-            return await Alternative.Run(stateMonad, cancellationToken);
+        if (Recover is null)
+            return DefaultValues.GetDefault<T>();
 
-        return DefaultValues.GetDefault<T>();
+        var scopedStateMonad = new ScopedStateMonad(
+            stateMonad,
+            stateMonad.GetState().ToImmutableDictionary(),
+            VariableName.Item,
+            new KeyValuePair<VariableName, ISCLObject>(
+                Recover.VariableNameOrItem,
+                new StringStream(message)
+            )
+        );
+
+        var result = await Recover.Step.Run<T>(scopedStateMonad, cancellationToken);
+
+        return result;
     }
 
     /// <summary>
@@ -58,11 +81,12 @@ public sealed class Try<T> : CompoundStep<T> where T : ISCLObject
     public IStep<T> Statement { get; set; } = null!;
 
     /// <summary>
-    /// What to return if the statement returns an error
+    /// The action to perform on an error.
     /// </summary>
-    [StepProperty(2)]
-    [DefaultValueExplanation("The Default Value")]
-    public IStep<T>? Alternative { get; set; } = null!;
+    [FunctionProperty()]
+    [Alias("OnError")]
+    [DefaultValueExplanation("Returns the default value of the return type.")]
+    public LambdaFunction<StringStream, T>? Recover { get; set; } = null;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory => TryStepFactory.Instance;
@@ -104,13 +128,13 @@ public sealed class Try<T> : CompoundStep<T> where T : ISCLObject
             if (statementType.IsFailure)
                 return statementType.ConvertFailure<TypeReference>();
 
-            var alternativeStep = freezableStepData.TryGetStep(nameof(Alternative), StepType);
+            var alternativeStep = freezableStepData.TryGetStep(nameof(Recover), StepType);
 
             if (alternativeStep.IsFailure)
                 return statementType.Value;
 
             var alternativeType = alternativeStep.Value.TryGetOutputTypeReference(
-                new CallerMetadata(TypeName, nameof(Alternative), TypeReference.Any.Instance),
+                new CallerMetadata(TypeName, nameof(Recover), TypeReference.Any.Instance),
                 typeResolver
             );
 

@@ -21,8 +21,10 @@ public partial class TryTests : StepTestBase<Try<SCLInt>, SCLInt>
                 new Try<SCLInt>()
                 {
                     Statement = new FailStep<SCLInt>() { ErrorMessage = "Statement Failed" },
-                    Alternative =
-                        new FailStep<SCLInt>() { ErrorMessage = "Alternative Failed" },
+                    Recover = new LambdaFunction<StringStream, SCLInt>(
+                        null,
+                        new FailStep<SCLInt>() { ErrorMessage = "Alternative Failed" }
+                    )
                 },
                 ErrorCode.Test.ToErrorBuilder("Alternative Failed")
                     .WithLocationSingle(ErrorLocation.EmptyLocation)
