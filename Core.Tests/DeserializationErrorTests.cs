@@ -164,6 +164,12 @@ public partial class DeserializationErrorTests
                 ("The entity can never have a property named 'bar'.",
                  "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 14, Idx: 14 Text: (Foo: 1)['bar']")
             );
+
+            yield return new DeserializationErrorCase(
+                "StringToCase String: 'abc' TextCase.Upper",
+                ("Syntax Error: Ordered arguments cannot appear after Named Arguments",
+                 "Line: 1, Col: 27, Idx: 27 - Line: 1, Col: 34, Idx: 34 Text: TextCase")
+            );
         }
     }
 
