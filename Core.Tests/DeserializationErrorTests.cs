@@ -72,7 +72,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Print (2 + 2",
-                ("Syntax Error: mismatched input '(' expecting <EOF>",
+                ("Syntax Error: Unclosed Parentheses",
                  "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 6, Idx: 6 Text: (")
             );
 
@@ -169,6 +169,12 @@ public partial class DeserializationErrorTests
                 "StringToCase String: 'abc' TextCase.Upper",
                 ("Syntax Error: Ordered arguments cannot appear after Named Arguments",
                  "Line: 1, Col: 27, Idx: 27 - Line: 1, Col: 34, Idx: 34 Text: TextCase")
+            );
+
+            yield return new DeserializationErrorCase(
+                "StringToCase String: 'abc' 'Upper'",
+                ("Syntax Error: Ordered arguments cannot appear after Named Arguments",
+                 "Line: 1, Col: 27, Idx: 27 - Line: 1, Col: 33, Idx: 33 Text: 'Upper'")
             );
 
             yield return new DeserializationErrorCase(

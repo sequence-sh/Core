@@ -20,11 +20,13 @@ public class ErrorErrorListener : IAntlrErrorListener<IToken>
         string msg,
         RecognitionException e)
     {
-        if (e is not null)
+        var context = e?.Context ?? (recognizer as SCLParser)?.Context;
+
+        if (context is not null)
         {
             var lazyVisitResult =
                 new Lazy<Maybe<FreezableStepProperty>>(
-                    () => new SCLParsing.Visitor().Visit(e.Context)
+                    () => new SCLParsing.Visitor().Visit(context)
                         .ToMaybe()
                         .Bind(
                             x => x == null
@@ -36,7 +38,7 @@ public class ErrorErrorListener : IAntlrErrorListener<IToken>
             foreach (var errorMatcher in IErrorMatcher.All)
             {
                 var specificError = errorMatcher.MatchError(
-                    e.Context,
+                    context,
                     offendingSymbol,
                     lazyVisitResult
                 );

@@ -27,11 +27,13 @@ public static partial class SCLParsing
             string msg,
             RecognitionException e)
         {
-            if (e?.Context is not null)
+            RuleContext? context = e?.Context ?? (recognizer as SCLParser)?.Context;
+
+            if (context is not null)
             {
                 var lazyVisitResult =
                     new Lazy<Maybe<FreezableStepProperty>>(
-                        () => new Visitor().Visit(e.Context)
+                        () => new Visitor().Visit(context)
                             .ToMaybe()
                             .Bind(
                                 x => x == null
@@ -43,7 +45,7 @@ public static partial class SCLParsing
                 foreach (var errorMatcher in IErrorMatcher.All)
                 {
                     var maybeError = errorMatcher.MatchError(
-                        e.Context,
+                        context,
                         offendingSymbol,
                         lazyVisitResult
                     );
