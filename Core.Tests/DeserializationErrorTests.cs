@@ -206,6 +206,12 @@ public partial class DeserializationErrorTests
                 ("Syntax Error: Unopened Brackets",
                  "Line: 1, Col: 9, Idx: 9 - Line: 1, Col: 9, Idx: 9 Text: )")
             );
+
+            yield return new DeserializationErrorCase(
+                "log 123\n- log 456",
+                ("Syntax Error: Sequences with multiple steps should start with a dash",
+                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 6, Idx: 6 Text: log 123")
+            );
         }
     }
 

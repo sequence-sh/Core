@@ -23,7 +23,47 @@ public interface IErrorMatcher
         OrderedAfterNamedArgumentErrorMatcher.Instance,
         UnclosedBracketsErrorMatcher.Instance,
         UnopenedBracketsErrorMatcher.Instance,
+        MissingDashErrorMatcher.Instance
     };
+}
+
+/// <summary>
+/// Matches a missing dash on the first line
+/// </summary>
+public class MissingDashErrorMatcher : IErrorMatcher
+{
+    private MissingDashErrorMatcher() { }
+
+    /// <summary>
+    /// The instance
+    /// </summary>
+    public static IErrorMatcher Instance { get; } = new MissingDashErrorMatcher();
+
+    /// <inheritdoc />
+    public Maybe<SingleError> MatchError(
+        RuleContext context,
+        IToken offendingSymbol,
+        Lazy<Maybe<FreezableStepProperty>> contextVisitResult)
+    {
+        if (context is SCLParser.FullSequenceContext fsc
+         && offendingSymbol.Type == SCLParser.NEWCOMMAND)
+        {
+            var location = fsc.children?
+                .OfType<ParserRuleContext>()
+                .Select(x => new TextLocation(x))
+                .FirstOrDefault() ?? new TextLocation(offendingSymbol);
+
+            var error =
+                ErrorCode.SCLSyntaxError.ToErrorBuilder(
+                        "Sequences with multiple steps should start with a dash"
+                    )
+                    .WithLocationSingle(location);
+
+            return Maybe<SingleError>.From(error);
+        }
+
+        return Maybe<SingleError>.None;
+    }
 }
 
 /// <summary>
