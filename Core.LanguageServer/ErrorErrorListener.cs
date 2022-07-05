@@ -20,6 +20,35 @@ public class ErrorErrorListener : IAntlrErrorListener<IToken>
         string msg,
         RecognitionException e)
     {
+        if (e is not null)
+        {
+            var lazyVisitResult =
+                new Lazy<Maybe<FreezableStepProperty>>(
+                    () => new SCLParsing.Visitor().Visit(e.Context)
+                        .ToMaybe()
+                        .Bind(
+                            x => x == null
+                                ? Maybe<FreezableStepProperty>.None
+                                : Maybe<FreezableStepProperty>.From(x)
+                        )
+                );
+
+            foreach (var errorMatcher in IErrorMatcher.All)
+            {
+                var specificError = errorMatcher.MatchError(
+                    e.Context,
+                    offendingSymbol,
+                    lazyVisitResult
+                );
+
+                if (specificError.HasValue)
+                {
+                    Errors.Add(specificError.Value);
+                    return;
+                }
+            }
+        }
+
         TextLocation textLocation;
 
         if (e is NoViableAltException noViableAltException)

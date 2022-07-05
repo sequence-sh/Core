@@ -174,7 +174,7 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "(1 + 2",
                 ("Syntax Error: Unclosed Parentheses",
-                 "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 5, Idx: 5 Text: <EOF>")
+                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 0, Idx: 0 Text: (")
             );
         }
     }

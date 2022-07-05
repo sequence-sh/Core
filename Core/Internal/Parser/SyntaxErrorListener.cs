@@ -27,29 +27,32 @@ public static partial class SCLParsing
             string msg,
             RecognitionException e)
         {
-            var lazyVisitResult =
-                new Lazy<Maybe<FreezableStepProperty>>(
-                    () => new Visitor().Visit(e.Context)
-                        .ToMaybe()
-                        .Bind(
-                            x => x == null
-                                ? Maybe<FreezableStepProperty>.None
-                                : Maybe<FreezableStepProperty>.From(x)
-                        )
-                );
-
-            foreach (var errorMatcher in ErrorMatchers)
+            if (e?.Context is not null)
             {
-                var maybeError = errorMatcher.MatchError(
-                    e.Context,
-                    offendingSymbol,
-                    lazyVisitResult
-                );
+                var lazyVisitResult =
+                    new Lazy<Maybe<FreezableStepProperty>>(
+                        () => new Visitor().Visit(e.Context)
+                            .ToMaybe()
+                            .Bind(
+                                x => x == null
+                                    ? Maybe<FreezableStepProperty>.None
+                                    : Maybe<FreezableStepProperty>.From(x)
+                            )
+                    );
 
-                if (maybeError.HasValue)
+                foreach (var errorMatcher in IErrorMatcher.All)
                 {
-                    Errors.Add(maybeError.Value);
-                    return;
+                    var maybeError = errorMatcher.MatchError(
+                        e.Context,
+                        offendingSymbol,
+                        lazyVisitResult
+                    );
+
+                    if (maybeError.HasValue)
+                    {
+                        Errors.Add(maybeError.Value);
+                        return;
+                    }
                 }
             }
 
@@ -59,80 +62,6 @@ public static partial class SCLParsing
                     .WithLocation(new TextLocation(offendingSymbol));
 
             UncategorizedErrors.Add(error);
-        }
-
-        private static IEnumerable<IErrorMatcher> ErrorMatchers { get; } = new List<IErrorMatcher>()
-        {
-            OrderedAfterNamedArgumentErrorMatcher.Instance,
-            UnclosedParenthesesErrorMatcher.Instance,
-        };
-
-        private interface IErrorMatcher
-        {
-            Maybe<IError> MatchError(
-                RuleContext context,
-                IToken offendingSymbol,
-                Lazy<Maybe<FreezableStepProperty>> contextVisitResult);
-        }
-
-        private class UnclosedParenthesesErrorMatcher : IErrorMatcher
-        {
-            private UnclosedParenthesesErrorMatcher() { }
-            public static IErrorMatcher Instance { get; } = new UnclosedParenthesesErrorMatcher();
-
-            /// <inheritdoc />
-            public Maybe<IError> MatchError(
-                RuleContext context,
-                IToken offendingSymbol,
-                Lazy<Maybe<FreezableStepProperty>> contextVisitResult)
-            {
-                if (context is SCLParser.TermContext { Stop: null } termContext
-                 && termContext.Start.Text == "(")
-                {
-                    var error =
-                        ErrorCode.SCLSyntaxError.ToErrorBuilder("Unclosed Parentheses")
-                            .WithLocation(new TextLocation(offendingSymbol));
-
-                    return Maybe<IError>.From(error);
-                }
-
-                return Maybe<IError>.None;
-            }
-        }
-
-        private class OrderedAfterNamedArgumentErrorMatcher : IErrorMatcher
-        {
-            private OrderedAfterNamedArgumentErrorMatcher() { }
-
-            public static IErrorMatcher Instance { get; } =
-                new OrderedAfterNamedArgumentErrorMatcher();
-
-            /// <inheritdoc />
-            public Maybe<IError> MatchError(
-                RuleContext context,
-                IToken offendingSymbol,
-                Lazy<Maybe<FreezableStepProperty>> contextVisitResult)
-            {
-                if (!contextVisitResult.Value.HasValue)
-                    return Maybe<IError>.None;
-
-                if (contextVisitResult.Value.Value.MemberType != MemberType.Step
-                 || contextVisitResult.Value.Value.ConvertToStep() is not CompoundFreezableStep cfs)
-                    return Maybe<IError>.None;
-
-                if (!cfs.FreezableStepData.StepProperties.Keys.Any(
-                        x => x is StepParameterReference.Named
-                    ))
-                    return Maybe<IError>.None;
-
-                var error =
-                    ErrorCode.SCLSyntaxError.ToErrorBuilder(
-                            "Ordered arguments cannot appear after Named Arguments"
-                        )
-                        .WithLocation(new TextLocation(offendingSymbol));
-
-                return Maybe<IError>.From(error);
-            }
         }
     }
 }
