@@ -79,13 +79,20 @@ public static partial class SCLParsing
 
         var result = visitor.Visit(parser.fullSequence());
 
-        if (result.IsFailure)
-            return result;
-
         if (syntaxErrorListener.Errors.Any())
         {
             return Result.Failure<FreezableStepProperty, IError>(
                 ErrorList.Combine(syntaxErrorListener.Errors)
+            );
+        }
+
+        if (result.IsFailure)
+            return result;
+
+        if (syntaxErrorListener.UncategorizedErrors.Any())
+        {
+            return Result.Failure<FreezableStepProperty, IError>(
+                ErrorList.Combine(syntaxErrorListener.UncategorizedErrors)
             );
         }
 

@@ -170,6 +170,12 @@ public partial class DeserializationErrorTests
                 ("Syntax Error: Ordered arguments cannot appear after Named Arguments",
                  "Line: 1, Col: 27, Idx: 27 - Line: 1, Col: 34, Idx: 34 Text: TextCase")
             );
+
+            yield return new DeserializationErrorCase(
+                "(1 + 2",
+                ("Syntax Error: Unclosed Parentheses",
+                 "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 5, Idx: 5 Text: <EOF>")
+            );
         }
     }
 
