@@ -24,7 +24,9 @@ public sealed record TextLocation(string Text, TextPosition Start, TextPosition 
         this(
             GetSourceText(context),
             new TextPosition(context.Start),
-            TextPosition.CreateStop(context.Stop)
+            context.Stop is null
+                ? new TextPosition(context.Start)
+                : TextPosition.CreateStop(context.Stop)
         ) { }
 
     /// <summary>
@@ -37,6 +39,11 @@ public sealed record TextLocation(string Text, TextPosition Start, TextPosition 
 
     static string GetSourceText(ParserRuleContext context)
     {
+        if (context.Stop is null)
+        {
+            return context.Start.Text;
+        }
+
         var text = context.Start.TokenSource.InputStream.GetText(
             new Interval(context.Start.StartIndex, context.Stop.StopIndex)
         );

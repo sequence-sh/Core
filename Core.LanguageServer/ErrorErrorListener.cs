@@ -20,6 +20,38 @@ public class ErrorErrorListener : IAntlrErrorListener<IToken>
         string msg,
         RecognitionException e)
     {
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+        var context = e?.Context ?? (recognizer as SCLParser)?.Context;
+
+        if (context is not null)
+        {
+            var lazyVisitResult =
+                new Lazy<Maybe<FreezableStepProperty>>(
+                    () => new SCLParsing.Visitor().Visit(context)
+                        .ToMaybe()
+                        .Bind(
+                            x => x == null
+                                ? Maybe<FreezableStepProperty>.None
+                                : Maybe<FreezableStepProperty>.From(x)
+                        )
+                );
+
+            foreach (var errorMatcher in IErrorMatcher.All)
+            {
+                var specificError = errorMatcher.MatchError(
+                    context,
+                    offendingSymbol,
+                    lazyVisitResult
+                );
+
+                if (specificError.HasValue)
+                {
+                    Errors.Add(specificError.Value);
+                    return;
+                }
+            }
+        }
+
         TextLocation textLocation;
 
         if (e is NoViableAltException noViableAltException)

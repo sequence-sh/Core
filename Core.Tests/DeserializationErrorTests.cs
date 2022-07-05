@@ -72,7 +72,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Print (2 + 2",
-                ("Syntax Error: mismatched input '(' expecting <EOF>",
+                ("Syntax Error: Unclosed Brackets",
                  "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 6, Idx: 6 Text: (")
             );
 
@@ -91,7 +91,7 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two') (<Num> => Print <Num>) ", //The ) should be a ]
                 (
-                    @"Syntax Error: mismatched input '[' expecting <EOF>",
+                    @"Syntax Error: Unclosed Brackets",
                     @"Line: 1, Col: 8, Idx: 8 - Line: 1, Col: 8, Idx: 8 Text: [")
             );
 
@@ -163,6 +163,54 @@ public partial class DeserializationErrorTests
                 "(Foo: 1)['bar']",
                 ("The entity can never have a property named 'bar'.",
                  "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 14, Idx: 14 Text: (Foo: 1)['bar']")
+            );
+
+            yield return new DeserializationErrorCase(
+                "StringToCase String: 'abc' TextCase.Upper",
+                ("Syntax Error: Ordered arguments cannot appear after Named Arguments",
+                 "Line: 1, Col: 27, Idx: 27 - Line: 1, Col: 34, Idx: 34 Text: TextCase")
+            );
+
+            yield return new DeserializationErrorCase(
+                "StringToCase String: 'abc' 'Upper'",
+                ("Syntax Error: Ordered arguments cannot appear after Named Arguments",
+                 "Line: 1, Col: 27, Idx: 27 - Line: 1, Col: 33, Idx: 33 Text: 'Upper'")
+            );
+
+            yield return new DeserializationErrorCase(
+                "(1 + 2",
+                ("Syntax Error: Unclosed Brackets",
+                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 0, Idx: 0 Text: (")
+            );
+
+            yield return new DeserializationErrorCase(
+                "[1 + 2",
+                ("Syntax Error: Unclosed Brackets",
+                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 0, Idx: 0 Text: [")
+            );
+
+            yield return new DeserializationErrorCase(
+                "log (1 + 2",
+                ("Syntax Error: Unclosed Brackets",
+                 "Line: 1, Col: 4, Idx: 4 - Line: 1, Col: 4, Idx: 4 Text: (")
+            );
+
+            yield return new DeserializationErrorCase(
+                "1 + 2)",
+                ("Syntax Error: Unopened Brackets",
+                 "Line: 1, Col: 5, Idx: 5 - Line: 1, Col: 5, Idx: 5 Text: )")
+            );
+
+            yield return new DeserializationErrorCase(
+                "log 1 + 2)",
+                ("Syntax Error: Unopened Brackets",
+                 "Line: 1, Col: 9, Idx: 9 - Line: 1, Col: 9, Idx: 9 Text: )")
+            );
+
+            yield return new DeserializationErrorCase(
+                "log 123\n- log 456",
+                ("Syntax Error: Sequences with multiple steps should start with a dash",
+                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 6, Idx: 6 Text: log 123")
             );
         }
     }
