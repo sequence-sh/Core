@@ -176,6 +176,12 @@ public partial class DeserializationErrorTests
                 ("Syntax Error: Unclosed Parentheses",
                  "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 0, Idx: 0 Text: (")
             );
+
+            yield return new DeserializationErrorCase(
+                "log (1 + 2",
+                ("Syntax Error: Unclosed Parentheses",
+                 "Line: 1, Col: 4, Idx: 4 - Line: 1, Col: 4, Idx: 4 Text: (")
+            );
         }
     }
 

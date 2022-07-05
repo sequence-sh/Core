@@ -53,6 +53,15 @@ public class UnclosedParenthesesErrorMatcher : IErrorMatcher
             return Maybe<SingleError>.From(error);
         }
 
+        if (offendingSymbol.Text == "(")
+        {
+            var error =
+                ErrorCode.SCLSyntaxError.ToErrorBuilder("Unclosed Parentheses")
+                    .WithLocationSingle(new TextLocation(offendingSymbol));
+
+            return Maybe<SingleError>.From(error);
+        }
+
         return Maybe<SingleError>.None;
     }
 }
