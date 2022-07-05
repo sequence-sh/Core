@@ -20,22 +20,23 @@ public interface IErrorMatcher
     /// </summary>
     public static IEnumerable<IErrorMatcher> All { get; } = new List<IErrorMatcher>()
     {
-        OrderedAfterNamedArgumentErrorMatcher.Instance,
-        UnclosedParenthesesErrorMatcher.Instance,
+        OrderedAfterNamedArgumentErrorMatcher.Instance, UnclosedBracketsErrorMatcher.Instance,
     };
 }
 
 /// <summary>
 /// Matches unclosed parentheses
 /// </summary>
-public class UnclosedParenthesesErrorMatcher : IErrorMatcher
+public class UnclosedBracketsErrorMatcher : IErrorMatcher
 {
-    private UnclosedParenthesesErrorMatcher() { }
+    private UnclosedBracketsErrorMatcher() { }
 
     /// <summary>
     /// The instance
     /// </summary>
-    public static IErrorMatcher Instance { get; } = new UnclosedParenthesesErrorMatcher();
+    public static IErrorMatcher Instance { get; } = new UnclosedBracketsErrorMatcher();
+
+    private static readonly ISet<string> BracketsOpenings = new HashSet<string>() { "(", "[" };
 
     /// <inheritdoc />
     public Maybe<SingleError> MatchError(
@@ -44,19 +45,19 @@ public class UnclosedParenthesesErrorMatcher : IErrorMatcher
         Lazy<Maybe<FreezableStepProperty>> contextVisitResult)
     {
         if (context is SCLParser.TermContext { Stop: null } termContext
-         && termContext.Start.Text == "(")
+         && BracketsOpenings.Contains(termContext.Start.Text))
         {
             var error =
-                ErrorCode.SCLSyntaxError.ToErrorBuilder("Unclosed Parentheses")
+                ErrorCode.SCLSyntaxError.ToErrorBuilder("Unclosed Brackets")
                     .WithLocationSingle(new TextLocation(termContext));
 
             return Maybe<SingleError>.From(error);
         }
 
-        if (offendingSymbol.Text == "(")
+        if (BracketsOpenings.Contains(offendingSymbol.Text))
         {
             var error =
-                ErrorCode.SCLSyntaxError.ToErrorBuilder("Unclosed Parentheses")
+                ErrorCode.SCLSyntaxError.ToErrorBuilder("Unclosed Brackets")
                     .WithLocationSingle(new TextLocation(offendingSymbol));
 
             return Maybe<SingleError>.From(error);

@@ -20,6 +20,7 @@ public class ErrorErrorListener : IAntlrErrorListener<IToken>
         string msg,
         RecognitionException e)
     {
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         var context = e?.Context ?? (recognizer as SCLParser)?.Context;
 
         if (context is not null)

@@ -72,7 +72,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "Print (2 + 2",
-                ("Syntax Error: Unclosed Parentheses",
+                ("Syntax Error: Unclosed Brackets",
                  "Line: 1, Col: 6, Idx: 6 - Line: 1, Col: 6, Idx: 6 Text: (")
             );
 
@@ -91,7 +91,7 @@ public partial class DeserializationErrorTests
             yield return new DeserializationErrorCase(
                 "Foreach ['one', 'two') (<Num> => Print <Num>) ", //The ) should be a ]
                 (
-                    @"Syntax Error: mismatched input '[' expecting <EOF>",
+                    @"Syntax Error: Unclosed Brackets",
                     @"Line: 1, Col: 8, Idx: 8 - Line: 1, Col: 8, Idx: 8 Text: [")
             );
 
@@ -179,13 +179,19 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "(1 + 2",
-                ("Syntax Error: Unclosed Parentheses",
+                ("Syntax Error: Unclosed Brackets",
                  "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 0, Idx: 0 Text: (")
             );
 
             yield return new DeserializationErrorCase(
+                "[1 + 2",
+                ("Syntax Error: Unclosed Brackets",
+                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 0, Idx: 0 Text: [")
+            );
+
+            yield return new DeserializationErrorCase(
                 "log (1 + 2",
-                ("Syntax Error: Unclosed Parentheses",
+                ("Syntax Error: Unclosed Brackets",
                  "Line: 1, Col: 4, Idx: 4 - Line: 1, Col: 4, Idx: 4 Text: (")
             );
         }
