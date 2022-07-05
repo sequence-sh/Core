@@ -194,6 +194,18 @@ public partial class DeserializationErrorTests
                 ("Syntax Error: Unclosed Brackets",
                  "Line: 1, Col: 4, Idx: 4 - Line: 1, Col: 4, Idx: 4 Text: (")
             );
+
+            yield return new DeserializationErrorCase(
+                "1 + 2)",
+                ("Syntax Error: Unopened Brackets",
+                 "Line: 1, Col: 5, Idx: 5 - Line: 1, Col: 5, Idx: 5 Text: )")
+            );
+
+            yield return new DeserializationErrorCase(
+                "log 1 + 2)",
+                ("Syntax Error: Unopened Brackets",
+                 "Line: 1, Col: 9, Idx: 9 - Line: 1, Col: 9, Idx: 9 Text: )")
+            );
         }
     }
 
