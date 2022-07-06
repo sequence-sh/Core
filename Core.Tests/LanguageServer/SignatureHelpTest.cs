@@ -1,4 +1,5 @@
-﻿using Reductech.Sequence.Core.LanguageServer;
+﻿using Reductech.Sequence.Core.Internal.Documentation;
+using Reductech.Sequence.Core.LanguageServer;
 using Reductech.Sequence.Core.LanguageServer.Objects;
 
 namespace Reductech.Sequence.Core.Tests.LanguageServer;
@@ -23,7 +24,12 @@ public class SignatureHelpTest
 
         var linePosition = new LinePosition(line, character);
 
-        var response = SignatureHelpHelper.GetSignatureHelpResponse(text, linePosition, sfs);
+        var response = SignatureHelpHelper.GetSignatureHelpResponse(
+            text,
+            linePosition,
+            sfs,
+            DocumentationOptions.DefaultDocumentationOptionsHtml
+        );
 
         if (expectedLabel is null)
         {
