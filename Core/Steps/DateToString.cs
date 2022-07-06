@@ -6,8 +6,10 @@
 /// </summary>
 [Alias("DateNow")]
 [Alias("ConvertDateToString")]
+[Alias("FormatDate")]
 [SCLExample("DateToString 1990-01-06T09:15:00",              "1990/01/06 09:15:00")]
 [SCLExample("DateToString 1990-01-06T09:15:00 'yyyy/MM/dd'", "1990/01/06")]
+[SCLExample("FormatDate 2022-01-01T01:01:01 As: 'HH:mm:ss'", "01:01:01")]
 [AllowConstantFolding]
 public sealed class DateToString : CompoundStep<StringStream>
 {
@@ -25,6 +27,7 @@ public sealed class DateToString : CompoundStep<StringStream>
     [StepProperty(2)]
     [DefaultValueExplanation("yyyy/MM/dd HH:mm:ss")]
     [Example("O")]
+    [Alias("As")]
     public new IStep<StringStream> Format { get; set; } =
         new SCLConstant<StringStream>("yyyy/MM/dd HH:mm:ss");
 
