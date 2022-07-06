@@ -31,7 +31,7 @@ public class Hash : CompoundStep<StringStream>
             cancellationToken
         );
 
-        StringStream result = Encoding.UTF8.GetString(hash);
+        StringStream result = Convert.ToHexString(hash);
 
         hashAlgorithm.Dispose();
 
