@@ -14,13 +14,15 @@ public sealed class Round : CompoundStep<SCLDouble>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<SCLDouble> Value { get; set; }
+    [Alias("Number")]
+    public IStep<SCLDouble> Value { get; set; } = null!;
 
     /// <summary>
     /// The number of decimal places to round to
     /// </summary>
     [StepProperty(2)]
     [DefaultValueExplanation("3")]
+    [Alias("DecimalPlaces")]
     public IStep<SCLInt> Precision { get; set; } = new SCLConstant<SCLInt>(new SCLInt(3));
 
     /// <inheritdoc />
