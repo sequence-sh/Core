@@ -4,7 +4,8 @@
 /// Delay for a specified amount of time
 /// </summary>
 [Alias("Sleep")]
-[SCLExample("Delay 10", description: "Delay 10 milliseconds.")]
+[SCLExample("Delay 10",     description: "Delay 10 milliseconds.")]
+[SCLExample("Sleep For: 5", description: "Delay for 5 milliseconds.")]
 public sealed class Delay : CompoundStep<Unit>
 {
     /// <inheritdoc />
@@ -28,6 +29,7 @@ public sealed class Delay : CompoundStep<Unit>
     [StepProperty(1)]
     [Required]
     [Alias("ms")]
+    [Alias("For")]
     public IStep<SCLInt> Milliseconds { get; set; } = null!;
 
     /// <inheritdoc />
