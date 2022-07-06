@@ -3,6 +3,7 @@
 /// <summary>
 /// Gets information about connectors
 /// </summary>
+[Alias("GetConnectorVersion")]
 public sealed class GetConnectorInformation : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
