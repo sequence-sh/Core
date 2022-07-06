@@ -4,7 +4,8 @@
 /// Repeat a step a set number of times.
 /// </summary>
 [AllowConstantFolding]
-public sealed class DoXTimes : CompoundStep<Unit> //TODO replace with a lambda function
+[Alias("DoXTimes")]
+public sealed class Repeat : CompoundStep<Unit> //TODO replace with a lambda function
 {
     /// <summary>
     /// The action to perform repeatedly.
@@ -18,15 +19,15 @@ public sealed class DoXTimes : CompoundStep<Unit> //TODO replace with a lambda f
     /// </summary>
     [StepProperty(2)]
     [Required]
-    [Alias("Times")]
-    public IStep<SCLInt> X { get; set; } = null!;
+    [Alias("X")]
+    public IStep<SCLInt> Times { get; set; } = null!;
 
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var numberResult = await X.Run(stateMonad, cancellationToken);
+        var numberResult = await Times.Run(stateMonad, cancellationToken);
 
         if (numberResult.IsFailure)
             return numberResult.ConvertFailure<Unit>();
@@ -43,5 +44,5 @@ public sealed class DoXTimes : CompoundStep<Unit> //TODO replace with a lambda f
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<DoXTimes, Unit>();
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<Repeat, Unit>();
 }
