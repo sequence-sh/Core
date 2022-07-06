@@ -13,11 +13,13 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     public CompletionVisitor(
         LinePosition position,
         StepFactoryStore stepFactoryStore,
-        Lazy<TypeResolver> lazyTypeResolver)
+        Lazy<TypeResolver> lazyTypeResolver,
+        DocumentationOptions documentationOptions)
     {
-        Position         = position;
-        StepFactoryStore = stepFactoryStore;
-        LazyTypeResolver = lazyTypeResolver;
+        Position             = position;
+        StepFactoryStore     = stepFactoryStore;
+        LazyTypeResolver     = lazyTypeResolver;
+        DocumentationOptions = documentationOptions;
     }
 
     /// <summary>
@@ -34,6 +36,11 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     /// A Lazy Type Resolver
     /// </summary>
     public Lazy<TypeResolver> LazyTypeResolver { get; }
+
+    /// <summary>
+    /// Options to use for rendering documentation
+    /// </summary>
+    public DocumentationOptions DocumentationOptions { get; }
 
     /// <inheritdoc />
     public override CompletionResponse? VisitChildren(IRuleNode node)
@@ -148,7 +155,8 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
                     return StepParametersCompletionResponse(
                         stepFactory,
                         new TextRange(Position, Position),
-                        context
+                        context,
+                        DocumentationOptions
                     );
             }
 
@@ -165,7 +173,11 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
                     .GroupBy(x => x.Value, x => x.Key)
                     .ToList();
 
-            return ReplaceWithSteps(options, context.NAME().Symbol.GetRange());
+            return ReplaceWithSteps(
+                options,
+                context.NAME().Symbol.GetRange(),
+                DocumentationOptions
+            );
         }
 
         var positionalTerms = context.term();
@@ -189,7 +201,8 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
                     var completionList1 = StepParametersCompletionResponse(
                         stepFactory,
                         term.GetRange(),
-                        context
+                        context,
+                        DocumentationOptions
                     );
 
                     var completionList2 = Visit(term);
@@ -220,7 +233,12 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
 
                     var range = namedArgumentContext.NAME().Symbol.GetRange();
 
-                    return StepParametersCompletionResponse(stepFactory, range, context);
+                    return StepParametersCompletionResponse(
+                        stepFactory,
+                        range,
+                        context,
+                        DocumentationOptions
+                    );
                 }
 
                 return Visit(namedArgumentContext);
@@ -234,14 +252,16 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
             return StepParametersCompletionResponse(
                 stepFactory,
                 new TextRange(Position, Position),
-                context
+                context,
+                DocumentationOptions
             );
         }
     }
 
     private static CompletionResponse ReplaceWithSteps(
         IEnumerable<IGrouping<IStepFactory, string>> stepFactories,
-        TextRange range)
+        TextRange range,
+        DocumentationOptions documentationOptions)
     {
         var items = stepFactories.SelectMany(CreateCompletionItems).ToList();
 
@@ -251,7 +271,7 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
         {
             var documentation = Helpers.GetMarkDownDocumentation(
                 factory,
-                Helpers.DocumentationRootUrl
+                documentationOptions
             );
 
             var first = true;
@@ -299,7 +319,8 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     private static CompletionResponse StepParametersCompletionResponse(
         IStepFactory stepFactory,
         TextRange range,
-        SCLParser.FunctionContext functionContext)
+        SCLParser.FunctionContext functionContext,
+        DocumentationOptions documentationOptions)
     {
         var usedNamedArguments = functionContext.namedArgument()
             .Select(x => x.NAME().GetText())
@@ -307,7 +328,7 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
 
         var documentation = Helpers.GetMarkDownDocumentation(
             stepFactory,
-            Helpers.DocumentationRootUrl
+            documentationOptions
         );
 
         var options =

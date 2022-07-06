@@ -1,4 +1,5 @@
-﻿using Reductech.Sequence.Core.LanguageServer;
+﻿using Reductech.Sequence.Core.Internal.Documentation;
+using Reductech.Sequence.Core.LanguageServer;
 using Reductech.Sequence.Core.LanguageServer.Objects;
 
 namespace Reductech.Sequence.Core.Tests.LanguageServer;
@@ -34,7 +35,8 @@ public class CompletionTest
             CompletionHelper.GetCompletionResponse(
                 text,
                 new LinePosition(line, character),
-                sfs
+                sfs,
+                DocumentationOptions.DefaultDocumentationOptionsHtml
             );
 
         if (string.IsNullOrWhiteSpace(expectedLabel))

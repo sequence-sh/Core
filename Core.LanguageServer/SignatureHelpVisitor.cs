@@ -6,10 +6,14 @@
 public class SignatureHelpVisitor : SCLBaseVisitor<SignatureHelpResponse?>
 {
     /// <inheritdoc />
-    public SignatureHelpVisitor(LinePosition position, StepFactoryStore stepFactoryStore)
+    public SignatureHelpVisitor(
+        LinePosition position,
+        StepFactoryStore stepFactoryStore,
+        DocumentationOptions documentationOptions)
     {
-        Position         = position;
-        StepFactoryStore = stepFactoryStore;
+        Position             = position;
+        StepFactoryStore     = stepFactoryStore;
+        DocumentationOptions = documentationOptions;
     }
 
     /// <summary>
@@ -21,6 +25,11 @@ public class SignatureHelpVisitor : SCLBaseVisitor<SignatureHelpResponse?>
     /// The Step Factory Store
     /// </summary>
     public StepFactoryStore StepFactoryStore { get; }
+
+    /// <summary>
+    /// The Documentation Options to use
+    /// </summary>
+    public DocumentationOptions DocumentationOptions { get; }
 
     /// <inheritdoc />
     public override SignatureHelpResponse? Visit(IParseTree tree)
@@ -68,7 +77,7 @@ public class SignatureHelpVisitor : SCLBaseVisitor<SignatureHelpResponse?>
                 if (!StepFactoryStore.Dictionary.TryGetValue(name, out var stepFactory))
                     return null; //No clue what name to use
 
-                var result = StepParametersSignatureHelp(stepFactory);
+                var result = StepParametersSignatureHelp(stepFactory, DocumentationOptions);
                 return result;
             }
 
@@ -103,7 +112,7 @@ public class SignatureHelpVisitor : SCLBaseVisitor<SignatureHelpResponse?>
 
                     //var range = namedArgumentContext.NAME().Symbol.GetRange();
 
-                    return StepParametersSignatureHelp(stepFactory);
+                    return StepParametersSignatureHelp(stepFactory, DocumentationOptions);
                 }
 
                 return Visit(namedArgumentContext);
@@ -114,15 +123,17 @@ public class SignatureHelpVisitor : SCLBaseVisitor<SignatureHelpResponse?>
             if (!StepFactoryStore.Dictionary.TryGetValue(name, out var stepFactory))
                 return null; //No clue what name to use
 
-            return StepParametersSignatureHelp(stepFactory);
+            return StepParametersSignatureHelp(stepFactory, DocumentationOptions);
         }
     }
 
-    private static SignatureHelpResponse StepParametersSignatureHelp(IStepFactory stepFactory)
+    private static SignatureHelpResponse StepParametersSignatureHelp(
+        IStepFactory stepFactory,
+        DocumentationOptions options)
     {
         var documentation = Helpers.GetMarkDownDocumentation(
             stepFactory,
-            Helpers.DocumentationRootUrl
+            options
         );
 
         var parameters =

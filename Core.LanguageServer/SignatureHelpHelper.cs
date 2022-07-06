@@ -11,9 +11,10 @@ public static class SignatureHelpHelper
     public static SignatureHelpResponse GetSignatureHelpResponse(
         string text,
         LinePosition linePosition,
-        StepFactoryStore sfs)
+        StepFactoryStore sfs,
+        DocumentationOptions documentationOptions)
     {
-        var visitor = new SignatureHelpVisitor(linePosition, sfs);
+        var visitor = new SignatureHelpVisitor(linePosition, sfs, documentationOptions);
 
         var signatureHelpResponse = visitor.LexParseAndVisit(
             text,

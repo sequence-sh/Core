@@ -10,7 +10,26 @@ public record DocumentationOptions(
     string RootUrl = "",
     bool IncludeExtensionsInLinks = true,
     bool IncludeSequenceUrl = false,
-    bool IncludeExamples = true);
+    bool IncludeExamples = true,
+    string NewlineToken = "<br/>")
+{
+    /// <summary>
+    /// Root url of the Reductech Documentation Website
+    /// </summary>
+    public const string DocumentationRootUrl = "https://sequence.sh/steps/";
+
+    /// <summary>
+    /// The documentation options for displaying in HTML
+    /// </summary>
+    public static readonly DocumentationOptions DefaultDocumentationOptionsHtml =
+        new(DocumentationRootUrl, false, true, false, "<br/>");
+
+    /// <summary>
+    /// The documentation options for displaying in Monaco
+    /// </summary>
+    public static readonly DocumentationOptions DefaultDocumentationOptionsMonaco =
+        new(DocumentationRootUrl, false, true, false, "  \r\n");
+}
 
 /// <summary>
 /// Contains helper methods for creating documentation
@@ -247,7 +266,7 @@ public static class DocumentationCreator
 
                     {
                         var nameString = string.Join(
-                            "<br/>",
+                            options.NewlineToken,
                             rp.Aliases.Select(x => $"_{x}_").Prepend(rp.Name)
                         );
 
