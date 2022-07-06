@@ -5,6 +5,8 @@
 /// </summary>
 [AllowConstantFolding]
 [Alias("DoXTimes")]
+[SCLExample("Repeat Action: (Log 1) Times: 3", ExpectedLogs = new[] { "1", "1", "1" })]
+[SCLExample("DoXTimes (Log 1) X: 3",           ExpectedLogs = new[] { "1", "1", "1" })]
 public sealed class Repeat : CompoundStep<Unit> //TODO replace with a lambda function
 {
     /// <summary>
