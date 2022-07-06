@@ -124,7 +124,7 @@ public partial class SequenceTests : StepTestBase<Sequence<StringStream>, String
                     },
                     FinalStep = Constant("Goodbye")
                 },
-                "\n- (\n\t- Log Value: \"Hello\"\n\t- DoNothing\n)\n- \"Goodbye\""
+                "\n- (\n\t- Log Value: \"Hello\" Severity: Severity.Information\n\t- DoNothing\n)\n- \"Goodbye\""
             );
 
             yield return new SerializeCase(

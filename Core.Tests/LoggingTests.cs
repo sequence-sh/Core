@@ -18,7 +18,7 @@ public partial class LoggingTests
                 CheckMessageAndScope(LogLevel.Debug, "Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Log Started with Parameters: [Value, 1]",
+                    "Log Started with Parameters: [Value, 1], [Severity, Severity.Information]",
                     new[] { "Log" }
                 ),
                 CheckMessageAndScope(LogLevel.Information, "1", new[] { "Log" }),
@@ -36,7 +36,7 @@ public partial class LoggingTests
                 CheckMessageAndScope(LogLevel.Debug, "Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Log Started with Parameters: [Value, (1 + 1)]",
+                    "Log Started with Parameters: [Value, (1 + 1)], [Severity, Severity.Information]",
                     new[] { "Log" }
                 ),
                 CheckMessageAndScope(
@@ -74,12 +74,12 @@ public partial class LoggingTests
                 CheckMessageAndScope(LogLevel.Debug, "Sequence Started", null),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "AssertError Started with Parameters: [Step, (Log Value: (1 / 0))]",
+                    "AssertError Started with Parameters: [Step, (Log Value: (1 / 0) Severity: Severity.Information)]",
                     new[] { "AssertError" }
                 ),
                 CheckMessageAndScope(
                     LogLevel.Trace,
-                    "Log Started with Parameters: [Value, (1 / 0)]",
+                    "Log Started with Parameters: [Value, (1 / 0)], [Severity, Severity.Information]",
                     new[] { "AssertError", "Log" }
                 ),
                 CheckMessageAndScope(
