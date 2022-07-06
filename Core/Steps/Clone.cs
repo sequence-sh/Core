@@ -1,24 +1,27 @@
 ﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
-/// Creates an array by repeating an element.
+/// Creates an array by cloning an element.
 /// </summary>
 [AllowConstantFolding]
-public sealed class Repeat<T> : CompoundStep<Array<T>> where T : ISCLObject
+[SCLExample("Clone Element: 'hello' Times: 2", "[\"hello\", \"hello\"]")]
+[SCLExample("Clone 1 Number: 3",               "[1, 1, 1]")]
+public sealed class Clone<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <summary>
-    /// The element to repeat.
+    /// The element to clone.
     /// </summary>
     [StepProperty(1)]
     [Required]
     public IStep<T> Element { get; set; } = null!;
 
     /// <summary>
-    /// The number of times to repeat the element
+    /// The number of times to clone the element.
     /// </summary>
     [StepProperty(2)]
-    [Required]
-    public IStep<SCLInt> Number { get; set; } = null!;
+    [DefaultValueExplanation("1")]
+    [Alias("Times")]
+    public IStep<SCLInt> Number { get; set; } = new SCLConstant<SCLInt>(1.ConvertToSCLObject());
 
     /// <inheritdoc />
     protected override async Task<Result<Array<T>, IError>> Run(
@@ -56,7 +59,7 @@ public sealed class Repeat<T> : CompoundStep<Array<T>> where T : ISCLObject
         public static GenericStepFactory Instance { get; } = new RepeatStepFactory();
 
         /// <inheritdoc />
-        public override Type StepType => typeof(Repeat<>);
+        public override Type StepType => typeof(Clone<>);
 
         /// <inheritdoc />
         public override string OutputTypeExplanation => "ArrayList<T>";
@@ -73,12 +76,12 @@ public sealed class Repeat<T> : CompoundStep<Array<T>> where T : ISCLObject
             TypeResolver typeResolver)
         {
             return freezableStepData
-                .TryGetStep(nameof(Repeat<ISCLObject>.Element), StepType)
+                .TryGetStep(nameof(Clone<ISCLObject>.Element), StepType)
                 .Bind(
                     x => x.TryGetOutputTypeReference(
                         new CallerMetadata(
                             TypeName,
-                            nameof(Repeat<ISCLObject>.Element),
+                            nameof(Clone<ISCLObject>.Element),
                             TypeReference.Any.Instance
                         ),
                         typeResolver

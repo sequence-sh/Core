@@ -1,6 +1,6 @@
 ﻿namespace Reductech.Sequence.Core.Tests.Steps;
 
-public partial class RepeatTests : StepTestBase<Repeat<SCLInt>, Array<SCLInt>>
+public partial class CloneTests : StepTestBase<Clone<SCLInt>, Array<SCLInt>>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -8,14 +8,14 @@ public partial class RepeatTests : StepTestBase<Repeat<SCLInt>, Array<SCLInt>>
         get
         {
             yield return new StepCase(
-                "Repeat number",
-                new Repeat<SCLInt>() { Element = Constant(6), Number = Constant(3) },
+                "Clone number",
+                new Clone<SCLInt>() { Element = Constant(6), Number = Constant(3) },
                 new List<int>() { 6, 6, 6 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
 
             yield return new StepCase(
-                "Repeat zero times",
-                new Repeat<SCLInt>() { Element = Constant(6), Number = Constant(0) },
+                "Clone zero times",
+                new Clone<SCLInt>() { Element = Constant(6), Number = Constant(0) },
                 new List<int>().Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
         }
@@ -27,8 +27,8 @@ public partial class RepeatTests : StepTestBase<Repeat<SCLInt>, Array<SCLInt>>
         get
         {
             yield return new DeserializeCase(
-                "Repeat number",
-                "Repeat Element: 6 Number: 3",
+                "Clone number",
+                "Clone Element: 6 Number: 3",
                 new List<int>() { 6, 6, 6 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
             );
         }
