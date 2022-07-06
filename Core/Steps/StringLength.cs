@@ -3,6 +3,7 @@
 /// <summary>
 /// Calculates the length of the string.
 /// </summary>
+[Alias("StrLen")]
 [AllowConstantFolding]
 public sealed class StringLength : CompoundStep<SCLInt>
 {
