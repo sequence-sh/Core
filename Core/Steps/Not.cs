@@ -3,8 +3,9 @@
 /// <summary>
 /// Negation of a boolean value.
 /// </summary>
-[SCLExample("Not true",  "False")]
-[SCLExample("Not false", "True")]
+[SCLExample("Not true",   "False")]
+[SCLExample("Not false",  "True")]
+[SCLExample("Not 1 == 1", "False")]
 [AllowConstantFolding]
 public sealed class Not : CompoundStep<SCLBool>
 {
