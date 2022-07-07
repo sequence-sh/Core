@@ -6,13 +6,13 @@ namespace Reductech.Sequence.Core.Steps;
 /// Gets the value of a property from an entity
 /// </summary>
 [Alias("From")]
-[SCLExample("(foo: 123)['foo']",                           "123")]
 [SCLExample("(foo: 123).foo",                              "123")]
+[SCLExample("(foo: 123)['foo']",                           "123")]
 [SCLExample("(foo: (bar: 123))['foo.bar']",                "123")]
 [SCLExample("(foo: (bar: 123)).foo.bar",                   "123")]
 [SCLExample("From ('type': 'C', 'value': 1) Get: 'value'", "1")]
 [SCLExample(
-    "- <myVar> = ('a':[1,2,3])['a']\r\n- <myVar> | Foreach (log (<>))",
+    "- <myVar> = ('a':[1,2,3])['a']\r\n- <myVar> | ForEach (log (<>))",
     IncludeInDocumentation = false,
     ExpectedLogs = new[] { "1", "2", "3" }
 )]

@@ -1,9 +1,12 @@
 ﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
-/// Gets the letter that appears at a specific index
+/// Gets the letter that appears at a specific index.
+/// First letter is at index 0.
 /// </summary>
-[SCLExample("CharAtIndex 'hello' 1", "e")]
+[Alias("GetLetter")]
+[SCLExample("CharAtIndex 'hello' 1",             "e")]
+[SCLExample("GetLetter From: 'Bye!' AtIndex: 0", "B")]
 [AllowConstantFolding]
 public sealed class CharAtIndex : CompoundStep<StringStream>
 {
@@ -12,6 +15,7 @@ public sealed class CharAtIndex : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("From")]
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <summary>
@@ -19,6 +23,7 @@ public sealed class CharAtIndex : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(2)]
     [Required]
+    [Alias("AtIndex")]
     public IStep<SCLInt> Index { get; set; } = null!;
 
     /// <inheritdoc />

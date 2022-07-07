@@ -5,6 +5,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// <summary>
 /// Convert a string representing a data size to  a string representing the same size but with different units.
 /// </summary>
+[Alias("ConvertFileSize")]
 [SCLExample(
     "ConvertSizeUnits '1024 Kb' SizeUnit.Megabytes",
     "1.00 MB",
@@ -26,7 +27,7 @@ namespace Reductech.Sequence.Core.Steps;
     description: "Basic Replacement"
 )]
 [SCLExample(
-    "ConvertSizeUnits '250 Kb' SizeUnit.Megabytes",
+    "ConvertFileSize From: '250 Kb' To: SizeUnit.Megabytes",
     "0.24 MB",
     description: "Basic Replacement"
 )]
@@ -119,6 +120,7 @@ public sealed class ConvertSizeUnits : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("From")]
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <summary>

@@ -1,89 +1,50 @@
 ﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
-/// Creates an array by repeating an element.
+/// Repeat a step a set number of times.
 /// </summary>
 [AllowConstantFolding]
-public sealed class Repeat<T> : CompoundStep<Array<T>> where T : ISCLObject
+[Alias("DoXTimes")]
+[SCLExample("Repeat Action: (Log 1) Times: 3", ExpectedLogs = new[] { "1", "1", "1" })]
+[SCLExample("DoXTimes (Log 1) X: 3",           ExpectedLogs = new[] { "1", "1", "1" })]
+public sealed class Repeat : CompoundStep<Unit> //TODO replace with a lambda function
 {
     /// <summary>
-    /// The element to repeat.
+    /// The action to perform repeatedly.
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<T> Element { get; set; } = null!;
+    public IStep<Unit> Action { get; set; } = null!;
 
     /// <summary>
-    /// The number of times to repeat the element
+    /// The number of times to perform the action.
     /// </summary>
     [StepProperty(2)]
     [Required]
-    public IStep<SCLInt> Number { get; set; } = null!;
+    [Alias("X")]
+    public IStep<SCLInt> Times { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<Array<T>, IError>> Run(
+    protected override async Task<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var element = await Element.Run(stateMonad, cancellationToken);
+        var numberResult = await Times.Run(stateMonad, cancellationToken);
 
-        if (element.IsFailure)
-            return element.ConvertFailure<Array<T>>();
+        if (numberResult.IsFailure)
+            return numberResult.ConvertFailure<Unit>();
 
-        var number = await Number.Run(stateMonad, cancellationToken);
+        for (var i = 0; i < numberResult.Value.Value; i++)
+        {
+            var result = await Action.Run(stateMonad, cancellationToken);
 
-        if (number.IsFailure)
-            return number.ConvertFailure<Array<T>>();
+            if (result.IsFailure)
+                return result.ConvertFailure<Unit>();
+        }
 
-        var result = Enumerable.Repeat(element.Value, number.Value.Value).ToSCLArray();
-
-        return result;
+        return Unit.Default;
     }
 
     /// <inheritdoc />
-    public override IStepFactory StepFactory => RepeatStepFactory.Instance;
-
-    /// <summary>
-    /// Creates an array by repeating an element.
-    /// </summary>
-    private sealed class RepeatStepFactory : GenericStepFactory
-    {
-        private RepeatStepFactory() { }
-
-        /// <summary>
-        /// The instance.
-        /// </summary>
-        public static GenericStepFactory Instance { get; } = new RepeatStepFactory();
-
-        /// <inheritdoc />
-        public override Type StepType => typeof(Repeat<>);
-
-        /// <inheritdoc />
-        public override string OutputTypeExplanation => "ArrayList<T>";
-
-        /// <inheritdoc />
-        public override TypeReference
-            GetOutputTypeReference(TypeReference memberTypeReference) =>
-            new TypeReference.Array(memberTypeReference);
-
-        /// <inheritdoc />
-        protected override Result<TypeReference, IError> GetGenericTypeParameter(
-            CallerMetadata callerMetadata,
-            FreezableStepData freezableStepData,
-            TypeResolver typeResolver)
-        {
-            return freezableStepData
-                .TryGetStep(nameof(Repeat<ISCLObject>.Element), StepType)
-                .Bind(
-                    x => x.TryGetOutputTypeReference(
-                        new CallerMetadata(
-                            TypeName,
-                            nameof(Repeat<ISCLObject>.Element),
-                            TypeReference.Any.Instance
-                        ),
-                        typeResolver
-                    )
-                );
-        }
-    }
+    public override IStepFactory StepFactory { get; } = new SimpleStepFactory<Repeat, Unit>();
 }

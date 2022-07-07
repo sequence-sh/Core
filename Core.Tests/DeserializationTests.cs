@@ -351,7 +351,7 @@ Log 'Comments!'",
             yield return new DeserializationTestInstance(
                 @"
 - <ArrayVar1> = ['abc', '123']
-- <ArrayVar2> = (Repeat <ArrayVar1> 2)
+- <ArrayVar2> = (Clone <ArrayVar1> 2)
 - Foreach <ArrayVar2> (Log (ArrayLength <Item>))",
                 "2",
                 "2"

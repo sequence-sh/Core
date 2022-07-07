@@ -1,6 +1,6 @@
 ﻿namespace Reductech.Sequence.Core.Tests.Steps;
 
-public partial class RepeatTests : StepTestBase<Repeat<SCLInt>, Array<SCLInt>>
+public partial class RepeatTests : StepTestBase<Repeat, Unit>
 {
     /// <inheritdoc />
     protected override IEnumerable<StepCase> StepCases
@@ -8,15 +8,35 @@ public partial class RepeatTests : StepTestBase<Repeat<SCLInt>, Array<SCLInt>>
         get
         {
             yield return new StepCase(
-                "Repeat number",
-                new Repeat<SCLInt>() { Element = Constant(6), Number = Constant(3) },
-                new List<int>() { 6, 6, 6 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
+                "Log something three times",
+                new Repeat { Action = new Log { Value = Constant(6) }, Times = Constant(3) },
+                Unit.Default,
+                "6",
+                "6",
+                "6"
             );
 
             yield return new StepCase(
-                "Repeat zero times",
-                new Repeat<SCLInt>() { Element = Constant(6), Number = Constant(0) },
-                new List<int>().Select(x => x.ConvertToSCLObject()).ToSCLArray()
+                "Run a sequence three times",
+                new Repeat
+                {
+                    Action = new Sequence<Unit>()
+                    {
+                        InitialSteps = new List<IStep<Unit>>()
+                        {
+                            new Log { Value = Constant(3) },
+                        },
+                        FinalStep = new Log { Value = Constant(3) },
+                    },
+                    Times = Constant(3)
+                },
+                Unit.Default,
+                "3",
+                "3",
+                "3",
+                "3",
+                "3",
+                "3"
             );
         }
     }
@@ -27,9 +47,12 @@ public partial class RepeatTests : StepTestBase<Repeat<SCLInt>, Array<SCLInt>>
         get
         {
             yield return new DeserializeCase(
-                "Repeat number",
-                "Repeat Element: 6 Number: 3",
-                new List<int>() { 6, 6, 6 }.Select(x => x.ConvertToSCLObject()).ToSCLArray()
+                "Log something three times",
+                "Repeat Action: (Log Value: 6) Times: 3",
+                Unit.Default,
+                "6",
+                "6",
+                "6"
             );
         }
     }

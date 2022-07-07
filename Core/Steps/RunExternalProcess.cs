@@ -6,6 +6,8 @@ namespace Reductech.Sequence.Core.Steps;
 /// <summary>
 /// Runs an external executable program.
 /// </summary>
+[Alias("ProcessStart")]
+[Alias("StartProcess")]
 public sealed class RunExternalProcess : CompoundStep<Unit>
 {
     /// <inheritdoc />

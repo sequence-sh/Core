@@ -3,6 +3,8 @@
 /// <summary>
 /// Prints a value to the console.
 /// </summary>
+[Alias("ConsoleWrite")]
+[Alias("WriteToConsole")]
 public sealed class Print : CompoundStep<Unit>
 {
     /// <inheritdoc />
@@ -32,6 +34,7 @@ public sealed class Print : CompoundStep<Unit>
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("Message")]
     public IStep Value { get; set; } = null!;
 
     /// <inheritdoc />

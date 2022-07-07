@@ -20,18 +20,19 @@ public sealed class For : CompoundStep<Unit>
     public IStep<SCLInt> To { get; set; } = null!;
 
     /// <summary>
-    /// The amount to increment by each iteration.
-    /// </summary>
-    [StepProperty(3)]
-    [Required]
-    public IStep<SCLInt> Increment { get; set; } = null!;
-
-    /// <summary>
     /// The action to perform repeatedly.
     /// </summary>
-    [FunctionProperty(4)]
+    [FunctionProperty(3)]
     [Required]
+    [Alias("Do")]
     public LambdaFunction<SCLInt, Unit> Action { get; set; } = null!;
+
+    /// <summary>
+    /// The amount to increment by each iteration.
+    /// </summary>
+    [StepProperty(4)]
+    [DefaultValueExplanation("1")]
+    public IStep<SCLInt> Increment { get; set; } = new SCLConstant<SCLInt>(1.ConvertToSCLObject());
 
     /// <inheritdoc />
     protected override async Task<Result<Unit, IError>> Run(

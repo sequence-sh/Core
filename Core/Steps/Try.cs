@@ -5,6 +5,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// <summary>
 /// Tries to execute a step and recovers if that step results in failure.
 /// </summary>
+[Alias("TryTo")]
 [SCLExample(
     "Try (1 / 0) OnError: 0",
     "0",
@@ -26,7 +27,7 @@ namespace Reductech.Sequence.Core.Steps;
     }
 )]
 [SCLExample(
-    @"Try (
+    @"TryTo Do: (
 - log 123
 - log 1 / 0
 - 4
@@ -78,6 +79,8 @@ public sealed class Try<T> : CompoundStep<T> where T : ISCLObject
     /// </summary>
     [StepProperty(1)]
     [Required]
+    [Alias("Sequence")]
+    [Alias("Do")]
     public IStep<T> Statement { get; set; } = null!;
 
     /// <summary>
