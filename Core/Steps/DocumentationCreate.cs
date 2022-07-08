@@ -17,6 +17,72 @@ namespace Reductech.Sequence.Core.Steps;
 [SCLExample("GenerateDocumentation | EntityFormat", ExampleOutput, ExecuteInTests = false)]
 [Alias("DocGen")]
 [Alias("GenerateDocumentation")]
+[TypeReferenceSchema(
+    @"{
+  ""title"": ""Documentation"",
+  ""type"": ""object"",
+  ""additionalProperties"": false,
+  ""properties"": {
+    ""MainContents"": {
+      ""type"": ""object"",
+      ""additionalItems"": {
+        ""type"": ""object""
+      },
+      ""required"": [
+        ""PageType"",
+        ""FileName"",
+        ""Title"",
+        ""FileText"",
+        ""Directory""
+      ],
+      ""properties"": {
+        ""PageType"": {
+          ""type"": ""string""
+        },
+        ""FileName"": {
+          ""type"": ""string""
+        },
+        ""Title"": {
+          ""type"": ""string""
+        },
+        ""FileText"": {
+          ""type"": ""string""
+        },
+        ""Directory"": {
+          ""type"": ""string""
+        }
+      }
+    },
+    ""Categories"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object""
+      },
+      ""prefixItems"": []
+    },
+    ""Enums"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object""
+      },
+      ""prefixItems"": []
+    },
+    ""AllPages"": {
+      ""type"": ""array"",
+      ""items"": {
+        ""type"": ""object""
+      },
+      ""prefixItems"": []
+    }
+  },
+  ""required"": [
+    ""MainContents"",
+    ""Categories"",
+    ""Enums"",
+    ""AllPages""
+  ]
+}"
+)]
 public sealed class DocumentationCreate : CompoundStep<Entity>
 {
     /// <inheritdoc />

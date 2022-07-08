@@ -4,6 +4,22 @@
 /// Gets information about connectors
 /// </summary>
 [Alias("GetConnectorVersion")]
+[TypeReferenceSchema(
+    @"{
+""type"": ""array"",
+""items"": {
+    ""type"": ""object"",
+    ""required"": [ ""Id"", ""Version"" ],
+   ""properties"": {
+    ""Id"": {
+      ""type"": ""string""
+    },
+    ""Version"": {
+      ""type"": ""string""
+    }
+}
+}}"
+)]
 public sealed class GetConnectorInformation : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
