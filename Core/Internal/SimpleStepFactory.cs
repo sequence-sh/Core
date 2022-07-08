@@ -12,12 +12,15 @@ public class SimpleStepFactory<TStep, TOutput> : StepFactory
         FreezableStepData freezableStepData,
         TypeResolver typeResolver)
     {
-        var reference = TypeReference.Create(typeof(TOutput));
+        var attribute = typeof(TStep).GetCustomAttribute<TypeReferenceSchemaAttribute>();
+
+        var typeReference =
+            attribute?.TypeReference ?? TypeReference.Create(typeof(TOutput));
 
         return callerMetadata
-            .CheckAllows(reference, typeResolver)
+            .CheckAllows(typeReference, typeResolver)
             .MapError(x => x.WithLocation(freezableStepData))
-            .Map(_ => reference);
+            .Map(_ => typeReference);
     }
 
     /// <inheritdoc />

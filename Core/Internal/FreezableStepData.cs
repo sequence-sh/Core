@@ -192,8 +192,7 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
 
                 else
                 {
-                    var arrayTypeReference =
-                        TypeReference.CreateFromStepType(parameter.StepType);
+                    var arrayTypeReference = parameter.StepTypeReference;
 
                     var memberTypeReference =
                         arrayTypeReference.TryGetArrayMemberTypeReference(typeResolver);
@@ -226,7 +225,7 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
             }
             else
             {
-                expectedTypeReference = TypeReference.CreateFromStepType(parameter.StepType);
+                expectedTypeReference = parameter.StepTypeReference;
             }
 
             var childCallerMetadata = new CallerMetadata(
@@ -262,7 +261,7 @@ public sealed record FreezableStepData(StepParameterDict StepProperties, TextLoc
                 return;
             }
 
-            var tr = TypeReference.CreateFromStepType(parameter.StepType);
+            var tr = parameter.StepTypeReference;
 
             var childCallerMetadata = new CallerMetadata(stepName, stepParameterReference.Name, tr);
 

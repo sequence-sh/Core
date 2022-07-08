@@ -16,6 +16,11 @@ public interface IStepParameter
     Type StepType { get; }
 
     /// <summary>
+    /// The type reference of this parameter
+    /// </summary>
+    public TypeReference StepTypeReference { get; }
+
+    /// <summary>
     /// The output type of the parameter step
     /// </summary>
     Type ActualType { get; }

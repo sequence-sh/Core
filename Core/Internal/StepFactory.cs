@@ -90,14 +90,14 @@ public abstract class StepFactory : IStepFactory
         FreezableStepData freezeData,
         TypeResolver typeResolver);
 
-    private IReadOnlyDictionary<StepParameterReference, IStepParameter>? _propertyDictionary;
+    private IReadOnlyDictionary<StepParameterReference, IStepParameter>? _parameterDictionary;
 
     /// <inheritdoc />
     public IReadOnlyDictionary<StepParameterReference, IStepParameter> ParameterDictionary
     {
         get
         {
-            return _propertyDictionary ??= StepType
+            return _parameterDictionary ??= StepType
                 .GetProperties()
                 .SelectMany(
                     propertyInfo => StepParameterReference.GetPossibleReferences(propertyInfo)
@@ -294,7 +294,7 @@ public abstract class StepFactory : IStepFactory
                 var stepCallerMetadata = new CallerMetadata(
                     stepTypeName,
                     stepParameter.Name,
-                    TypeReference.CreateFromStepType(stepParameter.StepType)
+                    stepParameter.StepTypeReference
                 );
 
                 return stepMember.ConvertToStep()
@@ -485,7 +485,7 @@ public abstract class StepFactory : IStepFactory
             );
         }
 
-        var expectedType = TypeReference.CreateFromStepType(propertyInfo.PropertyType);
+        var expectedType = TypeReference.CreateFromParameterProperty(propertyInfo);
 
         var callerMetadata = new CallerMetadata(
             parentStep.Name,

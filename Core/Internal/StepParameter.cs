@@ -25,7 +25,8 @@ public sealed partial record StepParameter : IStepParameter
         Metadata = PropertyInfo.GetCustomAttributes<MetadataAttribute>()
             .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
 
-        StepType = PropertyInfo.PropertyType;
+        StepType          = PropertyInfo.PropertyType;
+        StepTypeReference = TypeReference.CreateFromParameterProperty(propertyInfo);
 
         static Type TryGetNested(Type t) => t.IsGenericType ? t.GetGenericArguments()[0] : t;
 
@@ -114,6 +115,10 @@ public sealed partial record StepParameter : IStepParameter
     /// <inheritdoc />
     [IgnoreEquality]
     public Type StepType { get; }
+
+    /// <inheritdoc />
+    [IgnoreEquality]
+    public TypeReference StepTypeReference { get; }
 
     /// <inheritdoc />
     [IgnoreEquality]
