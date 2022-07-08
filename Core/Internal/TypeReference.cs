@@ -787,9 +787,31 @@ public abstract record TypeReference
     }
 
     /// <summary>
+    /// Create a type reference from a step parameter property.
+    /// Will return the member type if the parameter property is a step list
+    /// </summary>
+    public static TypeReference CreateFromParameterProperty(PropertyInfo property)
+    {
+        var attribute = property.GetCustomAttribute<TypeReferenceSchemaAttribute>();
+
+        if (attribute != null)
+            return attribute.TypeReference;
+
+        if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition()
+         == typeof(IReadOnlyList<>))
+        {
+            return CreateFromStepType(property.PropertyType.GenericTypeArguments.Single());
+        }
+        else
+        {
+            return CreateFromStepType(property.PropertyType);
+        }
+    }
+
+    /// <summary>
     /// Create a type reference from a step type
     /// </summary>
-    public static TypeReference CreateFromStepType(Type stepType)
+    public static TypeReference CreateFromStepType(Type stepType) //TODO make private
     {
         if (stepType.IsGenericType && stepType.GetGenericTypeDefinition() == typeof(IStep<>))
         {
