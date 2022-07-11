@@ -41,9 +41,12 @@ public static class Extensions
         TKey key,
         string? error)
     {
-        var r = dictionary.TryFind(key);
+        if (dictionary.TryGetValue(key, out var v))
+        {
+            return v;
+        }
 
-        return r.ToResult(error ?? $"The element '{key}' was not present.");
+        return Result.Failure<TValue>($"The element '{key}' was not present.");
     }
 
     /// <summary>
@@ -54,10 +57,10 @@ public static class Extensions
         TKey key,
         Func<TError> error)
     {
-        var r = dictionary.TryFind(key);
-
-        if (r.HasValue)
-            return r.GetValueOrThrow()!;
+        if (dictionary.TryGetValue(key, out var v))
+        {
+            return v;
+        }
 
         return error()!;
     }
