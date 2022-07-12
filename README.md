@@ -3,8 +3,8 @@
 [Sequence®](https://gitlab.com/reductech/sequence) is a collection of libraries
 that automates cross-application e-discovery and forensic workflows.
 
-It consists of the Core SDK which allows developers to
-build Steps for various application and to configure workflows
+The foundation of Sequence is the Core SDK which allows developers to
+build connectors for various applications and to configure workflows
 called Sequences using the Sequence Configuration Language (SCL).
 
 `Core` is:
@@ -24,16 +24,20 @@ such as creating a case, ingesting data, searching or exporting data.
 
 # Documentation
 
-Documentation available at https://sequence.sh
+https://sequence.sh
+
+# Download
+
+https://sequence.sh/download
 
 # Try SCL and Core
 
-Using the Sequence console application: https://gitlab.com/reductech/sequence/console
+https://sequence.sh/playground
 
-# Releases
+# Package Releases
 
 Can be downloaded from the [Releases page](https://gitlab.com/reductech/sequence/core/-/releases).
 
 # NuGet Packages
 
-Are available in the [Reductech Nuget feed](https://gitlab.com/reductech/nuget/-/packages).
+Release nuget packages are available from [nuget.org](https://www.nuget.org/profiles/Sequence).
