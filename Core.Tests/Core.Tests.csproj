@@ -11,22 +11,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <RepositoryUrl>https://gitlab.com/reductech/sequence/core</RepositoryUrl>
+    <RepositoryUrl>https://gitlab.com/reductech/sequence/core.git</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
     <Authors>Reductech</Authors>
     <Company>Reductech</Company>
     <Copyright>Copyright (c) 2022 Reductech Ltd</Copyright>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="StrykerOutput\**" />
-    <Compile Remove="TestResults\**" />
-    <EmbeddedResource Remove="StrykerOutput\**" />
-    <EmbeddedResource Remove="TestResults\**" />
-    <None Remove="StrykerOutput\**" />
-    <None Remove="TestResults\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="AliasDeserializationTest.cs" />
