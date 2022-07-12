@@ -9,7 +9,9 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
     {
         get
         {
-            var version = typeof(IStep).Assembly.GetName().Version!;
+            var version = typeof(IStep).Assembly
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+                .InformationalVersion;
 
             var baseEntity =
                 Entity.Create(
@@ -21,7 +23,7 @@ public partial class GetSettingsTests : StepTestBase<GetSettings, Entity>
                              new ConnectorSettings()
                              {
                                  Id      = "Reductech.Sequence.Core",
-                                 Version = version.ToString(3),
+                                 Version = version,
                                  Enable  = true
                              }
                          }
