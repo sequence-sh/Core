@@ -1,6 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -14,21 +13,51 @@
   <PropertyGroup>
     <PackageId>Reductech.Sequence.Core.LanguageServer</PackageId>
     <Title>Sequence® Core Language Server</Title>
-    <Description>Class library providing langauge server features for SCL.</Description>
+    <Description>
+      A language server for the Sequence Configuration Language.
+      Uses LSP (https://microsoft.github.io/language-server-protocol) to provide
+      advanced language completion and analysis features for editors.
+    </Description>
     <Product>Sequence®</Product>
+    <PackageTags>ediscovery;forensics;automation;orchestration;edrm;sequence;lsp;scl;language-server</PackageTags>
 
-    <PackageProjectUrl>https://gitlab.com/reductech/sequence/core</PackageProjectUrl>
-    <RepositoryUrl>https://gitlab.com/reductech/sequence/core</RepositoryUrl>
+    <PackageProjectUrl>https://sequence.sh</PackageProjectUrl>
+    <RepositoryUrl>https://gitlab.com/reductech/sequence/core.git</RepositoryUrl>
     <PackageReleaseNotes>https://gitlab.com/reductech/sequence/core/-/blob/main/CHANGELOG.md</PackageReleaseNotes>
-    <PackageTags>ediscovery;forensics;automation;orchestration;m;sequence</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <Authors>Reductech</Authors>
     <Company>Reductech</Company>
     <Copyright>Copyright (c) 2022 Reductech Ltd</Copyright>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(CI)' != ''">
+    <!-- deterministic builds for Source Link -->
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Source Link and symbols -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../CHANGELOG.md" Pack="true" PackagePath="/" />
+    <None Include="../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../NOTICE" Pack="true" PackagePath="/" />
+    <None Include="../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitLab" Version="1.1.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />

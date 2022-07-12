@@ -13,19 +13,43 @@
   <PropertyGroup>
     <PackageId>Reductech.Sequence.Core</PackageId>
     <Title>Sequence® Core SDK</Title>
-    <Description>Class library for automating e-discovery and forensic workflows.</Description>
+    <Description>
+      Sequence Configuration Language grammar and interpreter, and SDK for
+      automating e-discovery and forensic workflows.
+    </Description>
     <Product>Sequence®</Product>
-
-    <PackageProjectUrl>https://gitlab.com/reductech/sequence/core</PackageProjectUrl>
-    <RepositoryUrl>https://gitlab.com/reductech/sequence/core</RepositoryUrl>
-    <PackageReleaseNotes>https://gitlab.com/reductech/sequence/core/-/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>ediscovery;forensics;automation;orchestration;edrm;sequence</PackageTags>
+
+    <PackageProjectUrl>https://sequence.sh</PackageProjectUrl>
+    <RepositoryUrl>https://gitlab.com/reductech/sequence/core.git</RepositoryUrl>
+    <PackageReleaseNotes>https://gitlab.com/reductech/sequence/core/-/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <Authors>Reductech</Authors>
     <Company>Reductech</Company>
     <Copyright>Copyright (c) 2022 Reductech Ltd</Copyright>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(CI)' != ''">
+    <!-- deterministic builds for Source Link -->
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Source Link and symbols -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../CHANGELOG.md" Pack="true" PackagePath="/" />
+    <None Include="../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../NOTICE" Pack="true" PackagePath="/" />
+    <None Include="../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(CI)' == ''">
     <Antlr4 Include="Internal\Parser\SCL.g4">
@@ -57,6 +81,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitLab" Version="1.1.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Namotion.Reflection" Version="2.0.10" />
     <PackageReference Include="OneOf" Version="3.0.223" />
     <PackageReference Include="Reductech.Sequence.ConnectorManager.Base" Version="0.9.0-a.main.2206200117" />
