@@ -21,14 +21,19 @@ New aliases:
 Step parameter changes:
 
 - `For` step
-   - Made `Increment` optional with a default of 1
-   - Added `Do` alias for `Action`
+  - Made `Increment` optional with a default of 1
+  - Added `Do` alias for `Action`
 - `For` parameter alias for Milliseconds in `Delay`
 
-Steps renamed (breaking change):
+Steps renamed (**breaking** change):
 
 - `Repeat` to `Clone`
 - `DoXTimes` to `Repeat`
+
+### Other Changes
+
+- Enabled [Source Link](https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink)
+- Enabled publish to [Nuget.org](https://www.nuget.org) including symbols
 
 ## Issues Closed in this Release
 
@@ -53,6 +58,7 @@ Steps renamed (breaking change):
 ### Sequence Configuration Language
 
 - You can now use `"""` to indicate a multiline string with no escapes.
+
 ```scl
 """
 {
@@ -60,7 +66,9 @@ Steps renamed (breaking change):
 }
 """
 ```
+
 - Entity Properties can now be accessed using dot notation
+
 ```scl
 - <entity> = (foo: (bar: 1, baz: 2))
 - Print <entity>.foo.bar
@@ -150,17 +158,17 @@ The project has now been updated to use .NET 6.
 ### Core SDK
 
 - Step input and output types now have a base type of `ISCLObject`
-    - This enforces that all inputs and outputs are one of the following types:
-    - Unit
-    - SCLNull
-    - StringStream
-    - SCLBool
-    - SCLInt
-    - SCLDouble
-    - SCLDateTime
-    - SCLEnum
-    - SCLOneOf of ISCLObjects
-    - Array of ISCLObject
+  - This enforces that all inputs and outputs are one of the following types:
+  - Unit
+  - SCLNull
+  - StringStream
+  - SCLBool
+  - SCLInt
+  - SCLDouble
+  - SCLDateTime
+  - SCLEnum
+  - SCLOneOf of ISCLObjects
+  - Array of ISCLObject
 
 ### Steps
 
@@ -979,7 +987,3 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
-
-
-
-
