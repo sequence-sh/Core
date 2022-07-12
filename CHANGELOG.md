@@ -1,3 +1,51 @@
+# v0.16.0 (2022-07-13)
+
+## Summary of Changes
+
+### Steps
+
+The `Log` step now has a `Severity` parameter which allows logging Debug, Information, Warning and Error level log messages
+
+### Sequence Configuration Language
+
+New aliases:
+
+- `GetLetter` for `CharAtIndex`
+- `ConvertFileSize` for `ConvertSizeUnits`
+- `FormatDate` for `DateToString`
+- `GetConnectorVersion` for `GetConnectorInformation`
+- `ConsoleWrite`, `WriteToConsole` for `Print`
+- `ProcessStart`, `StartProcess` for `RunExternalProcess`
+- `StrLen` for `StringLength`
+
+Step parameter changes:
+
+- `For` step
+   - Made `Increment` optional with a default of 1
+   - Added `Do` alias for `Action`
+- `For` parameter alias for Milliseconds in `Delay`
+
+Steps renamed (breaking change):
+
+- `Repeat` to `Clone`
+- `DoXTimes` to `Repeat`
+
+## Issues Closed in this Release
+
+### New Features
+
+- Add TypeReferenceSchemaAttribute to enforce that entities returned from steps are used correctly #451
+- Add additional step and parameter aliases #447
+- Add severity parameter to Log step #449
+- More helpful Error Messages for Common Compilation Errors #416
+- Add a TryCatch Step #445
+- Multiline string should ignore the first character if it is a newline #440
+
+### Bug Fixes
+
+- Output from hash step should be hex string #450
+- Parameter Aliases are not displayed properly in Monaco Editors #448
+
 # v0.15.0 (2022-05-27)
 
 ## Summary of Changes
@@ -931,6 +979,7 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
+
 
 
 
