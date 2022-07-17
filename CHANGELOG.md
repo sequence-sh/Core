@@ -1,3 +1,56 @@
+# v0.16.0 (2022-07-13)
+
+## Summary of Changes
+
+### Steps
+
+The `Log` step now has a `Severity` parameter which allows logging Debug, Information, Warning and Error level log messages
+
+### Sequence Configuration Language
+
+New aliases:
+
+- `GetLetter` for `CharAtIndex`
+- `ConvertFileSize` for `ConvertSizeUnits`
+- `FormatDate` for `DateToString`
+- `GetConnectorVersion` for `GetConnectorInformation`
+- `ConsoleWrite`, `WriteToConsole` for `Print`
+- `ProcessStart`, `StartProcess` for `RunExternalProcess`
+- `StrLen` for `StringLength`
+
+Step parameter changes:
+
+- `For` step
+  - Made `Increment` optional with a default of 1
+  - Added `Do` alias for `Action`
+- `For` parameter alias for Milliseconds in `Delay`
+
+Steps renamed (**breaking** change):
+
+- `Repeat` to `Clone`
+- `DoXTimes` to `Repeat`
+
+### Other Changes
+
+- Enabled [Source Link](https://docs.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink)
+- Enabled publish to [Nuget.org](https://www.nuget.org) including symbols
+
+## Issues Closed in this Release
+
+### New Features
+
+- Add TypeReferenceSchemaAttribute to enforce that entities returned from steps are used correctly #451
+- Add additional step and parameter aliases #447
+- Add severity parameter to Log step #449
+- More helpful Error Messages for Common Compilation Errors #416
+- Add a TryCatch Step #445
+- Multiline string should ignore the first character if it is a newline #440
+
+### Bug Fixes
+
+- Output from hash step should be hex string #450
+- Parameter Aliases are not displayed properly in Monaco Editors #448
+
 # v0.15.0 (2022-05-27)
 
 ## Summary of Changes
@@ -5,6 +58,7 @@
 ### Sequence Configuration Language
 
 - You can now use `"""` to indicate a multiline string with no escapes.
+
 ```scl
 """
 {
@@ -12,7 +66,9 @@
 }
 """
 ```
+
 - Entity Properties can now be accessed using dot notation
+
 ```scl
 - <entity> = (foo: (bar: 1, baz: 2))
 - Print <entity>.foo.bar
@@ -102,17 +158,17 @@ The project has now been updated to use .NET 6.
 ### Core SDK
 
 - Step input and output types now have a base type of `ISCLObject`
-    - This enforces that all inputs and outputs are one of the following types:
-    - Unit
-    - SCLNull
-    - StringStream
-    - SCLBool
-    - SCLInt
-    - SCLDouble
-    - SCLDateTime
-    - SCLEnum
-    - SCLOneOf of ISCLObjects
-    - Array of ISCLObject
+  - This enforces that all inputs and outputs are one of the following types:
+  - Unit
+  - SCLNull
+  - StringStream
+  - SCLBool
+  - SCLInt
+  - SCLDouble
+  - SCLDateTime
+  - SCLEnum
+  - SCLOneOf of ISCLObjects
+  - Array of ISCLObject
 
 ### Steps
 
@@ -931,6 +987,3 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
-
-
-

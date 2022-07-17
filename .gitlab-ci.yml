@@ -5,6 +5,7 @@ include:
 variables:
   PACKAGE_NAME_NUGET: Reductech.Sequence.Core
   PACKAGE_NAME_DLL: Reductech.Sequence.Core
+  PUBLISH_NUGETORG: 1
 
 stages:
   - antlr
