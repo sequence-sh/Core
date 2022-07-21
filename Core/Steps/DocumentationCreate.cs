@@ -15,6 +15,10 @@ namespace Reductech.Sequence.Core.Steps;
     ExecuteInTests = false
 )]
 [SCLExample("GenerateDocumentation | EntityFormat", ExampleOutput, ExecuteInTests = false)]
+[SCLExample(
+    "log (stringContains (DocumentationCreate RootUrl: 'MyRoot').MainContents.FileText 'MyRoot/Core/And.md')",
+    expectedLogs: "True"
+)]
 [Alias("DocGen")]
 [Alias("GenerateDocumentation")]
 [TypeReferenceSchema(
@@ -103,7 +107,7 @@ public sealed class DocumentationCreate : CompoundStep<Entity>
 
         var creationResult = DocumentationCreator.CreateDocumentation(
             documented,
-            new DocumentationOptions() //Use default values
+            new DocumentationOptions() { RootUrl = r.Value } //Use default values
         );
 
         return creationResult.ConvertToEntity();
