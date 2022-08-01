@@ -61,9 +61,9 @@ public partial record EnumeratedValuesNodeData(
             .ToArray();
 
         if (values.Length == 1)
-            builder.Const(values.Single().ToJsonElement());
+            builder.Const(values.Single().ToJsonElement().AsNode());
         else if (values.Length > 1)
-            builder.Enum(values.Select(x => x.ToJsonElement()));
+            builder.Enum(values.Select(x => x.ToJsonElement().AsNode()));
     }
 
     /// <summary>

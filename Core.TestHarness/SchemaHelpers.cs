@@ -1,4 +1,6 @@
-﻿namespace Reductech.Sequence.Core.TestHarness;
+﻿using System.Text.Json.Nodes;
+
+namespace Reductech.Sequence.Core.TestHarness;
 
 public static class SchemaHelpers
 {
@@ -7,11 +9,7 @@ public static class SchemaHelpers
 
     public static JsonSchema EnumProperty(params object[] values) => new JsonSchemaBuilder()
         .Type(SchemaValueType.String)
-        .Enum(
-            values.Select(
-                x => JsonDocument.Parse(JsonSerializer.Serialize<object>(x)).RootElement.Clone()
-            )
-        )
+        .Enum(values.Select(x => JsonNode.Parse(JsonSerializer.Serialize(x))))
         .Build();
 
     public static JsonSchema AnyInt =>
