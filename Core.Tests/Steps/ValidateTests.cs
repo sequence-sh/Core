@@ -415,7 +415,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 new JsonSchemaBuilder().Title(SchemaName)
                     .Properties(("Foo", new JsonSchemaBuilder().Type(SchemaValueType.Integer))),
                 ErrorCode.SchemaViolation,
-                "Value is string but should be integer",
+                "Value is \"string\" but should be \"integer\"",
                 "#/properties/Foo/type"
             );
 
@@ -454,7 +454,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                     )
                     .Required("Foo", "Bar"),
                 ErrorCode.SchemaViolation,
-                "Required properties [Bar] were not present",
+                "Required properties [\"Bar\"] were not present",
                 "#/required"
             );
 
@@ -466,7 +466,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                     .AdditionalProperties(JsonSchema.False),
                 ErrorCode.SchemaViolation,
                 "All values fail against the false schema",
-                "#/additionalProperties/$false"
+                "#/additionalProperties"
             );
         }
     }

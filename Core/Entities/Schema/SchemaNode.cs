@@ -149,7 +149,7 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
         EnumeratedValuesNodeData enumeratedValuesNodeData;
 
         var constantValue = schema.Keywords.OfType<ConstKeyword>()
-            .Select(x => x.Value.Clone() as JsonElement?)
+            .Select(x => x.Value.ToJsonDocument()?.RootElement)
             .FirstOrDefault();
 
         if (constantValue is not null)
@@ -163,7 +163,11 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
 
             if (enumValues is not null)
                 enumeratedValuesNodeData =
-                    new EnumeratedValuesNodeData(enumValues.Select(Entity.Create).ToList());
+                    new EnumeratedValuesNodeData(
+                        enumValues.WhereNotNull()
+                            .Select(Entity.Create)
+                            .ToList()
+                    );
 
             else
                 enumeratedValuesNodeData = EnumeratedValuesNodeData.Empty;

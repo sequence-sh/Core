@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Generator.Equals;
 
@@ -88,6 +89,24 @@ public sealed partial record Entity(
             return nestedEntity;
 
         return new Entity(new[] { new EntityProperty(PrimitiveKey, ev, 0) });
+    }
+
+    /// <summary>
+    /// Create an entity from a JsonNode
+    /// </summary>
+    [Pure]
+    public static Entity Create(JsonNode node)
+    {
+        var rootElement = node.ToJsonDocument()?.RootElement;
+
+        if (rootElement.HasValue)
+        {
+            return Create(rootElement.Value);
+        }
+        else
+        {
+            return Empty;
+        }
     }
 
     /// <summary>
