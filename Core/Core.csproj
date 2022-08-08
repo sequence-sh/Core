@@ -87,7 +87,7 @@
     </PackageReference>
     <PackageReference Include="Namotion.Reflection" Version="2.0.10" />
     <PackageReference Include="OneOf" Version="3.0.223" />
-    <PackageReference Include="Reductech.Sequence.ConnectorManager.Base" Version="0.9.0" />
+    <PackageReference Include="Reductech.Sequence.ConnectorManager.Base" Version="0.10.0-a.main.2208080108" />
     <PackageReference Include="RestSharp" Version="108.0.1" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
