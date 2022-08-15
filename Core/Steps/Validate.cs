@@ -7,7 +7,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// Validate that the schema is valid for all entities.
 /// Does not evaluate the entity stream.
 /// For more information on schemas please see the
-/// [documentation](https://docs.reductech.io/sequence/how-to/scl/schemas.html).
+/// [documentation](https://sequence.sh/docs/schemas/).
 /// </summary>
 [Alias("SchemaValidate")]
 [AllowConstantFolding]
