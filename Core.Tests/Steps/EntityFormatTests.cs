@@ -80,10 +80,12 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
                 {
                     Value = new EntityFormat()
                     {
-                        Entity = Constant(
-                            Entity.Create(
-                                ("prop1", 123),
-                                ("prop2", "abc")
+                        Entity = new SCLConstant<SCLOneOf<Entity, Array<Entity>>>(
+                            new SCLOneOf<Entity, Array<Entity>>(
+                                Entity.Create(
+                                    ("prop1", 123),
+                                    ("prop2", "abc")
+                                )
                             )
                         )
                     }
@@ -101,10 +103,12 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
                 {
                     Value = new EntityFormat()
                     {
-                        Entity = Constant(
-                            Entity.Create(
-                                ("longprop1", 123),
-                                ("p2", "abc")
+                        Entity = new SCLConstant<SCLOneOf<Entity, Array<Entity>>>(
+                            new SCLOneOf<Entity, Array<Entity>>(
+                                Entity.Create(
+                                    ("longprop1", 123),
+                                    ("p2", "abc")
+                                )
                             )
                         )
                     }
@@ -122,32 +126,36 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
                 {
                     Value = new EntityFormat()
                     {
-                        Entity = Constant(
-                            Entity.Create(
-                                ("listProp1", new List<int>()
-                                {
-                                    1,
-                                    2,
-                                    3,
-                                    4,
-                                    5
-                                }),
-                                ("listProp2", new List<Entity>()
-                                {
-                                    Entity.Create(
-                                        ("prop1", 123),
-                                        ("prop2", "abc")
-                                    ),
-                                    Entity.Create(
-                                        ("prop1", 456),
-                                        ("prop2", "def")
-                                    ),
-                                }),
-                                ("listProp3",
-                                 new List<List<int>>()
-                                 {
-                                     new() { 1, 2, 3 }, new() { 4, 5, 6 }, new() { 7, 8, 9 },
-                                 })
+                        Entity = new SCLConstant<SCLOneOf<Entity, Array<Entity>>>(
+                            new SCLOneOf<Entity, Array<Entity>>(
+                                Entity.Create(
+                                    ("listProp1", new List<int>()
+                                    {
+                                        1,
+                                        2,
+                                        3,
+                                        4,
+                                        5
+                                    }),
+                                    ("listProp2", new List<Entity>()
+                                    {
+                                        Entity.Create(
+                                            ("prop1", 123),
+                                            ("prop2", "abc")
+                                        ),
+                                        Entity.Create(
+                                            ("prop1", 456),
+                                            ("prop2", "def")
+                                        ),
+                                    }),
+                                    ("listProp3",
+                                     new List<List<int>>()
+                                     {
+                                         new() { 1, 2, 3 },
+                                         new() { 4, 5, 6 },
+                                         new() { 7, 8, 9 },
+                                     })
+                                )
                             )
                         )
                     }
