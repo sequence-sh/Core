@@ -1,10 +1,12 @@
 ﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
-/// Formats an entity as a string
+/// Formats an entity or an array of entities as a string
 /// </summary>
 [Alias("Format")]
 [AllowConstantFolding]
+[SCLExample("EntityFormat (a:1, b:2)",               "( 'a': 1 'b': 2 )")]
+[SCLExample("EntityFormat [(a:1, b:2), (a:3, b:4)]", "[ ( 'a': 1 'b': 2 ), ( 'a': 3 'b': 4 ) ]")]
 public sealed class EntityFormat : CompoundStep<StringStream>
 {
     /// <inheritdoc />
@@ -12,14 +14,22 @@ public sealed class EntityFormat : CompoundStep<StringStream>
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var entity = await Entity.Run(stateMonad, cancellationToken);
+        var oneOf = await Entity.Run(stateMonad, cancellationToken);
 
-        if (entity.IsFailure)
-            return entity.ConvertFailure<StringStream>();
+        if (oneOf.IsFailure)
+            return oneOf.ConvertFailure<StringStream>();
 
-        var result = entity.Value.Format();
+        var sb = new IndentationStringBuilder();
 
-        return new StringStream(result);
+        var serializable = oneOf.Value.OneOf.Match(x => x, x => x as ISerializable);
+
+        serializable.Format(
+            sb,
+            new FormattingOptions(),
+            new Stack<Comment>()
+        );
+
+        return new StringStream(sb.ToString());
     }
 
     /// <summary>
@@ -27,7 +37,7 @@ public sealed class EntityFormat : CompoundStep<StringStream>
     /// </summary>
     [StepProperty(1)]
     [Required]
-    public IStep<Entity> Entity { get; set; } = null!;
+    public IStep<SCLOneOf<Entity, Array<Entity>>> Entity { get; set; } = null!;
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
