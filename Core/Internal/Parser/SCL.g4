@@ -32,7 +32,7 @@ lambda              : OPENBRACKET (VARIABLENAME | AUTOMATICVARIABLE) ARROW step 
 number              : NUMBER ;
 boolean				: TRUE | FALSE ;
 dateTime			: DATETIME ;
-interpolatedString	: OPENISTRING step (ISTRINGSEGMENT step)* CLOSEISTRING;
+interpolatedString	: OPENISTRING step? (ISTRINGSEGMENT step?)* CLOSEISTRING;
 quotedString		: MULTILINESTRING | DOUBLEQUOTEDSTRING | SINGLEQUOTEDSTRING | SIMPLEISTRING ;
 enumeration			: NAME DOT NAME ;
 nullValue           : NULLVALUE ;

@@ -390,25 +390,23 @@ public static partial class SCLParsing
 
             for (var i = 0; i < context.ChildCount; i++)
             {
-                var index = i / 2;
+                var node = context.GetChild(i);
 
-                if (i % 2 == 0)
+                if (node is TerminalNodeImpl isc)
                 {
-                    var s         = (ITerminalNode)context.GetChild(i);
-                    var text      = s.GetText();
+                    var text      = isc.GetText();
                     var unescaped = UnescapeInterpolated(text, i == 0);
 
                     var cs = new SCLConstantFreezable<StringStream>(
                         unescaped,
-                        new TextLocation(s.Symbol)
+                        new TextLocation(isc.Symbol)
                     );
 
                     steps.Add(cs);
                 }
                 else
                 {
-                    var s = context.step(index);
-                    var r = Visit(s);
+                    var r = Visit(node);
 
                     if (r.IsSuccess) { steps.Add(r.Value.ConvertToStep()); }
                     else { errors.Add(r.Error); }

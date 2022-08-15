@@ -9,7 +9,9 @@ namespace Reductech.Sequence.Core.Steps;
 /// quotes and prefixed with a dollar-sign ($). Then, anything in curly
 /// brackets { and } will be evaluated as SCL.
 /// </summary>
-[SCLExample("$\"The answer is {6 + (6 ^ 2)}\"", "The answer is 42")]
+[SCLExample("$\"The answer is {6 + (6 ^ 2)}\"",       "The answer is 42")]
+[SCLExample("$\"The answer is {}???\"",               "The answer is ???")]
+[SCLExample("$\"(a:{1}, b:{}, c:{3}, d:{}, e:{5})\"", "(a:1, b:, c:3, d:, e:5)")]
 [AllowConstantFolding]
 public sealed class StringInterpolate : CompoundStep<StringStream>
 {
