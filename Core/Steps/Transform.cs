@@ -11,7 +11,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// The properties of the transformed entities will be in the same order as in the schema
 ///
 /// For more information on schemas please see the
-/// [documentation](https://docs.reductech.io/sequence/how-to/scl/schemas.html). 
+/// [documentation](https://sequence.sh/docs/schemas/). 
 /// </summary>
 [Alias("SchemaTransform")]
 [AllowConstantFolding]
