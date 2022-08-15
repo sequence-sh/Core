@@ -17,9 +17,14 @@ public sealed partial record StepParameter : IStepParameter
         StepPropertyBaseAttribute attribute)
     {
         PropertyInfo = propertyInfo;
-        Attribute = attribute;
-        Required = PropertyInfo.GetCustomAttributes<RequiredAttribute>().Any();
-        Aliases = PropertyInfo.GetCustomAttributes<AliasAttribute>().Select(x => x.Name).ToList();
+        Attribute    = attribute;
+        // ReSharper disable ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+        Required = PropertyInfo.GetCustomAttributes<RequiredAttribute>()?.Any() ?? false;
+
+        Aliases = PropertyInfo.GetCustomAttributes<AliasAttribute>()?.Select(x => x.Name).ToList()
+                  // ReSharper restore ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+               ?? new List<string>();
+
         Summary = propertyInfo.GetXmlDocsSummary();
 
         Metadata = PropertyInfo.GetCustomAttributes<MetadataAttribute>()
