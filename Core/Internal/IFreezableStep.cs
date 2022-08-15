@@ -56,6 +56,13 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
         StepFactoryStore stepFactoryStore,
         IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (stepFactoryStore is null) //This was happening in some situations. Possibly a race condition with the connector manager
+        {
+            return ErrorCode.Unknown.ToErrorBuilder("StepFactoryStore is null")
+                .WithLocationSingle(ErrorLocation.EmptyLocation);
+        }
+
         var thisReorganized = ReorganizeNamedArguments(stepFactoryStore);
 
         var typeResolver = TypeResolver
