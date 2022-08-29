@@ -1,5 +1,11 @@
 # v0.17.0 (2022-08-29)
 
+## Summary of Changes
+
+- `EntityFormat` step now accepts arrays as input
+- Using empty blocks with `StringInterpolate` no longer throws errors
+- Updated `JsonSchema.Net` to `3.2.0`
+
 ## Issues Closed in this Release
 
 ### New Features
