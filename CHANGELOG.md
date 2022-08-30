@@ -1,3 +1,28 @@
+# v0.17.0 (2022-08-29)
+
+## Summary of Changes
+
+- `EntityFormat` step now accepts arrays as input
+- Using empty blocks with `StringInterpolate` no longer throws errors
+- Updated `JsonSchema.Net` to `3.2.0`
+
+## Issues Closed in this Release
+
+### New Features
+
+- EntityFormat step should accept arrays as input #457
+- StringInterpolate should accept empty blocks #458
+
+### Bug Fixes
+
+- Null reference exception with creating a StepParameter #459
+- Remove references to docs.reductech.io in the documentation #455
+- DocumentationCreate RootUrl is not working #456
+
+### Maintenance
+
+- Bump versions of external dependencies #460
+
 # v0.16.0 (2022-07-13)
 
 ## Summary of Changes
@@ -987,3 +1012,4 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
+
