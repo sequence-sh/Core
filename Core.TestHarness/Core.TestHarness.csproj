@@ -9,7 +9,7 @@
     <IsPackable>true</IsPackable>
     <IsTestProject>false</IsTestProject>
     <Nullable>enable</Nullable>
-    <Version>0.17.0$(VersionSuffix)</Version>
+    <Version>0.18.0$(VersionSuffix)</Version>
   </PropertyGroup>
 
   <PropertyGroup>
