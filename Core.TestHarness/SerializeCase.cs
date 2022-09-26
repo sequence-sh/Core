@@ -4,7 +4,10 @@ namespace Reductech.Sequence.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
-    [AutoTheory.GenerateAsyncTheory("Serialize")]
+    /// <summary>
+    /// Tests that test step serialization
+    /// </summary>
+    [GenerateAsyncTheory("Serialize")]
     protected virtual IEnumerable<SerializeCase> SerializeCases
     {
         get
@@ -15,13 +18,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
     }
 
-    #pragma warning disable CA1034 // Nested types should not be visible
+    /// <summary>
+    /// A test case that tests step serialization
+    /// </summary>
     public record SerializeCase(
-            string Name,
-            TStep Step,
-            string ExpectedSCL,
-            Configuration? ExpectedConfiguration = null) : IAsyncTestInstance
-        #pragma warning restore CA1034 // Nested types should not be visible
+        string Name,
+        TStep Step,
+        string ExpectedSCL,
+        Configuration? ExpectedConfiguration = null) : IAsyncTestInstance
     {
         /// <inheritdoc />
         public override string ToString() => Name;
@@ -43,6 +47,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
     }
 
+    /// <summary>
+    /// The default serialize case
+    /// </summary>
     public static SerializeCase CreateDefaultSerializeCase()
     {
         var (step, values) = CreateStepWithDefaultOrArbitraryValues();

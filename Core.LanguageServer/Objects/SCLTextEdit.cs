@@ -1,5 +1,8 @@
 ﻿namespace Reductech.Sequence.Core.LanguageServer.Objects;
 
+/// <summary>
+/// A language server text edit
+/// </summary>
 public record SCLTextEdit(
     string NewText,
     int StartLine,
@@ -7,9 +10,16 @@ public record SCLTextEdit(
     int EndLine,
     int EndColumn)
 {
+    /// <summary>
+    /// Convert this Text Edit to a string
+    /// </summary>
+    /// <returns></returns>
     public override string ToString() =>
         $"StartLine={StartLine}, StartColumn={StartColumn}, EndLine={EndLine}, EndColumn={EndColumn}, NewText='{(NewText.Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t"))}'";
 
+    /// <summary>
+    /// Create a new SCLTextEdit
+    /// </summary>
     public SCLTextEdit(string newText, TextRange range)
         : this(
             newText,

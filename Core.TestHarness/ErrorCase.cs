@@ -2,13 +2,20 @@
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
+    /// <summary>
+    /// Error cases for this step
+    /// </summary>
     [GenerateAsyncTheory("ExpectError")]
     protected virtual IEnumerable<ErrorCase> ErrorCases => CreateDefaultErrorCases();
 
-    #pragma warning disable CA1034 // Nested types should not be visible
+    /// <summary>
+    /// A case that tests a particular error condition
+    /// </summary>
     public record ErrorCase : CaseThatExecutes
-        #pragma warning restore CA1034 // Nested types should not be visible
     {
+        /// <summary>
+        /// Create a new ErrorCase
+        /// </summary>
         public ErrorCase(string name, IStep step, IError expectedError) : base(
             name,
             ArraySegment<string>.Empty
@@ -19,13 +26,23 @@ public abstract partial class StepTestBase<TStep, TOutput>
             IgnoreLoggedValues = true;
         }
 
+        /// <summary>
+        /// Create a new ErrorCase
+        /// </summary>
         public ErrorCase(string name, IStep step, IErrorBuilder expectedErrorBuilder) : this(
             name,
             step,
             expectedErrorBuilder.WithLocation(step)
         ) { }
 
+        /// <summary>
+        /// The step to test
+        /// </summary>
         public IStep Step { get; }
+
+        /// <summary>
+        /// The expected error
+        /// </summary>
         public IError ExpectedError { get; }
 
         /// <inheritdoc />

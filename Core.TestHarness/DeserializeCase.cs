@@ -4,7 +4,10 @@ namespace Reductech.Sequence.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
-    [AutoTheory.GenerateAsyncTheory("Deserialize")]
+    /// <summary>
+    /// Deserialization Cases
+    /// </summary>
+    [GenerateAsyncTheory("Deserialize")]
     protected virtual IEnumerable<DeserializeCase> DeserializeCases
     {
         get
@@ -13,10 +16,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
         }
     }
 
-    #pragma warning disable CA1034 // Nested types should not be visible
+    /// <summary>
+    /// A test that deserializes a step
+    /// </summary>
     public record DeserializeCase : CaseThatExecutes
-        #pragma warning restore CA1034 // Nested types should not be visible
     {
+        /// <summary>
+        /// Create a new DeserializeCase
+        /// </summary>
         public DeserializeCase(
             string name,
             string scl,
@@ -27,9 +34,13 @@ public abstract partial class StepTestBase<TStep, TOutput>
             ExpectedOutput = new ExpectedValueOutput(expectedOutput);
         }
 
+        /// <summary>
+        /// Create a new DeserializeCase
+        /// </summary>
         public DeserializeCase(
             string name,
             string scl,
+            // ReSharper disable once UnusedParameter.Local
             Unit _,
             params string[] expectedLoggedValues) : base(name, expectedLoggedValues)
         {
@@ -37,7 +48,14 @@ public abstract partial class StepTestBase<TStep, TOutput>
             ExpectedOutput = ExpectedUnitOutput.Instance;
         }
 
+        /// <summary>
+        /// The SCL to deserialize
+        /// </summary>
         public string SCL { get; }
+
+        /// <summary>
+        /// The expected output of the step
+        /// </summary>
         public ExpectedOutput ExpectedOutput { get; }
 
         /// <inheritdoc />

@@ -1,22 +1,38 @@
 ﻿namespace Reductech.Sequence.Core.TestHarness;
 
+/// <summary>
+/// A test that tests the behaviour of a step
+/// </summary>
 public interface IStepTestBase
 {
+    /// <summary>
+    /// The name ofd the step
+    /// </summary>
     string StepName { get; }
 
+    /// <summary>
+    /// The Type of the step
+    /// </summary>
     Type StepType { get; }
 }
 
+/// <summary>
+/// A test that tests the behaviour of a step
+/// </summary>
 [UseTestOutputHelper]
 public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
     where TStep : class, ICompoundStep<TOutput>, new()
     where TOutput : ISCLObject
 {
+    /// <inheritdoc />
     public string StepName => typeof(TStep).GetDisplayName();
 
     /// <inheritdoc />
     public Type StepType => typeof(TStep);
 
+    /// <summary>
+    /// Checks that all properties have the correct attributes
+    /// </summary>
     [Fact]
     public void All_Properties_should_have_correct_attribute()
     {
@@ -51,6 +67,9 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
         }
     }
 
+    /// <summary>
+    /// Checks property ordering
+    /// </summary>
     [Fact]
     public void All_Properties_should_have_distinct_consecutive_positive_orders()
     {
@@ -95,6 +114,9 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
             throw new XunitException(string.Join("\r\n", errors));
     }
 
+    /// <summary>
+    /// Checks required and default values
+    /// </summary>
     [Fact]
     public void All_properties_should_be_required_or_have_default_values_and_attributes()
     {
@@ -163,6 +185,9 @@ public abstract partial class StepTestBase<TStep, TOutput> : IStepTestBase
             throw new XunitException(string.Join("\r\n", errors));
     }
 
+    /// <summary>
+    /// Checks that the step factory is set correctly
+    /// </summary>
     [Fact]
     public void Process_factory_must_be_set_correctly()
     {
