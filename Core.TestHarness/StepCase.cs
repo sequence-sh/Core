@@ -4,20 +4,33 @@ namespace Reductech.Sequence.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {
+    /// <summary>
+    /// 
+    /// </summary>
     protected abstract IEnumerable<StepCase> StepCases { get; }
 
-    [AutoTheory.GenerateAsyncTheory("Run")]
+    /// <summary>
+    /// Cases that run the step
+    /// </summary>
+    [GenerateAsyncTheory("Run")]
     public IEnumerable<StepCase> RunCases => StepCases;
 
-    [AutoTheory.GenerateAsyncTheory("DeserializeAndRun")]
+    /// <summary>
+    /// Cases that deserialize and run the step
+    /// </summary>
+    [GenerateAsyncTheory("DeserializeAndRun")]
     public IEnumerable<StepCase> DeserializeAndRunCases => StepCases
         .Where(x => x.TestDeserializeAndRun)
         .Select(x => x with { SerializeFirst = true });
 
-    #pragma warning disable CA1034 // Nested types should not be visible
+    /// <summary>
+    /// A single test of a step
+    /// </summary>
     public record StepCase : CaseThatExecutes
-        #pragma warning restore CA1034 // Nested types should not be visible
     {
+        /// <summary>
+        /// Create a new StepCase
+        /// </summary>
         public StepCase(
             string name,
             TStep step,
@@ -25,6 +38,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
             params string[] expectedLoggedValues)
             : this(name, step, new ExpectedValueOutput(expectedOutput), expectedLoggedValues) { }
 
+        /// <summary>
+        /// Create a new StepCase
+        /// </summary>
         public StepCase(
             string name,
             IStep<Unit> step,
@@ -32,6 +48,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
             params string[] expectedLoggedValues)
             : this(name, step, ExpectedUnitOutput.Instance, expectedLoggedValues) { }
 
+        /// <summary>
+        /// Create a new StepCase
+        /// </summary>
         protected StepCase(
             string name,
             IStep step,
@@ -42,6 +61,9 @@ public abstract partial class StepTestBase<TStep, TOutput>
             ExpectedOutput = expectedOutput;
         }
 
+        /// <summary>
+        /// Whether to serialize this step before running
+        /// </summary>
         public bool SerializeFirst { get; set; }
 
         /// <summary>
@@ -50,11 +72,17 @@ public abstract partial class StepTestBase<TStep, TOutput>
         /// </summary>
         public ExpectedOutput ExpectedOutput { get; }
 
+        /// <summary>
+        /// Whether to test deserializing and running this step
+        /// </summary>
         public bool TestDeserializeAndRun { get; set; } = true;
 
         /// <inheritdoc />
         public override string ToString() => Name;
 
+        /// <summary>
+        /// The Step to test
+        /// </summary>
         public IStep Step { get; }
 
         /// <inheritdoc />

@@ -15,6 +15,9 @@ public static partial class SCLParsing
         /// </summary>
         public readonly List<IError> Errors = new();
 
+        /// <summary>
+        /// Uncategorized Errors found by this error listener.
+        /// </summary>
         public readonly List<IError> UncategorizedErrors = new();
 
         /// <inheritdoc />
@@ -27,7 +30,7 @@ public static partial class SCLParsing
             string msg,
             RecognitionException e)
         {
-            RuleContext? context = e?.Context ?? (recognizer as SCLParser)?.Context;
+            var context = e?.Context ?? (recognizer as SCLParser)?.Context;
 
             if (context is not null)
             {

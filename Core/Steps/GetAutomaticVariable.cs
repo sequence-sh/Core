@@ -116,7 +116,11 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T> where T : ISCLObje
                 FormattingOptions options,
                 Stack<Comment>? remainingComments = null)
             {
-                indentationStringBuilder.AppendPrecedingComments(remainingComments, textLocation);
+                indentationStringBuilder.AppendPrecedingComments(
+                    remainingComments ?? new Stack<Comment>(),
+                    textLocation
+                );
+
                 indentationStringBuilder.Append("<>");
             }
         }

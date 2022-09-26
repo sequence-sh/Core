@@ -115,7 +115,11 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
                 FormattingOptions options,
                 Stack<Comment>? remainingComments = null)
             {
-                indentationStringBuilder.AppendPrecedingComments(remainingComments, textLocation);
+                indentationStringBuilder.AppendPrecedingComments(
+                    remainingComments ?? new Stack<Comment>(),
+                    textLocation
+                );
+
                 indentationStringBuilder.Append("$\"");
 
                 foreach (var step in stepProperties.Cast<StepProperty.StepListProperty>()
@@ -133,7 +137,13 @@ public sealed class StringInterpolate : CompoundStep<StringStream>
                     else
                     {
                         indentationStringBuilder.Append("{");
-                        step.Format(indentationStringBuilder, options, remainingComments);
+
+                        step.Format(
+                            indentationStringBuilder,
+                            options,
+                            remainingComments ?? new Stack<Comment>()
+                        );
+
                         indentationStringBuilder.Append("}");
                     }
                 }

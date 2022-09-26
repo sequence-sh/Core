@@ -18,7 +18,7 @@ public class AnalyticsLogger : ILogger
         LogLevel logLevel,
         EventId eventId,
         TState state,
-        Exception exception,
+        Exception? exception,
         Func<TState, Exception, string> formatter)
     {
         if (state is LogMessage { StepName: { }, Location: { } } logMessage)

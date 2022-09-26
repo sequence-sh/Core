@@ -32,6 +32,9 @@ public class ArrayElementAtIndexSerializer : IStepSerializer
         FormattingOptions options,
         Stack<Comment>? remainingComments = null)
     {
-        indentationStringBuilder.AppendPrecedingComments(remainingComments, textLocation);
+        indentationStringBuilder.AppendPrecedingComments(
+            remainingComments ?? new Stack<Comment>(),
+            textLocation
+        );
     }
 }

@@ -1,3 +1,6 @@
 ﻿namespace Reductech.Sequence.Core.LanguageServer.Objects;
 
-public record SignatureHelpParameter(string Name, string Label, string Documentation) { }
+/// <summary>
+/// A language server signature help parameter
+/// </summary>
+public record SignatureHelpParameter(string Name, string Label, string Documentation);
