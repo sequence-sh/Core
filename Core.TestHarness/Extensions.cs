@@ -125,11 +125,11 @@ public static class Extensions
     {
         var response = new RestResponse()
         {
-            Content        = responseContent,
-            ContentLength  = responseContent.Length,
-            ResponseStatus = ResponseStatus.Completed,
-            StatusCode     = responseStatusCode,
-            IsSuccessful   = responseSuccess
+            Content             = responseContent,
+            ContentLength       = responseContent.Length,
+            ResponseStatus      = ResponseStatus.Completed,
+            StatusCode          = responseStatusCode,
+            IsSuccessStatusCode = true,
         };
 
         stepCase.RESTClientSetupHelper.AddHttpTestAction(
