@@ -4,8 +4,14 @@ using Reductech.Sequence.Core.TestHarness.Rest;
 
 namespace Reductech.Sequence.Core.TestHarness;
 
+/// <summary>
+/// Extension methods for Test Harness
+/// </summary>
 public static class Extensions
 {
+    /// <summary>
+    /// Checks that this step produces a particular final state
+    /// </summary>
     public static T WithExpectedFinalState<T>(this T cws, string variableName, object? value)
         where T : ICaseThatExecutes
     {
@@ -15,6 +21,9 @@ public static class Extensions
         return cws;
     }
 
+    /// <summary>
+    /// Check that this step injects a particular variable
+    /// </summary>
     public static T WithInjectedVariable<T>(this T cws, string variableName, object? value)
         where T : ICaseWithSetup
     {
@@ -23,6 +32,9 @@ public static class Extensions
         return cws;
     }
 
+    /// <summary>
+    /// Run this step with a particular StepFactoryStore
+    /// </summary>
     public static T WithStepFactoryStore<T>(this T cws, StepFactoryStore stepFactoryStore)
         where T : ICaseThatExecutes
     {
@@ -30,6 +42,9 @@ public static class Extensions
         return cws;
     }
 
+    /// <summary>
+    /// Checks the final context after the step has finished
+    /// </summary>
     public static T WithFinalContextCheck<T>(this T cws, Action<IExternalContext> contextCheck)
         where T : ICaseThatExecutes
     {
@@ -37,6 +52,9 @@ public static class Extensions
         return cws;
     }
 
+    /// <summary>
+    /// Checks a rest request
+    /// </summary>
     public static bool CheckRequest(
         this RestRequest request,
         (string resource, Method method, object? body) expected)
@@ -57,6 +75,9 @@ public static class Extensions
         return true;
     }
 
+    /// <summary>
+    /// Checks the resource of a REST request
+    /// </summary>
     public static string GetFullResource(this RestRequest request)
     {
         var resource = request.Resource;
@@ -72,6 +93,9 @@ public static class Extensions
         return result;
     }
 
+    /// <summary>
+    /// Gets the body of a REST request
+    /// </summary>
     public static object? GetRequestBody(this RestRequest request)
     {
         foreach (var parameter in
@@ -83,6 +107,9 @@ public static class Extensions
         return null;
     }
 
+    /// <summary>
+    /// Add an additional External Process Action
+    /// </summary>
     public static T WithExternalProcessAction<T>(
         this T cws,
         Action<Mock<IExternalProcessRunner>> action) where T : ICaseWithSetup => WithAction(
@@ -90,12 +117,18 @@ public static class Extensions
         new Action<Mock<IExternalProcessRunner>, MockRepository>((a, _) => action(a))
     );
 
+    /// <summary>
+    /// Add an additional Console Action
+    /// </summary>
     public static T WithConsoleAction<T>(this T cws, Action<Mock<IConsole>> action)
         where T : ICaseWithSetup => WithAction(
         cws,
         new Action<Mock<IConsole>, MockRepository>((a, _) => action(a))
     );
 
+    /// <summary>
+    /// Add an additional Console Action
+    /// </summary>
     public static T WithConsoleAction<T>(this T cws, Action<Mock<IConsole>, MockRepository> action)
         where T : ICaseWithSetup => WithAction(cws, action);
 
@@ -176,6 +209,9 @@ public static class Extensions
         return stepCase;
     }
 
+    /// <summary>
+    /// Add an additional context to this Step
+    /// </summary>
     public static T WithContext<T>(this T cws, string name, object context)
         where T : ICaseWithSetup
     {
@@ -183,6 +219,9 @@ public static class Extensions
         return cws;
     }
 
+    /// <summary>
+    /// Add an additional context mock to this Step
+    /// </summary>
     public static T WithContextMock<T>(
         this T cws,
         string name,
@@ -193,6 +232,9 @@ public static class Extensions
         return cws;
     }
 
+    /// <summary>
+    /// Set the minimum log level to check
+    /// </summary>
     public static T WithCheckLogLevel<T>(this T cte, LogLevel logLevel)
         where T : ICaseThatExecutes
     {
@@ -316,11 +358,17 @@ public static class Extensions
         result.Error.Should().Be(expectedError);
     }
 
+    /// <summary>
+    /// Asserts this maybe should have a value
+    /// </summary>
     public static void ShouldHaveValue<T>(this Maybe<T> maybe)
     {
         maybe.HasValue.Should().BeTrue("Maybe should have value");
     }
 
+    /// <summary>
+    /// Asserts this maybe should have no value
+    /// </summary>
     public static void ShouldHaveNoValue<T>(this Maybe<T> maybe)
     {
         maybe.HasValue.Should().BeFalse("Maybe should have no value");
