@@ -228,7 +228,11 @@ public static partial class SCLParsing
         private static SingleError ParseError(ParserRuleContext pt)
         {
             return ErrorCode.SCLSyntaxError.ToErrorBuilder(GetMessage(pt.exception))
-                .WithLocationSingle(new TextLocation(pt.exception.OffendingToken));
+                .WithLocationSingle(
+                    pt.exception is null
+                        ? new TextLocation(pt.Start)
+                        : new TextLocation(pt.exception.OffendingToken)
+                );
         }
 
         private static string GetMessage(RecognitionException re)
@@ -241,7 +245,8 @@ public static partial class SCLParsing
                     $"No Viable Alternative - '{nve1.OffendingToken.Text}' not recognized.",
                 NoViableAltException nve2 =>
                     $"No Viable Alternative - '{nve2.OffendingToken.Text}' was unexpected.",
-                _ => throw new ArgumentOutOfRangeException(nameof(re))
+                _ => "Unknown Error"
+                //_ => throw new ArgumentOutOfRangeException(nameof(re))
             };
         }
 
