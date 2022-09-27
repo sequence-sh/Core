@@ -212,6 +212,12 @@ public partial class DeserializationErrorTests
                 ("Syntax Error: Sequences with multiple steps should start with a dash",
                  "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 6, Idx: 6 Text: log 123")
             );
+
+            yield return new DeserializationErrorCase(
+                "<",
+                ("Syntax Error: Exception of type 'Antlr4.Runtime.InputMismatchException' was thrown.",
+                 "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 0, Idx: 0 Text: <")
+            );
         }
     }
 

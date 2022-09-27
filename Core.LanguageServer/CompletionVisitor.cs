@@ -1,4 +1,5 @@
-﻿using Reductech.Sequence.Core.Entities.Schema;
+﻿using System.Text.RegularExpressions;
+using Reductech.Sequence.Core.Entities.Schema;
 
 namespace Reductech.Sequence.Core.LanguageServer;
 
@@ -14,12 +15,15 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
         LinePosition position,
         StepFactoryStore stepFactoryStore,
         Lazy<TypeResolver> lazyTypeResolver,
-        DocumentationOptions documentationOptions)
+        DocumentationOptions documentationOptions,
+        IReadOnlyDictionary<VariableName, ISCLObject> injectedVariables)
     {
         Position             = position;
         StepFactoryStore     = stepFactoryStore;
         LazyTypeResolver     = lazyTypeResolver;
         DocumentationOptions = documentationOptions;
+
+        InjectedVariables = injectedVariables;
     }
 
     /// <summary>
@@ -41,6 +45,11 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     /// Options to use for rendering documentation
     /// </summary>
     public DocumentationOptions DocumentationOptions { get; }
+
+    /// <summary>
+    /// Variables injected into this sequence
+    /// </summary>
+    public IReadOnlyDictionary<VariableName, ISCLObject> InjectedVariables { get; }
 
     /// <inheritdoc />
     public override CompletionResponse? VisitChildren(IRuleNode node)
@@ -125,11 +134,41 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     {
         if (node.Symbol.ContainsPosition(Position))
         {
+            var variableStartMatch = VariableStartRegex.Match(node.Symbol.Text);
+
+            if (variableStartMatch.Success)
+            {
+                var text = variableStartMatch.Groups["text"].Value;
+
+                var completionItems = InjectedVariables
+                    .Where(x => x.Key.Name.StartsWith(text, StringComparison.OrdinalIgnoreCase))
+                    .Select(
+                        x => new CompletionItem(
+                            x.Key.Serialize(SerializeOptions.Serialize),
+                            x.Value.GetTypeReference().HumanReadableTypeName,
+                            x.Value.Serialize(SerializeOptions.Serialize),
+                            x.Key.Name.Equals(text, StringComparison.OrdinalIgnoreCase),
+                            new SCLTextEdit(
+                                x.Key.Serialize(SerializeOptions.Serialize),
+                                node.Symbol.GetRange()
+                            )
+                        )
+                    )
+                    .ToList();
+
+                return new CompletionResponse(false, completionItems);
+            }
+
             return base.VisitErrorNode(node);
         }
 
         return base.VisitErrorNode(node);
     }
+
+    private static readonly Regex VariableStartRegex = new(
+        @"\A<(?<text>[a-e0-9]*)\Z",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase
+    );
 
     /// <inheritdoc />
     public override CompletionResponse? VisitFunction1(SCLParser.Function1Context context)

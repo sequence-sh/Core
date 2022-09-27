@@ -27,7 +27,8 @@ public static class CompletionHelper
             position,
             stepFactoryStore,
             lazyTypeResolver,
-            documentationOptions
+            documentationOptions,
+            injectedVariables ?? new Dictionary<VariableName, ISCLObject>()
         );
 
         var completionResponse = visitor.LexParseAndVisit(
@@ -47,7 +48,8 @@ public static class CompletionHelper
                 command.Value.newPosition,
                 stepFactoryStore,
                 lazyTypeResolver,
-                documentationOptions
+                documentationOptions,
+                injectedVariables ?? new Dictionary<VariableName, ISCLObject>()
             );
 
             var lineCompletionResponse = visitor.LexParseAndVisit(
