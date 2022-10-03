@@ -270,21 +270,21 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         var vn = new VariableName(context.GetText().TrimStart('<').TrimEnd('>'));
 
-        //TODO use injected variables here
+        var value = InjectedVariables.TryGetValue(vn, out var v) ? v : null;
 
         if (LazyTypeResolver.Value.Dictionary.TryGetValue(vn, out var tr))
         {
             return Description(
                 context.GetText(),
                 tr.TypeReference,
-                null
+                value?.Serialize(SerializeOptions.Serialize)
             );
         }
 
         return Description(
             context.GetText(),
             nameof(VariableName),
-            null
+            value?.Serialize(SerializeOptions.Serialize)
         );
     }
 
@@ -322,21 +322,21 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         var vn = new VariableName(text.TrimStart('<').TrimEnd('>'));
 
-        //TODO use injected variables here
+        var value = InjectedVariables.TryGetValue(vn, out var v) ? v : null;
 
         if (LazyTypeResolver.Value.Dictionary.TryGetValue(vn, out var tr))
         {
             return Description(
                 text,
                 tr.TypeReference,
-                null
+                value?.Serialize(SerializeOptions.Serialize)
             );
         }
 
         return Description(
             text,
             nameof(VariableName),
-            null
+            value?.Serialize(SerializeOptions.Serialize)
         );
     }
 
