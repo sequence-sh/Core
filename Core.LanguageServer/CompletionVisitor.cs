@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Reductech.Sequence.Core.Entities.Schema;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Reductech.Sequence.Core.LanguageServer;
 
@@ -140,23 +141,7 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
             {
                 var text = variableStartMatch.Groups["text"].Value;
 
-                var completionItems = InjectedVariables
-                    .Where(x => x.Key.Name.StartsWith(text, StringComparison.OrdinalIgnoreCase))
-                    .Select(
-                        x => new CompletionItem(
-                            x.Key.Serialize(SerializeOptions.Serialize),
-                            x.Value.GetTypeReference().HumanReadableTypeName,
-                            x.Value.Serialize(SerializeOptions.Serialize),
-                            x.Key.Name.Equals(text, StringComparison.OrdinalIgnoreCase),
-                            new SCLTextEdit(
-                                x.Key.Serialize(SerializeOptions.Serialize),
-                                node.Symbol.GetRange()
-                            )
-                        )
-                    )
-                    .ToList();
-
-                return new CompletionResponse(false, completionItems);
+                return VariableNameCompletionResponse(text, node.Symbol.GetRange());
             }
 
             return base.VisitErrorNode(node);
@@ -204,6 +189,19 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
 
         if (context.NAME().Symbol.ContainsPosition(Position))
         {
+            var greatGrandParent     = context.Parent.Parent.Parent;
+            var greatGrandParentText = greatGrandParent.GetText();
+
+            if (greatGrandParentText?.EndsWith("<EOF>") == true)
+                greatGrandParentText = greatGrandParentText[..^5];
+
+            if (greatGrandParentText == "<" + context.GetText())
+            {
+                var range = context.GetRange();
+                range.StartColumn -= 1;
+                return VariableNameCompletionResponse(context.GetText(), range);
+            }
+
             var nameText = context.NAME().GetText();
 
             var options =
@@ -328,6 +326,27 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
                 first = false;
             }
         }
+    }
+
+    private CompletionResponse VariableNameCompletionResponse(string text, TextRange range)
+    {
+        var completionItems = InjectedVariables
+            .Where(x => x.Key.Name.StartsWith(text, StringComparison.OrdinalIgnoreCase))
+            .Select(
+                x => new CompletionItem(
+                    x.Key.Serialize(SerializeOptions.Serialize),
+                    x.Value.GetTypeReference().HumanReadableTypeName,
+                    x.Value.Serialize(SerializeOptions.Serialize),
+                    x.Key.Name.Equals(text, StringComparison.OrdinalIgnoreCase),
+                    new SCLTextEdit(
+                        x.Key.Serialize(SerializeOptions.Serialize),
+                        range
+                    )
+                )
+            )
+            .ToList();
+
+        return new CompletionResponse(false, completionItems);
     }
 
     private static CompletionResponse EntityPropertiesCompletionResponse(

@@ -23,7 +23,7 @@ public class CompletionTest
     [InlineData("- Print 123\r\n- HttpRequest Uri: 'abc' he", 1, 27, "Headers",     25)]
     [InlineData(LongText,                                     1, 2,  "ArrayFilter", null)]
     [InlineData("<",                                          0, 1,  "<var1>",      0)]
-    //[InlineData("<v",                                         0, 1,  "<var1>",      0)]
+    [InlineData("<v",                                         0, 1,  "<var1>",      0)]
     public void ShouldGiveCorrectCompletion(
         string text,
         int line,
