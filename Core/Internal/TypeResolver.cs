@@ -1,6 +1,13 @@
 ﻿namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
+/// A reference to a variable
+/// </summary>
+public sealed record VariableReference(
+    TypeReference TypeReference,
+    bool Injected); //TODO add description
+
+/// <summary>
 /// Gets the actual type from a type reference.
 /// </summary>
 public sealed class TypeResolver
@@ -11,11 +18,11 @@ public sealed class TypeResolver
     private TypeResolver(
         StepFactoryStore stepFactoryStore,
         Maybe<VariableName> automaticVariableName,
-        Dictionary<VariableName, TypeReference>? myDictionary = null)
+        Dictionary<VariableName, VariableReference>? myDictionary = null)
     {
         StepFactoryStore      = stepFactoryStore;
         AutomaticVariableName = automaticVariableName;
-        MyDictionary          = myDictionary ?? new Dictionary<VariableName, TypeReference>();
+        MyDictionary          = myDictionary ?? new Dictionary<VariableName, VariableReference>();
     }
 
     /// <summary>
@@ -38,12 +45,12 @@ public sealed class TypeResolver
     /// <inheritdoc />
     public override string ToString() => Dictionary.Count + " Types";
 
-    private Dictionary<VariableName, TypeReference> MyDictionary { get; }
+    private Dictionary<VariableName, VariableReference> MyDictionary { get; }
 
     /// <summary>
     /// The dictionary mapping VariableNames to ActualTypeReferences
     /// </summary>
-    public IReadOnlyDictionary<VariableName, TypeReference> Dictionary => MyDictionary;
+    public IReadOnlyDictionary<VariableName, VariableReference> Dictionary => MyDictionary;
 
     /// <summary>
     /// The name of the automatic variable
@@ -67,7 +74,7 @@ public sealed class TypeResolver
         var vn              = lambda.VariableNameOrItem;
         newTypeResolver.AutomaticVariableName = vn;
 
-        var r1 = newTypeResolver.TryAddType(vn, typeReference);
+        var r1 = newTypeResolver.TryAddType(vn, true, new VariableReference(typeReference, false));
 
         if (r1.IsFailure)
         {
@@ -108,7 +115,11 @@ public sealed class TypeResolver
         foreach (var (key, value) in variablesToInject
                                   ?? ImmutableDictionary<VariableName, ISCLObject>.Empty)
         {
-            var addResult = typeResolver.TryAddType(key, value.GetTypeReference());
+            var addResult = typeResolver.TryAddType(
+                key,
+                true,
+                new VariableReference(value.GetTypeReference(), true)
+            );
 
             if (addResult.IsFailure)
                 return addResult.ConvertFailure<TypeResolver>()
@@ -153,7 +164,8 @@ public sealed class TypeResolver
                 {
                     var addResult = TryAddType(
                         usedVariable.VariableName,
-                        usedVariable.TypeReference
+                        usedVariable.WasSet,
+                        new VariableReference(usedVariable.TypeReference, false)
                     );
 
                     if (addResult.IsFailure)
@@ -170,18 +182,19 @@ public sealed class TypeResolver
                 {
                     unresolvableVariableNames.Remove(usedVariable);
 
-                    var combinedTypeResult = resolvedType.TryCombine(
+                    var combinedTypeResult = resolvedType.TypeReference.TryCombine(
                         usedVariable.TypeReference,
                         this
                     );
 
                     if (combinedTypeResult.IsFailure)
                         errors.Add(combinedTypeResult.Error.WithLocation(usedVariable.Location));
-                    else if (combinedTypeResult.Value != resolvedType)
+                    else if (combinedTypeResult.Value != resolvedType.TypeReference)
                     {
                         var addResult = TryAddType(
                             usedVariable.VariableName,
-                            combinedTypeResult.Value
+                            usedVariable.WasSet,
+                            resolvedType with { TypeReference = combinedTypeResult.Value }
                         );
 
                         if (addResult.IsFailure)
@@ -227,14 +240,15 @@ public sealed class TypeResolver
     /// </summary>
     public Result<Unit, IErrorBuilder> TryAddType(
         VariableName variable,
-        TypeReference typeReference)
+        bool isBeingSet,
+        VariableReference variableReference)
     {
-        var can = CanAddType(variable, typeReference);
+        var can = CanAddType(variable, isBeingSet, variableReference.TypeReference);
 
         if (can.IsSuccess)
         {
             if (can.Value)
-                MyDictionary[variable] = typeReference;
+                MyDictionary[variable] = variableReference;
 
             return Unit.Default;
         }
@@ -248,15 +262,24 @@ public sealed class TypeResolver
     /// </summary>
     public Result<bool, IErrorBuilder> CanAddType(
         VariableName variable,
+        bool isBeingSet,
         TypeReference typeReference)
     {
         if (MyDictionary.TryGetValue(variable, out var previous))
         {
-            if (previous.Equals(typeReference)
-             || typeReference.Allow(previous, this)) //The variable already had this type reference
+            if (isBeingSet && previous.Injected)
+            {
+                return ErrorCode.AttemptToSetInjectedVariable.ToErrorBuilder(variable.Name);
+            }
+
+            if (previous.TypeReference.Equals(typeReference)
+             || typeReference.Allow(
+                    previous.TypeReference,
+                    this
+                )) //The variable already had this type reference
                 return false;
 
-            if (!previous.Allow(typeReference, this))
+            if (!previous.TypeReference.Allow(typeReference, this))
                 return ErrorCode.WrongVariableType.ToErrorBuilder(
                     variable.Name,
                     typeReference.Name
@@ -282,7 +305,7 @@ public sealed class TypeResolver
             {
                 case TypeReference.Variable vr
                     when Dictionary.TryGetValue(vr.VariableName, out var tr):
-                    typeReference = tr;
+                    typeReference = tr.TypeReference;
                     continue;
                 case TypeReference.AutomaticVariable when AutomaticVariableName.HasValue
                                                        && Dictionary.TryGetValue(
@@ -290,7 +313,7 @@ public sealed class TypeResolver
                                                                   .GetValueOrThrow(),
                                                               out var tr2
                                                           ):
-                    typeReference = tr2;
+                    typeReference = tr2.TypeReference;
                     continue;
                 default: return typeReference;
             }

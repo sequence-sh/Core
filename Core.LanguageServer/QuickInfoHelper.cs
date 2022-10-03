@@ -32,7 +32,8 @@ public static class QuickInfoHelper
         var visitor = new QuickInfoVisitor(
             command.Value.newPosition,
             stepFactoryStore,
-            lazyTypeResolver
+            lazyTypeResolver,
+            injectedVariables ?? new Dictionary<VariableName, ISCLObject>()
         );
 
         var errorListener = new ErrorErrorListener();

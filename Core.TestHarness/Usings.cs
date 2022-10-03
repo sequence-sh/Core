@@ -12,7 +12,6 @@ global using RestSharp;
 global using Reductech.Sequence.Core.Internal.Serialization;
 global using System.ComponentModel.DataAnnotations;
 global using Json.Schema;
-global using OneOf;
 global using Reductech.Sequence.Core.Attributes;
 global using Reductech.Sequence.Core.Internal;
 global using Divergic.Logging.Xunit;

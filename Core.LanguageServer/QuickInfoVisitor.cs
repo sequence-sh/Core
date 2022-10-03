@@ -13,11 +13,13 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     public QuickInfoVisitor(
         LinePosition position,
         StepFactoryStore stepFactoryStore,
-        Lazy<TypeResolver> lazyTypeResolver)
+        Lazy<TypeResolver> lazyTypeResolver,
+        IReadOnlyDictionary<VariableName, ISCLObject> injectedVariables)
     {
-        LinePosition     = position;
-        StepFactoryStore = stepFactoryStore;
-        LazyTypeResolver = lazyTypeResolver;
+        LinePosition      = position;
+        StepFactoryStore  = stepFactoryStore;
+        LazyTypeResolver  = lazyTypeResolver;
+        InjectedVariables = injectedVariables;
     }
 
     /// <summary>
@@ -34,6 +36,11 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     /// A Lazy Type Resolver
     /// </summary>
     public Lazy<TypeResolver> LazyTypeResolver { get; }
+
+    /// <summary>
+    /// Injected Variables
+    /// </summary>
+    public IReadOnlyDictionary<VariableName, ISCLObject> InjectedVariables { get; }
 
     /// <inheritdoc />
     protected override bool ShouldVisitNextChild(IRuleNode node, QuickInfoResponse? currentResult)
@@ -263,11 +270,13 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         var vn = new VariableName(context.GetText().TrimStart('<').TrimEnd('>'));
 
+        //TODO use injected variables here
+
         if (LazyTypeResolver.Value.Dictionary.TryGetValue(vn, out var tr))
         {
             return Description(
                 context.GetText(),
-                tr,
+                tr.TypeReference,
                 null
             );
         }
@@ -313,11 +322,13 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         var vn = new VariableName(text.TrimStart('<').TrimEnd('>'));
 
+        //TODO use injected variables here
+
         if (LazyTypeResolver.Value.Dictionary.TryGetValue(vn, out var tr))
         {
             return Description(
                 text,
-                tr,
+                tr.TypeReference,
                 null
             );
         }

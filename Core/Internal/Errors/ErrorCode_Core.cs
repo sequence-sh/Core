@@ -428,5 +428,11 @@ public sealed record ErrorCode : ErrorCodeBase
     /// </summary>
     public static readonly ErrorCode EntityPropertyNever = new(nameof(EntityPropertyNever));
 
+    /// <summary>
+    /// The variable '{0}' was injected and therefore cannot be set.
+    /// </summary>
+    public static readonly ErrorCode AttemptToSetInjectedVariable =
+        new(nameof(AttemptToSetInjectedVariable));
+
 #endregion
 }

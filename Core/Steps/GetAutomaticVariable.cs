@@ -81,7 +81,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T> where T : ISCLObje
 
             if (typeResolver.Dictionary.TryGetValue(avr.GetValueOrThrow(), out var tr))
             {
-                var result = tr.TryCombine(expectedTypeReference, typeResolver);
+                var result = tr.TypeReference.TryCombine(expectedTypeReference, typeResolver);
                 return result.MapError(x => x.WithLocation(freezableStepData));
             }
 

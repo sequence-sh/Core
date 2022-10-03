@@ -77,7 +77,8 @@ public abstract class ArrayStepFactory : GenericStepFactory
         if (nestedTypeResolver.IsFailure)
             return nestedTypeResolver.ConvertFailure<TypeReference>();
 
-        var realType = nestedTypeResolver.Value.Dictionary[lambda.Value.VariableNameOrItem];
+        var realType = nestedTypeResolver.Value.Dictionary[lambda.Value.VariableNameOrItem]
+            ?.TypeReference;
 
         if (realType is null)
             throw new Exception("Could not expected type from type resolver");

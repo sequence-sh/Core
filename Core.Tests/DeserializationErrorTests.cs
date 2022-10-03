@@ -218,6 +218,15 @@ public partial class DeserializationErrorTests
                 ("Syntax Error: Exception of type 'Antlr4.Runtime.InputMismatchException' was thrown.",
                  "Line: 1, Col: 0, Idx: 0 - Line: 1, Col: 0, Idx: 0 Text: <")
             );
+
+            yield return new DeserializationErrorCase(
+                "- <myVar> = 2\n- log <myVar>",
+                ("The variable 'myVar' was injected and therefore cannot be set.",
+                 "Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 12, Idx: 12 Text: <myVar> = 2")
+            ).WithInjectedVariable(
+                new VariableName("myVar"),
+                ISCLObject.CreateFromCSharpObject(1)
+            );
         }
     }
 
@@ -234,6 +243,9 @@ public partial class DeserializationErrorTests
         public string SCL { get; set; }
         public (string error, string location)[] ExpectedErrors { get; set; }
 
+        private Dictionary<VariableName, ISCLObject> VariablesToInject { get; set; } =
+            new();
+
         /// <inheritdoc />
         public void Run(ITestOutputHelper testOutputHelper)
         {
@@ -242,7 +254,7 @@ public partial class DeserializationErrorTests
             var sfs = StepFactoryStore.Create();
 
             var result = SCLParsing.TryParseStep(SCL)
-                .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, sfs))
+                .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, sfs, VariablesToInject))
                 .Map(SCLRunner.ConvertToUnitStep);
 
             result.IsFailure.Should().BeTrue("Case should fail");
@@ -256,5 +268,13 @@ public partial class DeserializationErrorTests
         }
 
         public string Name => SCL;
+
+        public DeserializationErrorCase WithInjectedVariable(
+            VariableName variableName,
+            ISCLObject sclObject)
+        {
+            VariablesToInject[variableName] = sclObject;
+            return this;
+        }
     }
 }

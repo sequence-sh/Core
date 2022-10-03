@@ -64,7 +64,7 @@ public sealed class GetVariable<T> : CompoundStep<T> where T : ISCLObject
 
             if (typeResolver.Dictionary.TryGetValue(variableName.Value, out var tr))
             {
-                var result = tr.TryCombine(expectedTypeReference, typeResolver);
+                var result = tr.TypeReference.TryCombine(expectedTypeReference, typeResolver);
                 return result.MapError(x => x.WithLocation(freezableStepData));
             }
 
