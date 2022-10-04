@@ -39,9 +39,12 @@ public class CompletionTest
                 new LinePosition(line, character),
                 sfs,
                 DocumentationOptions.DefaultDocumentationOptionsHtml,
-                new Dictionary<VariableName, ISCLObject>()
+                new Dictionary<VariableName, InjectedVariable>()
                 {
-                    { new VariableName("var1"), SCLBool.True }
+                    {
+                        new VariableName("var1"),
+                        new InjectedVariable(SCLBool.True, "Amazing Description")
+                    }
                 }
             );
 

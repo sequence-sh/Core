@@ -11,7 +11,7 @@ public static class FormattingHelper
     public static List<SCLTextEdit> FormatSCL(
         string scl,
         StepFactoryStore stepFactoryStore,
-        IReadOnlyDictionary<VariableName, ISCLObject>? injectedVariables = null)
+        IReadOnlyDictionary<VariableName, InjectedVariable>? injectedVariables = null)
     {
         //Split the SCL into commands
         //Try to freeze each command

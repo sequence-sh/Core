@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using Reductech.Sequence.Core.Entities.Schema;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Reductech.Sequence.Core.LanguageServer;
 
@@ -16,15 +15,12 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
         LinePosition position,
         StepFactoryStore stepFactoryStore,
         Lazy<TypeResolver> lazyTypeResolver,
-        DocumentationOptions documentationOptions,
-        IReadOnlyDictionary<VariableName, ISCLObject> injectedVariables)
+        DocumentationOptions documentationOptions)
     {
         Position             = position;
         StepFactoryStore     = stepFactoryStore;
         LazyTypeResolver     = lazyTypeResolver;
         DocumentationOptions = documentationOptions;
-
-        InjectedVariables = injectedVariables;
     }
 
     /// <summary>
@@ -46,11 +42,6 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     /// Options to use for rendering documentation
     /// </summary>
     public DocumentationOptions DocumentationOptions { get; }
-
-    /// <summary>
-    /// Variables injected into this sequence
-    /// </summary>
-    public IReadOnlyDictionary<VariableName, ISCLObject> InjectedVariables { get; }
 
     /// <inheritdoc />
     public override CompletionResponse? VisitChildren(IRuleNode node)
@@ -330,13 +321,14 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
 
     private CompletionResponse VariableNameCompletionResponse(string text, TextRange range)
     {
-        var completionItems = InjectedVariables
+        var completionItems = LazyTypeResolver.Value.Dictionary
             .Where(x => x.Key.Name.StartsWith(text, StringComparison.OrdinalIgnoreCase))
             .Select(
                 x => new CompletionItem(
                     x.Key.Serialize(SerializeOptions.Serialize),
-                    x.Value.GetTypeReference().HumanReadableTypeName,
-                    x.Value.Serialize(SerializeOptions.Serialize),
+                    x.Value.TypeReference.HumanReadableTypeName,
+                    x.Value.GetMarkdown() ?? "",
+                    //x.Value. .Serialize(SerializeOptions.Serialize),
                     x.Key.Name.Equals(text, StringComparison.OrdinalIgnoreCase),
                     new SCLTextEdit(
                         x.Key.Serialize(SerializeOptions.Serialize),

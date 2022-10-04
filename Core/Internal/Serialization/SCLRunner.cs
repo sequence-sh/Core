@@ -40,7 +40,7 @@ public sealed class SCLRunner
         string text,
         Dictionary<string, object> sequenceMetadata,
         CancellationToken cancellationToken,
-        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
+        IReadOnlyDictionary<VariableName, InjectedVariable>? variablesToInject = null)
     {
         sequenceMetadata[SCLTextName] = text;
         sequenceMetadata[RunIdName]   = Guid.NewGuid();
@@ -83,7 +83,7 @@ public sealed class SCLRunner
         string text,
         IReadOnlyDictionary<string, object> sequenceMetadata,
         CancellationToken cancellationToken,
-        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
+        IReadOnlyDictionary<VariableName, InjectedVariable>? variablesToInject = null)
     {
         var stepResult = SCLParsing.TryParseStep(text)
             .Bind(x => x.TryFreeze(RootCallerMetadata, _stepFactoryStore, variablesToInject))
@@ -101,7 +101,11 @@ public sealed class SCLRunner
             sequenceMetadata
         );
 
-        var injectResult = await stateMonad.SetInitialVariablesAsync(variablesToInject);
+        var initialVariables =
+            (variablesToInject ?? ImmutableDictionary<VariableName, InjectedVariable>.Empty)
+            .Select(x => new KeyValuePair<VariableName, ISCLObject>(x.Key, x.Value.SCLObject));
+
+        var injectResult = await stateMonad.SetInitialVariablesAsync(initialVariables);
 
         if (injectResult.IsFailure)
             return injectResult.ConvertFailure<Unit>();

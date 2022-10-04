@@ -1,13 +1,6 @@
 ﻿namespace Reductech.Sequence.Core.Internal;
 
 /// <summary>
-/// A reference to a variable
-/// </summary>
-public sealed record VariableReference(
-    TypeReference TypeReference,
-    bool Injected); //TODO add description
-
-/// <summary>
 /// Gets the actual type from a type reference.
 /// </summary>
 public sealed class TypeResolver
@@ -74,7 +67,16 @@ public sealed class TypeResolver
         var vn              = lambda.VariableNameOrItem;
         newTypeResolver.AutomaticVariableName = vn;
 
-        var r1 = newTypeResolver.TryAddType(vn, true, new VariableReference(typeReference, false));
+        var r1 = newTypeResolver.TryAddType(
+            vn,
+            true,
+            new VariableReference(
+                typeReference,
+                false,
+                $"{scopedCallerMetadata.ParameterName} from {scopedCallerMetadata.StepName}",
+                null
+            )
+        );
 
         if (r1.IsFailure)
         {
@@ -108,17 +110,23 @@ public sealed class TypeResolver
         CallerMetadata callerMetadata,
         Maybe<VariableName> automaticVariableName,
         IFreezableStep? topLevelStep,
-        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject)
+        IReadOnlyDictionary<VariableName, InjectedVariable>? variablesToInject)
     {
         var typeResolver = new TypeResolver(stepFactoryStore, automaticVariableName);
 
-        foreach (var (key, value) in variablesToInject
-                                  ?? ImmutableDictionary<VariableName, ISCLObject>.Empty)
+        foreach (var (key, (value, description)) in variablesToInject
+                                                 ?? ImmutableDictionary<VariableName,
+                                                        InjectedVariable>.Empty)
         {
             var addResult = typeResolver.TryAddType(
                 key,
                 true,
-                new VariableReference(value.GetTypeReference(), true)
+                new VariableReference(
+                    value.GetTypeReference(),
+                    true,
+                    description,
+                    value.Serialize(SerializeOptions.Serialize)
+                )
             );
 
             if (addResult.IsFailure)
@@ -165,7 +173,7 @@ public sealed class TypeResolver
                     var addResult = TryAddType(
                         usedVariable.VariableName,
                         usedVariable.WasSet,
-                        new VariableReference(usedVariable.TypeReference, false)
+                        new VariableReference(usedVariable.TypeReference, false, null, null)
                     );
 
                     if (addResult.IsFailure)

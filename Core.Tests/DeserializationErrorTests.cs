@@ -243,7 +243,7 @@ public partial class DeserializationErrorTests
         public string SCL { get; set; }
         public (string error, string location)[] ExpectedErrors { get; set; }
 
-        private Dictionary<VariableName, ISCLObject> VariablesToInject { get; set; } =
+        private Dictionary<VariableName, InjectedVariable> VariablesToInject { get; set; } =
             new();
 
         /// <inheritdoc />
@@ -273,7 +273,7 @@ public partial class DeserializationErrorTests
             VariableName variableName,
             ISCLObject sclObject)
         {
-            VariablesToInject[variableName] = sclObject;
+            VariablesToInject[variableName] = new InjectedVariable(sclObject, null);
             return this;
         }
     }

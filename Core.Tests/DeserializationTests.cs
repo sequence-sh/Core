@@ -70,7 +70,7 @@ public partial class DeserializationTests
         /// <inheritdoc />
         public List<Action> FinalChecks { get; } = new();
 
-        public Dictionary<VariableName, ISCLObject> InjectedVariables { get; } = new();
+        public Dictionary<VariableName, InjectedVariable> InjectedVariables { get; } = new();
     }
 
     [GenerateAsyncTheory("Deserialize")]

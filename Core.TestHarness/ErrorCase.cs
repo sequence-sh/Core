@@ -105,9 +105,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 IgnoreFinalState = true
             };
 
-            foreach (var injectedVariable in injectedVariables)
+            foreach (var (variableName, sclObject) in injectedVariables)
             {
-                errorCase.InjectedVariables.Add(injectedVariable.Key, injectedVariable.Value);
+                errorCase.InjectedVariables.Add(
+                    variableName,
+                    new InjectedVariable(sclObject, null)
+                );
             }
 
             yield return errorCase;

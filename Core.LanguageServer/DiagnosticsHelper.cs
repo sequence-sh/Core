@@ -11,7 +11,7 @@ public static class DiagnosticsHelper
     public static IReadOnlyList<Diagnostic> GetDiagnostics(
         string text,
         StepFactoryStore stepFactoryStore,
-        IReadOnlyDictionary<VariableName, ISCLObject>? injectedVariables = null)
+        IReadOnlyDictionary<VariableName, InjectedVariable>? injectedVariables = null)
     {
         List<Diagnostic> diagnostics;
 

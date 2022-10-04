@@ -148,7 +148,12 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 new Dictionary<string, object>()
             );
 
-            var injectResult = await stateMonad.SetInitialVariablesAsync(InjectedVariables);
+            var injectResult = await stateMonad.SetInitialVariablesAsync(
+                InjectedVariables.Select(
+                    x => new KeyValuePair<VariableName, ISCLObject>(x.Key, x.Value.SCLObject)
+                )
+            );
+
             injectResult.ShouldBeSuccessful();
 
             return stateMonad;
@@ -175,7 +180,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
         public LogLevel CheckLogLevel { get; set; } = LogLevel.Information;
 
         public Dictionary<VariableName, ISCLObject> ExpectedFinalState { get; } = new();
-        public Dictionary<VariableName, ISCLObject> InjectedVariables { get; } = new();
+        public Dictionary<VariableName, InjectedVariable> InjectedVariables { get; } = new();
         public string Name { get; set; } = Name;
 
         public IReadOnlyCollection<string> ExpectedLoggedValues { get; set; } =

@@ -12,7 +12,7 @@ public static class QuickInfoHelper
         string code,
         LinePosition position,
         StepFactoryStore stepFactoryStore,
-        IReadOnlyDictionary<VariableName, ISCLObject>? injectedVariables = null)
+        IReadOnlyDictionary<VariableName, InjectedVariable>? injectedVariables = null)
     {
         var lazyTypeResolver = new Lazy<TypeResolver>(
             () => SCLParsing.CreateTypeResolver(
@@ -32,8 +32,7 @@ public static class QuickInfoHelper
         var visitor = new QuickInfoVisitor(
             command.Value.newPosition,
             stepFactoryStore,
-            lazyTypeResolver,
-            injectedVariables ?? new Dictionary<VariableName, ISCLObject>()
+            lazyTypeResolver
         );
 
         var errorListener = new ErrorErrorListener();

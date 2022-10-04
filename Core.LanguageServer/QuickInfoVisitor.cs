@@ -13,13 +13,11 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     public QuickInfoVisitor(
         LinePosition position,
         StepFactoryStore stepFactoryStore,
-        Lazy<TypeResolver> lazyTypeResolver,
-        IReadOnlyDictionary<VariableName, ISCLObject> injectedVariables)
+        Lazy<TypeResolver> lazyTypeResolver)
     {
-        LinePosition      = position;
-        StepFactoryStore  = stepFactoryStore;
-        LazyTypeResolver  = lazyTypeResolver;
-        InjectedVariables = injectedVariables;
+        LinePosition     = position;
+        StepFactoryStore = stepFactoryStore;
+        LazyTypeResolver = lazyTypeResolver;
     }
 
     /// <summary>
@@ -36,11 +34,6 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
     /// A Lazy Type Resolver
     /// </summary>
     public Lazy<TypeResolver> LazyTypeResolver { get; }
-
-    /// <summary>
-    /// Injected Variables
-    /// </summary>
-    public IReadOnlyDictionary<VariableName, ISCLObject> InjectedVariables { get; }
 
     /// <inheritdoc />
     protected override bool ShouldVisitNextChild(IRuleNode node, QuickInfoResponse? currentResult)
@@ -268,23 +261,15 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
         if (!context.ContainsPosition(LinePosition))
             return null;
 
-        var vn = new VariableName(context.GetText().TrimStart('<').TrimEnd('>'));
+        var variableHover = VisitVariable(context.VARIABLENAME());
 
-        var value = InjectedVariables.TryGetValue(vn, out var v) ? v : null;
-
-        if (LazyTypeResolver.Value.Dictionary.TryGetValue(vn, out var tr))
-        {
-            return Description(
-                context.GetText(),
-                tr.TypeReference,
-                value?.Serialize(SerializeOptions.Serialize)
-            );
-        }
+        if (variableHover is not null)
+            return variableHover;
 
         return Description(
             context.GetText(),
             nameof(VariableName),
-            value?.Serialize(SerializeOptions.Serialize)
+            null
         );
     }
 
@@ -322,21 +307,19 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         var vn = new VariableName(text.TrimStart('<').TrimEnd('>'));
 
-        var value = InjectedVariables.TryGetValue(vn, out var v) ? v : null;
-
         if (LazyTypeResolver.Value.Dictionary.TryGetValue(vn, out var tr))
         {
             return Description(
                 text,
                 tr.TypeReference,
-                value?.Serialize(SerializeOptions.Serialize)
+                tr.GetMarkdown()
             );
         }
 
         return Description(
             text,
             nameof(VariableName),
-            value?.Serialize(SerializeOptions.Serialize)
+            null
         );
     }
 

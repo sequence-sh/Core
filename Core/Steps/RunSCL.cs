@@ -41,7 +41,7 @@ public sealed class RunSCL : CompoundStep<Unit>
                 x => x.TryFreeze(
                     new CallerMetadata(Name, nameof(SCL), TypeReference.Unit.Instance),
                     stateMonad.StepFactoryStore,
-                    ImmutableDictionary<VariableName, ISCLObject>.Empty
+                    ImmutableDictionary<VariableName, InjectedVariable>.Empty
                 )
             );
 
