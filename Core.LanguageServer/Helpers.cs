@@ -27,6 +27,53 @@ public static class Helpers
     }
 
     /// <summary>
+    /// Gets the node in the parse tree before this node
+    /// </summary>
+    public static IParseTree? GetPrevious(this IParseTree node)
+    {
+        var parent   = node.Parent;
+        var previous = node;
+
+        while (parent is not null)
+        {
+            switch (parent.ChildCount)
+            {
+                case <= 0: return null;
+                case 1:
+                    previous = parent;
+                    parent   = parent.Parent;
+                    break;
+                default:
+                {
+                    var firstChild = previous.GetChild(0);
+
+                    if (firstChild == previous)
+                    {
+                        previous = parent;
+                        parent   = parent.Parent;
+                    }
+                    else
+                    {
+                        for (var i = 1; i < parent.ChildCount; i++)
+                        {
+                            if (parent.GetChild(i) == previous)
+                            {
+                                return parent.GetChild(i - 1);
+                            }
+                        }
+
+                        return null;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Returns whether this node siblings after the position
     /// </summary>
     public static bool HasSiblingsAfter(this IRuleNode ruleContext, LinePosition p)

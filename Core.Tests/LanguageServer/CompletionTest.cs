@@ -24,6 +24,8 @@ public class CompletionTest
     [InlineData(LongText,                                     1, 2,  "ArrayFilter", null)]
     [InlineData("<",                                          0, 1,  "<var1>",      0)]
     [InlineData("<v",                                         0, 1,  "<var1>",      0)]
+    [InlineData("- <v",                                       0, 4,  "<var1>",      2)]
+    //[InlineData("- <myvar> = 1\r\n- <m",                      1, 4,  "<myvar>",     2)] //TODO add this test back
     public void ShouldGiveCorrectCompletion(
         string text,
         int line,

@@ -1,8 +1,5 @@
 ﻿using System.IO;
 using Antlr4.Runtime;
-using StepParameterDict =
-    System.Collections.Generic.Dictionary<Reductech.Sequence.Core.Internal.StepParameterReference,
-        Reductech.Sequence.Core.Internal.FreezableStepProperty>;
 
 namespace Reductech.Sequence.Core.Internal.Parser;
 
