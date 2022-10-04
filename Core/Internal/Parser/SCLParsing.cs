@@ -1,8 +1,5 @@
 ﻿using System.IO;
 using Antlr4.Runtime;
-using StepParameterDict =
-    System.Collections.Generic.Dictionary<Reductech.Sequence.Core.Internal.StepParameterReference,
-        Reductech.Sequence.Core.Internal.FreezableStepProperty>;
 
 namespace Reductech.Sequence.Core.Internal.Parser;
 
@@ -33,7 +30,7 @@ public static partial class SCLParsing
     public static TypeResolver CreateTypeResolver(
         string fullSCL,
         StepFactoryStore stepFactoryStore,
-        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
+        IReadOnlyDictionary<VariableName, InjectedVariable>? variablesToInject = null)
     {
         var fullResult =
             TryParseStep(fullSCL)
@@ -58,6 +55,8 @@ public static partial class SCLParsing
                 null,
                 variablesToInject
             );
+
+        //TODO parse individual lines to get types
 
         if (partialResult1.IsSuccess)
             return partialResult1.Value;

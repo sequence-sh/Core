@@ -70,6 +70,15 @@ namespace Reductech.Sequence.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The variable &apos;{0}&apos; was injected and therefore cannot be set..
+        /// </summary>
+        internal static string AttemptToSetInjectedVariable {
+            get {
+                return ResourceManager.GetString("AttemptToSetInjectedVariable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The automatic variable was not set..
         /// </summary>
         internal static string AutomaticVariableNotSet {

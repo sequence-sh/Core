@@ -27,10 +27,13 @@ public class ConstantFoldingTests
         var sfs = StepFactoryStore.Create();
 
         var variables = myVarValue is null
-            ? new Dictionary<VariableName, ISCLObject>()
-            : new Dictionary<VariableName, ISCLObject>()
+            ? new Dictionary<VariableName, InjectedVariable>()
+            : new Dictionary<VariableName, InjectedVariable>()
             {
-                { new VariableName("myVar"), ISCLObject.CreateFromCSharpObject(myVarValue) }
+                {
+                    new VariableName("myVar"),
+                    new InjectedVariable(ISCLObject.CreateFromCSharpObject(myVarValue), null)
+                }
             };
 
         var parseResult = SCLParsing
@@ -42,7 +45,12 @@ public class ConstantFoldingTests
         var expectedSclObject = ISCLObject.CreateFromCSharpObject(expectedValue)
             .Serialize(SerializeOptions.Primitive);
 
-        var cv = parseResult.Value.TryGetConstantValueAsync(variables, sfs).Result;
+        var cv = parseResult.Value.TryGetConstantValueAsync(
+                variables.ToDictionary(x => x.Key, x => x.Value.SCLObject),
+                sfs
+            )
+            .Result;
+
         cv.ShouldHaveValue();
 
         cv.Value.Serialize(SerializeOptions.Primitive).Should().Be(expectedSclObject);
@@ -56,10 +64,13 @@ public class ConstantFoldingTests
         var sfs = StepFactoryStore.Create();
 
         var variables = myVarValue is null
-            ? new Dictionary<VariableName, ISCLObject>()
-            : new Dictionary<VariableName, ISCLObject>()
+            ? new Dictionary<VariableName, InjectedVariable>()
+            : new Dictionary<VariableName, InjectedVariable>()
             {
-                { new VariableName("myVar"), ISCLObject.CreateFromCSharpObject(myVarValue) }
+                {
+                    new VariableName("myVar"),
+                    new InjectedVariable(ISCLObject.CreateFromCSharpObject(myVarValue), null)
+                }
             };
 
         var parseResult = SCLParsing
@@ -70,7 +81,10 @@ public class ConstantFoldingTests
 
         parseResult.Value.HasConstantValue(variables.Keys).Should().BeFalse();
 
-        var r = await parseResult.Value.TryGetConstantValueAsync(variables, sfs);
+        var r = await parseResult.Value.TryGetConstantValueAsync(
+            variables.ToDictionary(x => x.Key, x => x.Value.SCLObject),
+            sfs
+        );
 
         r.ShouldHaveNoValue();
     }

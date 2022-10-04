@@ -54,7 +54,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         StepFactoryStore stepFactoryStore,
-        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject = null)
+        IReadOnlyDictionary<VariableName, InjectedVariable>? variablesToInject = null)
     {
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (stepFactoryStore is null) //This was happening in some situations. Possibly a race condition with the connector manager

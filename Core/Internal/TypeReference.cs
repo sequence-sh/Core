@@ -646,7 +646,7 @@ public abstract record TypeReference
                     out var tr
                 ))
             {
-                return tr.ToSchemaNode(typeResolver);
+                return tr.TypeReference.ToSchemaNode(typeResolver);
             }
 
             return TrueNode.Instance;
@@ -676,11 +676,11 @@ public abstract record TypeReference
             while (typeReferences.Add(vtr)
                 && typeResolver.Dictionary.TryGetValue(vtr.VariableName, out var tr))
             {
-                if (tr is Variable vtr2)
+                if (tr.TypeReference is Variable vtr2)
                     vtr = vtr2;
 
                 else
-                    return tr.TryGetArrayMemberTypeReference(typeResolver);
+                    return tr.TypeReference.TryGetArrayMemberTypeReference(typeResolver);
             }
 
             return ErrorCode.CannotInferType.ToErrorBuilder($"{VariableName} is not an Array Type");
@@ -697,11 +697,11 @@ public abstract record TypeReference
             while (typeReferences.Add(vtr)
                 && typeResolver.Dictionary.TryGetValue(vtr.VariableName, out var tr))
             {
-                if (tr is Variable vtr2)
+                if (tr.TypeReference is Variable vtr2)
                     vtr = vtr2;
 
                 else
-                    return tr.TryGetType(typeResolver);
+                    return tr.TypeReference.TryGetType(typeResolver);
             }
 
             return ErrorCode.CannotInferType.ToErrorBuilder(
@@ -716,7 +716,7 @@ public abstract record TypeReference
              || !typeResolver.Dictionary.TryGetValue(VariableName, out var resolvedType))
                 return true;
 
-            return resolvedType.Allow(other, typeResolver);
+            return resolvedType.TypeReference.Allow(other, typeResolver);
         }
 
         /// <inheritdoc />
@@ -727,7 +727,7 @@ public abstract record TypeReference
                     out var tr
                 ))
             {
-                return tr.ToSchemaNode(typeResolver);
+                return tr.TypeReference.ToSchemaNode(typeResolver);
             }
 
             return TrueNode.Instance;

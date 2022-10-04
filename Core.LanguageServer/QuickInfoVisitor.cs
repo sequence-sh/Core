@@ -261,16 +261,10 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
         if (!context.ContainsPosition(LinePosition))
             return null;
 
-        var vn = new VariableName(context.GetText().TrimStart('<').TrimEnd('>'));
+        var variableHover = VisitVariable(context.VARIABLENAME());
 
-        if (LazyTypeResolver.Value.Dictionary.TryGetValue(vn, out var tr))
-        {
-            return Description(
-                context.GetText(),
-                tr,
-                null
-            );
-        }
+        if (variableHover is not null)
+            return variableHover;
 
         return Description(
             context.GetText(),
@@ -317,8 +311,8 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
         {
             return Description(
                 text,
-                tr,
-                null
+                tr.TypeReference,
+                tr.GetMarkdown()
             );
         }
 

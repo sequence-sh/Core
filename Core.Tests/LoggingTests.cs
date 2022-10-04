@@ -199,6 +199,6 @@ public partial class LoggingTests
         public List<Action> FinalChecks { get; } = new();
 
         /// <inheritdoc />
-        public Dictionary<VariableName, ISCLObject> InjectedVariables { get; } = new();
+        public Dictionary<VariableName, InjectedVariable> InjectedVariables { get; } = new();
     }
 }

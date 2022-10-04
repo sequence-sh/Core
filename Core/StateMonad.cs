@@ -122,11 +122,9 @@ public sealed class StateMonad : IStateMonad
     /// Set the initial variables for this StateMonad
     /// </summary>
     public async Task<Result<Unit, IError>> SetInitialVariablesAsync(
-        IReadOnlyDictionary<VariableName, ISCLObject>? variablesToInject)
+        IEnumerable<KeyValuePair<VariableName, ISCLObject>> variablesToInject)
     {
-        foreach (var (variableName, sclObject) in variablesToInject
-                                               ?? ImmutableDictionary<VariableName, ISCLObject>
-                                                      .Empty)
+        foreach (var (variableName, sclObject) in variablesToInject)
         {
             var r = await SetVariableAsync(
                 variableName,

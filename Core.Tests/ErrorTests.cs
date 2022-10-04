@@ -148,7 +148,12 @@ public partial class RunErrorTests
                 new Dictionary<string, object>()
             );
 
-            var injectResult = await state.SetInitialVariablesAsync(InjectedVariables);
+            var injectResult = await state.SetInitialVariablesAsync(
+                InjectedVariables.Select(
+                    x => new KeyValuePair<VariableName, ISCLObject>(x.Key, x.Value.SCLObject)
+                )
+            );
+
             injectResult.ShouldBeSuccessful();
 
             var r = await Process.Run<ISCLObject>(state, CancellationToken.None);
@@ -177,6 +182,6 @@ public partial class RunErrorTests
 
         public List<Action> FinalChecks { get; } = new();
 
-        public Dictionary<VariableName, ISCLObject> InjectedVariables { get; } = new();
+        public Dictionary<VariableName, InjectedVariable> InjectedVariables { get; } = new();
     }
 }

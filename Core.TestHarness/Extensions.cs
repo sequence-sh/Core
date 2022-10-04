@@ -28,7 +28,12 @@ public static class Extensions
         where T : ICaseWithSetup
     {
         var sclObject = ISCLObject.CreateFromCSharpObject(value);
-        cws.InjectedVariables.Add(new VariableName(variableName), sclObject);
+
+        cws.InjectedVariables.Add(
+            new VariableName(variableName),
+            new InjectedVariable(sclObject, null)
+        );
+
         return cws;
     }
 

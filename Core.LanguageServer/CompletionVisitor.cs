@@ -15,15 +15,12 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
         LinePosition position,
         StepFactoryStore stepFactoryStore,
         Lazy<TypeResolver> lazyTypeResolver,
-        DocumentationOptions documentationOptions,
-        IReadOnlyDictionary<VariableName, ISCLObject> injectedVariables)
+        DocumentationOptions documentationOptions)
     {
         Position             = position;
         StepFactoryStore     = stepFactoryStore;
         LazyTypeResolver     = lazyTypeResolver;
         DocumentationOptions = documentationOptions;
-
-        InjectedVariables = injectedVariables;
     }
 
     /// <summary>
@@ -45,11 +42,6 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     /// Options to use for rendering documentation
     /// </summary>
     public DocumentationOptions DocumentationOptions { get; }
-
-    /// <summary>
-    /// Variables injected into this sequence
-    /// </summary>
-    public IReadOnlyDictionary<VariableName, ISCLObject> InjectedVariables { get; }
 
     /// <inheritdoc />
     public override CompletionResponse? VisitChildren(IRuleNode node)
@@ -134,39 +126,48 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     {
         if (node.Symbol.ContainsPosition(Position))
         {
-            var variableStartMatch = VariableStartRegex.Match(node.Symbol.Text);
+            var range = node.Symbol.GetRange();
 
-            if (variableStartMatch.Success)
+            var completionResponse = TryGetCompletionResponse(
+                node.Symbol.Text,
+                range
+            );
+
+            if (completionResponse is not null)
+                return completionResponse;
+
+            var previous = node.GetPrevious();
+
+            if (previous is not null)
             {
-                var text = variableStartMatch.Groups["text"].Value;
+                var combinedText = previous.GetText() + node.Symbol.Text;
+                range.StartColumn  -= 1;
+                completionResponse =  TryGetCompletionResponse(combinedText, range);
 
-                var completionItems = InjectedVariables
-                    .Where(x => x.Key.Name.StartsWith(text, StringComparison.OrdinalIgnoreCase))
-                    .Select(
-                        x => new CompletionItem(
-                            x.Key.Serialize(SerializeOptions.Serialize),
-                            x.Value.GetTypeReference().HumanReadableTypeName,
-                            x.Value.Serialize(SerializeOptions.Serialize),
-                            x.Key.Name.Equals(text, StringComparison.OrdinalIgnoreCase),
-                            new SCLTextEdit(
-                                x.Key.Serialize(SerializeOptions.Serialize),
-                                node.Symbol.GetRange()
-                            )
-                        )
-                    )
-                    .ToList();
-
-                return new CompletionResponse(false, completionItems);
+                if (completionResponse is not null)
+                    return completionResponse;
             }
-
-            return base.VisitErrorNode(node);
         }
 
         return base.VisitErrorNode(node);
     }
 
+    private CompletionResponse? TryGetCompletionResponse(string text, TextRange range)
+    {
+        var variableStartMatch = VariableStartRegex.Match(text);
+
+        if (variableStartMatch.Success)
+        {
+            var name = variableStartMatch.Groups["name"].Value;
+
+            return VariableNameCompletionResponse(name, range);
+        }
+
+        return null;
+    }
+
     private static readonly Regex VariableStartRegex = new(
-        @"\A<(?<text>[a-e0-9]*)\Z",
+        @"\A<(?<name>[a-z0-9]*)\Z",
         RegexOptions.Compiled | RegexOptions.IgnoreCase
     );
 
@@ -204,6 +205,18 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
 
         if (context.NAME().Symbol.ContainsPosition(Position))
         {
+            var previous = context.GetPrevious();
+
+            if (previous?.GetText() == "<")
+            {
+                var range = context.GetRange();
+                range.StartColumn -= 1;
+                var completionResponse = TryGetCompletionResponse("<" + context.GetText(), range);
+
+                if (completionResponse is not null)
+                    return completionResponse;
+            }
+
             var nameText = context.NAME().GetText();
 
             var options =
@@ -328,6 +341,28 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
                 first = false;
             }
         }
+    }
+
+    private CompletionResponse VariableNameCompletionResponse(string text, TextRange range)
+    {
+        var completionItems = LazyTypeResolver.Value.Dictionary
+            .Where(x => x.Key.Name.StartsWith(text, StringComparison.OrdinalIgnoreCase))
+            .Select(
+                x => new CompletionItem(
+                    x.Key.Serialize(SerializeOptions.Serialize),
+                    x.Value.TypeReference.HumanReadableTypeName,
+                    x.Value.GetMarkdown() ?? "",
+                    //x.Value. .Serialize(SerializeOptions.Serialize),
+                    x.Key.Name.Equals(text, StringComparison.OrdinalIgnoreCase),
+                    new SCLTextEdit(
+                        x.Key.Serialize(SerializeOptions.Serialize),
+                        range
+                    )
+                )
+            )
+            .ToList();
+
+        return new CompletionResponse(false, completionItems);
     }
 
     private static CompletionResponse EntityPropertiesCompletionResponse(

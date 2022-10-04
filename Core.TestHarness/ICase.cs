@@ -57,5 +57,5 @@ public interface ICaseWithSetup
     /// <summary>
     /// Variables to inject
     /// </summary>
-    Dictionary<VariableName, ISCLObject> InjectedVariables { get; }
+    Dictionary<VariableName, InjectedVariable> InjectedVariables { get; }
 }

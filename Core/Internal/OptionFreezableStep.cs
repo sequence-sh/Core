@@ -105,12 +105,16 @@ public sealed record OptionFreezableStep(
             {
                 var canAdd = true;
 
-                foreach (var (variableName, typeReference, _, _) in variablesUsed.Value)
+                foreach (var (variableName, typeReference, wasSet, _) in variablesUsed.Value)
                 {
                     if (!typeReference
                             .IsUnknown) //ignore unknown types. Type will hopefully be resolved later
                     {
-                        var addResult = typeResolver.CanAddType(variableName, typeReference);
+                        var addResult = typeResolver.CanAddType(
+                            variableName,
+                            wasSet,
+                            typeReference
+                        );
 
                         if (addResult.IsFailure)
                         {
