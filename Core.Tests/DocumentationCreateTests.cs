@@ -102,7 +102,7 @@ public class DocumentationCreateTests
     private class StepRequirementsStep : CompoundStep<SCLInt>
     {
         /// <inheritdoc />
-        protected override Task<Result<SCLInt, IError>> Run(
+        protected override ValueTask<Result<SCLInt, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {

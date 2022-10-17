@@ -35,7 +35,7 @@ namespace Reductech.Sequence.Core.Steps;
 public sealed class ConvertSizeUnits : CompoundStep<StringStream>
 {
     /// <inheritdoc />
-    protected override async Task<Result<StringStream, IError>> Run(
+    protected override async ValueTask<Result<StringStream, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

@@ -20,7 +20,7 @@ namespace Reductech.Sequence.Core.Steps;
 public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
-    protected override Task<Result<T, IError>> Run(
+    protected override ValueTask<Result<T, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -28,7 +28,7 @@ public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
     }
 
     /// <inheritdoc />
-    public override async Task<Result<T1, IError>> Run<T1>(
+    public override async ValueTask<Result<T1, IError>> Run<T1>(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

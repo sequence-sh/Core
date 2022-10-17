@@ -17,7 +17,7 @@ public interface ISequenceStep
 public sealed class Sequence<T> : CompoundStep<T>, ISequenceStep where T : ISCLObject
 {
     /// <inheritdoc />
-    protected override async Task<Result<T, IError>> Run(
+    protected override async ValueTask<Result<T, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

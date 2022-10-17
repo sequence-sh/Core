@@ -6,11 +6,12 @@
 public sealed class GetSettings : CompoundStep<Entity>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Entity, IError>> Run(
+    #pragma warning disable CS1998
+    protected override async ValueTask<Result<Entity, IError>> Run(
+        #pragma warning restore CS1998
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
         var entity = stateMonad.Settings;
 
         return entity;

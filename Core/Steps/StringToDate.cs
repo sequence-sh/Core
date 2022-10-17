@@ -41,7 +41,7 @@ public sealed class StringToDate : CompoundStep<SCLDateTime>
         new SCLConstant<StringStream>(CultureInfo.CurrentCulture.Name);
 
     /// <inheritdoc />
-    protected override async Task<Result<SCLDateTime, IError>> Run(
+    protected override async ValueTask<Result<SCLDateTime, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

@@ -8,7 +8,7 @@ public static partial class StepHelpers
     /// <summary>
     /// Evaluates steps and combines their results
     /// </summary>
-    public static async Task<Result<T1, IError>> RunStepsAsync<T1>(
+    public static async ValueTask<Result<T1, IError>> RunStepsAsync<T1>(
         this IStateMonad stateMonad,
         IRunnableStep<T1> s1,
         CancellationToken cancellationToken)
@@ -20,7 +20,7 @@ public static partial class StepHelpers
     /// <summary>
     /// Evaluates steps and combines their results
     /// </summary>
-    public static async Task<Result<(T1, T2), IError>> RunStepsAsync<T1, T2>(
+    public static async ValueTask<Result<(T1, T2), IError>> RunStepsAsync<T1, T2>(
         this IStateMonad stateMonad,
         IRunnableStep<T1> s1,
         IRunnableStep<T2> s2,
@@ -132,7 +132,7 @@ public static partial class StepHelpers
         : IRunnableStep<TOut>
     {
         /// <inheritdoc />
-        public async Task<Result<TOut, IError>> Run(
+        public async ValueTask<Result<TOut, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
@@ -151,7 +151,7 @@ public static partial class StepHelpers
         (IRunnableStep<TIn>? Step, IStepValueMap<TIn, TOut> Map) : IRunnableStep<Maybe<TOut>>
     {
         /// <inheritdoc />
-        public async Task<Result<Maybe<TOut>, IError>> Run(
+        public async ValueTask<Result<Maybe<TOut>, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
@@ -179,7 +179,7 @@ public interface IStepValueMap<in TIn, TOut>
     /// <summary>
     /// Map the result of the step
     /// </summary>
-    Task<Result<TOut, IError>> Map(TIn t, CancellationToken cancellationToken);
+    ValueTask<Result<TOut, IError>> Map(TIn t, CancellationToken cancellationToken);
 }
 
 /// <summary>
@@ -196,11 +196,13 @@ public static class StepMaps
     private record SchemaMap(IStep ParentStep) : IStepValueMap<Entity, JsonSchema>
     {
         /// <inheritdoc />
-        public async Task<Result<JsonSchema, IError>> Map(
+        #pragma warning disable CS1998
+        public async ValueTask<Result<JsonSchema, IError>> Map(
+            #pragma warning restore CS1998
             Entity t,
             CancellationToken cancellationToken)
         {
-            await Task.CompletedTask;
+            //await ValueTask.CompletedTask;
             JsonSchema schema;
 
             try
@@ -231,10 +233,10 @@ public static class StepMaps
     private record EntityConversionMap<T>(IStep ParentStep) : IStepValueMap<Entity, T>
     {
         /// <inheritdoc />
-        public async Task<Result<T, IError>> Map(Entity t, CancellationToken cancellationToken)
+        #pragma warning disable CS1998
+        public async ValueTask<Result<T, IError>> Map(Entity t, CancellationToken cancellationToken)
+            #pragma warning restore CS1998
         {
-            await Task.CompletedTask;
-
             var conversionResult = EntityConversionHelpers.TryCreateFromEntity<T>(t)
                 .MapError(x => x.WithLocation(ParentStep));
 
@@ -278,7 +280,7 @@ public static class StepMaps
         where TIn1 : ISCLObject
     {
         /// <inheritdoc />
-        public async Task<Result<OneOf<TOut0, TOut1>, IError>> Map(
+        public async ValueTask<Result<OneOf<TOut0, TOut1>, IError>> Map(
             SCLOneOf<TIn0, TIn1> t,
             CancellationToken cancellationToken)
         {
@@ -313,7 +315,7 @@ public static class StepMaps
         where TIn2 : ISCLObject
     {
         /// <inheritdoc />
-        public async Task<Result<OneOf<TOut0, TOut1, TOut2>, IError>> Map(
+        public async ValueTask<Result<OneOf<TOut0, TOut1, TOut2>, IError>> Map(
             SCLOneOf<TIn0, TIn1, TIn2> t,
             CancellationToken cancellationToken)
         {
@@ -359,7 +361,7 @@ public static class StepMaps
         public static StringMap Instance { get; } = new();
 
         /// <inheritdoc />
-        public async Task<Result<string, IError>> Map(
+        public async ValueTask<Result<string, IError>> Map(
             StringStream t,
             CancellationToken cancellationToken)
         {
@@ -386,9 +388,10 @@ public static class StepMaps
         public static DoNothingMap<T> Instance { get; } = new();
 
         /// <inheritdoc />
-        public async Task<Result<T, IError>> Map(T t, CancellationToken _)
+        #pragma warning disable CS1998
+        public async ValueTask<Result<T, IError>> Map(T t, CancellationToken _)
+            #pragma warning restore CS1998
         {
-            await Task.CompletedTask;
             return t;
         }
     }
@@ -415,7 +418,7 @@ public static class StepMaps
         where TIn : ISCLObject
     {
         /// <inheritdoc />
-        public async Task<Result<IReadOnlyList<TOut>, IError>> Map(
+        public async ValueTask<Result<IReadOnlyList<TOut>, IError>> Map(
             Array<TIn> t,
             CancellationToken cancellationToken)
         {

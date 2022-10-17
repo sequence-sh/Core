@@ -8,7 +8,7 @@ public sealed class GetAutomaticVariable<T> : CompoundStep<T> where T : ISCLObje
 {
     /// <inheritdoc />
     #pragma warning disable 1998
-    protected override async Task<Result<T, IError>> Run(
+    protected override async ValueTask<Result<T, IError>> Run(
         #pragma warning restore 1998
         IStateMonad stateMonad,
         CancellationToken cancellationToken)

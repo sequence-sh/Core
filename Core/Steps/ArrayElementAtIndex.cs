@@ -26,7 +26,7 @@ public sealed class ArrayElementAtIndex<T> : CompoundStep<T> where T : ISCLObjec
     public IStep<SCLInt> Index { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<T, IError>> Run(
+    protected override async ValueTask<Result<T, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

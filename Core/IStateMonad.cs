@@ -48,7 +48,7 @@ public interface IStateMonad : IAsyncDisposable
     /// <summary>
     /// Creates or set the value of this variable.
     /// </summary>
-    Task<Result<Unit, IError>> SetVariableAsync<T>(
+    ValueTask<Result<Unit, IError>> SetVariableAsync<T>(
         VariableName key,
         T variable,
         bool disposeOld,
@@ -58,7 +58,7 @@ public interface IStateMonad : IAsyncDisposable
     /// <summary>
     /// Removes the variable if it exists.
     /// </summary>
-    Task RemoveVariableAsync(VariableName key, bool dispose, IStep? callingStep);
+    ValueTask RemoveVariableAsync(VariableName key, bool dispose, IStep? callingStep);
 
     /// <summary>
     /// Logs a message not associated with a situation.

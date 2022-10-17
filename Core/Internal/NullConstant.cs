@@ -17,12 +17,12 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     public string Name => "Null";
 
     /// <inheritdoc />
-    public async Task<Result<T, IError>> Run<T>(
+    #pragma warning disable CS1998
+    public async ValueTask<Result<T, IError>> Run<T>(
+        #pragma warning restore CS1998
         IStateMonad stateMonad,
         CancellationToken cancellationToken) where T : ISCLObject
     {
-        await Task.CompletedTask;
-
         var r = (SCLNull.Instance as ISCLObject).TryConvertTyped<T>("Step")
             .MapError(x => x.WithLocation(TextLocation ?? ErrorLocation.EmptyLocation));
 
@@ -30,7 +30,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     }
 
     /// <inheritdoc />
-    public Task<Result<ISCLObject, IError>> RunUntyped(
+    public ValueTask<Result<ISCLObject, IError>> RunUntyped(
         IStateMonad stateMonad,
         CancellationToken cancellationToken) =>
         Run(stateMonad, cancellationToken).Map(x => x as ISCLObject);
@@ -125,11 +125,12 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     }
 
     /// <inheritdoc />
-    public async Task<Result<SCLNull, IError>> Run(
+    #pragma warning disable CS1998
+    public async ValueTask<Result<SCLNull, IError>> Run(
+        #pragma warning restore CS1998
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
         return SCLNull.Instance;
     }
 
@@ -148,9 +149,9 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     public bool HasConstantValue(IEnumerable<VariableName> providedVariables) => true;
 
     /// <inheritdoc />
-    public Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
-        StepFactoryStore sfs) => Task.FromResult(Maybe<ISCLObject>.From(SCLNull.Instance));
+        StepFactoryStore sfs) => ValueTask.FromResult(Maybe<ISCLObject>.From(SCLNull.Instance));
 
     /// <inheritdoc />
     public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()

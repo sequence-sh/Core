@@ -14,7 +14,7 @@
 public sealed class EntityRemoveProperty : CompoundStep<Entity>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Entity, IError>> Run(
+    protected override async ValueTask<Result<Entity, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

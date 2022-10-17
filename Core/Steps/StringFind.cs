@@ -30,7 +30,7 @@ public sealed class StringFind : CompoundStep<SCLInt>
     public IStep<StringStream> SubString { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<SCLInt, IError>> Run(
+    protected override async ValueTask<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

@@ -11,7 +11,7 @@ public abstract class OneOfStep : IStep
     protected abstract IStep StepValue { get; }
 
     /// <inheritdoc />
-    public Task<Result<T, IError>> Run<T>(
+    public ValueTask<Result<T, IError>> Run<T>(
         IStateMonad stateMonad,
         CancellationToken cancellationToken) where T : ISCLObject
     {
@@ -19,7 +19,7 @@ public abstract class OneOfStep : IStep
     }
 
     /// <inheritdoc />
-    public Task<Result<ISCLObject, IError>> RunUntyped(
+    public ValueTask<Result<ISCLObject, IError>> RunUntyped(
         IStateMonad stateMonad,
         CancellationToken cancellationToken) => StepValue.RunUntyped(stateMonad, cancellationToken);
 
@@ -66,7 +66,7 @@ public abstract class OneOfStep : IStep
         StepValue.HasConstantValue(providedVariables);
 
     /// <inheritdoc />
-    public Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
         StepFactoryStore sfs) => StepValue.TryGetConstantValueAsync(variableValues, sfs);
 
@@ -140,7 +140,7 @@ public class OneOfStep<T0, T1> : OneOfStep, IStep<SCLOneOf<T0, T1>>
     public override Type OutputType => typeof(OneOf<T0, T1>);
 
     /// <inheritdoc />
-    public Task<Result<SCLOneOf<T0, T1>, IError>> Run(
+    public ValueTask<Result<SCLOneOf<T0, T1>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -195,7 +195,7 @@ public class OneOfStep<T0, T1, T2> : OneOfStep, IStep<SCLOneOf<T0, T1, T2>>
     public override Type OutputType => typeof(OneOf<T0, T1, T2>);
 
     /// <inheritdoc />
-    public Task<Result<SCLOneOf<T0, T1, T2>, IError>> Run(
+    public ValueTask<Result<SCLOneOf<T0, T1, T2>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

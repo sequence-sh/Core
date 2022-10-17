@@ -21,7 +21,7 @@ public interface IArrayNewStep
 public sealed class ArrayNew<T> : CompoundStep<Array<T>>, IArrayNewStep where T : ISCLObject
 {
     /// <inheritdoc />
-    protected override async Task<Result<Array<T>, IError>> Run(
+    protected override async ValueTask<Result<Array<T>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

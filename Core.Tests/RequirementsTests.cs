@@ -89,7 +89,7 @@ public partial class RequirementsTests
     private class RuntimeRequirementsStep : CompoundStep<SCLInt>
     {
         /// <inheritdoc />
-        protected override Task<Result<SCLInt, IError>> Run(
+        protected override ValueTask<Result<SCLInt, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {
@@ -113,7 +113,7 @@ public partial class RequirementsTests
     private class FixedRequirementsStep : CompoundStep<SCLInt>
     {
         /// <inheritdoc />
-        protected override async Task<Result<SCLInt, IError>> Run(
+        protected override async ValueTask<Result<SCLInt, IError>> Run(
             IStateMonad stateMonad,
             CancellationToken cancellationToken)
         {

@@ -17,7 +17,7 @@ public sealed class StringToDouble : CompoundStep<SCLDouble>
     public IStep<StringStream> Double { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<SCLDouble, IError>> Run(
+    protected override async ValueTask<Result<SCLDouble, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

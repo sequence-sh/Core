@@ -16,7 +16,7 @@ public partial class StateMonadTests
 
         var monad = CreateMonad(repo);
 
-        sd.Setup(x => x.DisposeAsync(monad)).Returns(Task.CompletedTask);
+        sd.Setup(x => x.DisposeAsync(monad)).Returns(ValueTask.CompletedTask);
         sd.Setup(x => x.Dispose());
 
         await monad.SetVariableAsync(
@@ -42,7 +42,7 @@ public partial class StateMonadTests
         var monad = CreateMonad(repo);
 
         // ReSharper disable once AccessToDisposedClosure
-        sd.Setup(x => x.DisposeAsync(monad)).Returns(Task.CompletedTask);
+        sd.Setup(x => x.DisposeAsync(monad)).Returns(ValueTask.CompletedTask);
         sd.Setup(x => x.Dispose());
 
         await monad.SetVariableAsync(
@@ -73,7 +73,7 @@ public partial class StateMonadTests
             Maybe<VariableName>.None
         );
 
-        sd.Setup(x => x.DisposeAsync(scopedMonad)).Returns(Task.CompletedTask);
+        sd.Setup(x => x.DisposeAsync(scopedMonad)).Returns(ValueTask.CompletedTask);
         sd.Setup(x => x.Dispose());
 
         await scopedMonad.SetVariableAsync(
@@ -105,7 +105,7 @@ public partial class StateMonadTests
         );
 
         // ReSharper disable once AccessToDisposedClosure
-        sd.Setup(x => x.DisposeAsync(scopedMonad)).Returns(Task.CompletedTask);
+        sd.Setup(x => x.DisposeAsync(scopedMonad)).Returns(ValueTask.CompletedTask);
         sd.Setup(x => x.Dispose());
 
         await scopedMonad.SetVariableAsync(

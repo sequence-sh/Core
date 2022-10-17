@@ -32,7 +32,7 @@ public sealed class DateToString : CompoundStep<StringStream>
         new SCLConstant<StringStream>("yyyy/MM/dd HH:mm:ss");
 
     /// <inheritdoc />
-    protected override async Task<Result<StringStream, IError>> Run(
+    protected override async ValueTask<Result<StringStream, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

@@ -73,7 +73,7 @@ public sealed class ScopedStateMonad : IStateMonad
         _fixedState.ContainsKey(variable);
 
     /// <inheritdoc />
-    public async Task<Result<Unit, IError>> SetVariableAsync<T>(
+    public async ValueTask<Result<Unit, IError>> SetVariableAsync<T>(
         VariableName key,
         T variable,
         bool disposeOld,
@@ -108,7 +108,7 @@ public sealed class ScopedStateMonad : IStateMonad
     }
 
     /// <inheritdoc />
-    public async Task RemoveVariableAsync(VariableName key, bool dispose, IStep? callingStep)
+    public async ValueTask RemoveVariableAsync(VariableName key, bool dispose, IStep? callingStep)
     {
         if (_scopedStateDictionary.Remove(key, out var v) && dispose)
         {

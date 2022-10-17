@@ -30,7 +30,7 @@ public sealed class StringToCase : CompoundStep<StringStream>
     public IStep<SCLEnum<TextCase>> Case { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<StringStream, IError>> Run(
+    protected override async ValueTask<Result<StringStream, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

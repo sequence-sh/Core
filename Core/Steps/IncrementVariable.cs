@@ -30,7 +30,7 @@ public sealed class IncrementVariable : CompoundStep<Unit>
     public IStep<SCLInt> Amount { get; set; } = new SCLConstant<SCLInt>(1.ConvertToSCLObject());
 
     /// <inheritdoc />
-    protected override async Task<Result<Unit, IError>> Run(
+    protected override async ValueTask<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

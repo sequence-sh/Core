@@ -108,9 +108,14 @@ public class EntityConversionTests
                     )
                 );
 
-        parseResult.Result.ShouldBeSuccessful();
+        parseResult.ShouldBeSuccessful();
 
-        return parseResult.Result.Value.GetValueOrThrow() as Entity;
+        var entity = parseResult.Value.Result.GetValueOrThrow() as Entity;
+
+        if (entity is null)
+            throw new Exception("Parse result should be an entity");
+
+        return entity;
     }
 
     [Fact]

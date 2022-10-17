@@ -26,7 +26,7 @@ public sealed class Round : CompoundStep<SCLDouble>
     public IStep<SCLInt> Precision { get; set; } = new SCLConstant<SCLInt>(new SCLInt(3));
 
     /// <inheritdoc />
-    protected override async Task<Result<SCLDouble, IError>> Run(
+    protected override async ValueTask<Result<SCLDouble, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

@@ -47,8 +47,8 @@ public static class FunctionalExtensions
     /// Casts the result to type T2.
     /// Returns failure if this cast is not possible.
     /// </summary>
-    public static async Task<Result<T2, TE>> BindCast<T1, T2, TE>(
-        this Task<Result<T1, TE>> result,
+    public static async ValueTask<Result<T2, TE>> BindCast<T1, T2, TE>(
+        this ValueTask<Result<T1, TE>> result,
         TE error) // where T2 : T1
     {
         var result1 = await result;

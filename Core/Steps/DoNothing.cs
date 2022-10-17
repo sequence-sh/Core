@@ -8,11 +8,12 @@
 public class DoNothing : CompoundStep<Unit>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Unit, IError>> Run(
+    #pragma warning disable CS1998
+    protected override async ValueTask<Result<Unit, IError>> Run(
+        #pragma warning restore CS1998
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
         return Unit.Default;
     }
 

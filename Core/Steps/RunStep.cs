@@ -7,7 +7,7 @@
 public sealed class RunStep<T> : CompoundStep<Unit> where T : ISCLObject
 {
     /// <inheritdoc />
-    protected override async Task<Result<Unit, IError>> Run(
+    protected override async ValueTask<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -27,7 +27,7 @@ public sealed class RunStep<T> : CompoundStep<Unit> where T : ISCLObject
     /// <summary>
     /// Reads all data in the object, returning any errors.
     /// </summary>
-    public static async Task<Result<Unit, IError>> ReadToEnd(
+    public static async ValueTask<Result<Unit, IError>> ReadToEnd(
         object? o,
         CancellationToken cancellation)
     {

@@ -22,3 +22,4 @@ global using Reductech.Sequence.Core.Entities.Schema;
 global using Reductech.Sequence.Core.Internal;
 global using Reductech.Sequence.ConnectorManagement.Base;
 global using Entity = Reductech.Sequence.Core.Entity;
+global using CSharpFunctionalExtensions.ValueTasks;
