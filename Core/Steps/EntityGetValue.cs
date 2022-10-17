@@ -146,7 +146,8 @@ public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
                             nameof(EntityGetValue<ISCLObject>.Property),
                             TypeReference.Actual.String
                         ),
-                        typeResolver.StepFactoryStore
+                        typeResolver.StepFactoryStore,
+                        OptimizationSettings.None
                     );
 
                     if (frozenPropertyStep.IsSuccess)

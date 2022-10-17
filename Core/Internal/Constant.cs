@@ -111,4 +111,12 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     {
         yield break;
     }
+
+    /// <inheritdoc />
+    public IStep FoldIfConstant(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables)
+    {
+        return this;
+    }
 }

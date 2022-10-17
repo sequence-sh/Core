@@ -42,7 +42,8 @@ public partial class EntityFormatTests : StepTestBase<EntityFormat, StringStream
             .Bind(
                 x => x.TryFreeze(
                     SCLRunner.RootCallerMetadata,
-                    stepFactoryStore
+                    stepFactoryStore,
+                    OptimizationSettings.None
                 )
             );
 

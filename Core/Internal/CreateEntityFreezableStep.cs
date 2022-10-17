@@ -13,7 +13,10 @@ public sealed record CreateEntityFreezableStep
     public TextLocation TextLocation => FreezableEntityData.Location;
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IStep, IError> TryFreeze(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver,
+        OptimizationSettings settings)
     {
         var checkResult = callerMetadata.CheckAllows(
                 TypeReference.Entity.NoSchema,
@@ -35,7 +38,7 @@ public sealed record CreateEntityFreezableStep
             );
 
             var frozen = stepMember.ConvertToStep()
-                .TryFreeze(cm, typeResolver)
+                .TryFreeze(cm, typeResolver, settings)
                 .Map(s => (propertyName, s));
 
             results.Add(frozen);

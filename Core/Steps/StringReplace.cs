@@ -52,7 +52,33 @@ public sealed class StringReplace : CompoundStep<StringStream>
             );
         }
 
-        var currentState = stateMonad.GetState().ToImmutableDictionary();
+        if (replace.HasValue && Function is not null)
+        {
+            return new SingleError(
+                new ErrorLocation(this),
+                ErrorCode.ConflictingParameters,
+                nameof(Replace),
+                nameof(Function)
+            );
+        }
+
+        if (replace.HasValue
+         && !GroupsRegex.IsMatch(
+                replace.Value
+            )) //This replace uses no numbered groups. Use regular string replace instead
+        {
+            var options = ignoreCase
+                ? RegexOptions.IgnoreCase | RegexOptions.Compiled
+                : RegexOptions.None | RegexOptions.Compiled;
+
+            var result = Regex.Replace(input, pattern, replace.Value, options);
+            return new StringStream(result);
+        }
+
+        var currentState =
+            new Lazy<ImmutableDictionary<VariableName, ISCLObject>>(
+                () => stateMonad.GetState().ToImmutableDictionary()
+            );
 
         var regexOptions = RegexOptions.None;
 
@@ -73,7 +99,7 @@ public sealed class StringReplace : CompoundStep<StringStream>
             {
                 await using var scopedMonad = new ScopedStateMonad(
                     stateMonad,
-                    currentState,
+                    currentState.Value,
                     Function.VariableNameOrItem,
                     new KeyValuePair<VariableName, ISCLObject>(
                         Function.VariableNameOrItem,
@@ -175,7 +201,7 @@ public sealed class StringReplace : CompoundStep<StringStream>
     /// <summary>
     /// Regex for matching regex groups
     /// </summary>
-    private static readonly Regex GroupsRegex = new("\\$(?<number>\\d)");
+    private static readonly Regex GroupsRegex = new("\\$(?<number>\\d)", RegexOptions.Compiled);
 
     /// <inheritdoc />
     public override Result<Unit, IError> VerifyThis(StepFactoryStore stepFactoryStore)

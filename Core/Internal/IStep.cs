@@ -108,6 +108,13 @@ public interface IStep : ISerializable
 
         return ErrorCode.InvalidCast.ToErrorBuilder(propertyName, Name);
     }
+
+    /// <summary>
+    /// If this step has a constant value. Convert it to a constant
+    /// </summary>
+    public IStep FoldIfConstant(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables);
 }
 
 /// <summary>

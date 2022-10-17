@@ -41,7 +41,7 @@ public sealed class RunSCL : CompoundStep<Unit>
                 x => x.TryFreeze(
                     new CallerMetadata(Name, nameof(SCL), TypeReference.Unit.Instance),
                     stateMonad.StepFactoryStore,
-                    ImmutableDictionary<VariableName, InjectedVariable>.Empty
+                    OptimizationSettings.None
                 )
             );
 
@@ -110,7 +110,8 @@ public sealed class RunSCL : CompoundStep<Unit>
                                 nameof(Export),
                                 new TypeReference.Array(TypeReference.Actual.String)
                             ),
-                            typeResolver
+                            typeResolver,
+                            OptimizationSettings.None
                         )
                     )
                 ;

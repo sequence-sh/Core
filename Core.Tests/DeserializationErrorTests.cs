@@ -254,7 +254,13 @@ public partial class DeserializationErrorTests
             var sfs = StepFactoryStore.Create();
 
             var result = SCLParsing.TryParseStep(SCL)
-                .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, sfs, VariablesToInject))
+                .Bind(
+                    x => x.TryFreeze(
+                        SCLRunner.RootCallerMetadata,
+                        sfs,
+                        new OptimizationSettings(true, VariablesToInject)
+                    )
+                )
                 .Map(SCLRunner.ConvertToUnitStep);
 
             result.IsFailure.Should().BeTrue("Case should fail");

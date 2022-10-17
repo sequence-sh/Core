@@ -85,7 +85,11 @@ public sealed class TypeResolver
                 return r1.ConvertFailure<TypeResolver>()
                     .MapError(x => x.WithLocation(lambda.Location));
 
-            var r3 = lambda.FreezableStep.TryFreeze(scopedCallerMetadata, newTypeResolver);
+            var r3 = lambda.FreezableStep.TryFreeze(
+                scopedCallerMetadata,
+                newTypeResolver,
+                OptimizationSettings.None
+            );
 
             if (r3.IsFailure)
                 return r3.ConvertFailure<TypeResolver>();

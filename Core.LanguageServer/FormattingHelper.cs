@@ -32,7 +32,8 @@ public static class FormattingHelper
             {
                 var freezeResult = stepParseResult.Value.TryFreeze(
                     commandCallerMetadata,
-                    typeResolver
+                    typeResolver,
+                    OptimizationSettings.None
                 );
 
                 if (freezeResult.IsSuccess)

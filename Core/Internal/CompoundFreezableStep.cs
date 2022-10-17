@@ -24,13 +24,29 @@ public sealed record CompoundFreezableStep(
     }
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IStep, IError> TryFreeze(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver,
+        OptimizationSettings settings)
     {
-        return TryGetStepFactory(typeResolver.StepFactoryStore)
-            .Bind(
-                x =>
-                    x.TryFreeze(callerMetadata, typeResolver, FreezableStepData)
+        var result =
+            TryGetStepFactory(typeResolver.StepFactoryStore)
+                .Bind(
+                    x =>
+                        x.TryFreeze(callerMetadata, typeResolver, FreezableStepData, settings)
+                );
+
+        if (settings.FoldConstants)
+        {
+            return result.Map(
+                x => x.FoldIfConstant(
+                    typeResolver.StepFactoryStore,
+                    settings.InjectedVariables
+                )
             );
+        }
+        else
+            return result;
     }
 
     /// <inheritdoc />

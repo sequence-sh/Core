@@ -77,7 +77,7 @@ public sealed class SCLRunner
     );
 
     /// <summary>
-    /// Runs an SCL sequence without injecting any metadata
+    /// Runs an SCL sequence
     /// </summary>
     public async Task<Result<Unit, IError>> RunSequence(
         string text,
@@ -85,8 +85,10 @@ public sealed class SCLRunner
         CancellationToken cancellationToken,
         IReadOnlyDictionary<VariableName, InjectedVariable>? variablesToInject = null)
     {
+        var settings = new OptimizationSettings(true, variablesToInject);
+
         var stepResult = SCLParsing.TryParseStep(text)
-            .Bind(x => x.TryFreeze(RootCallerMetadata, _stepFactoryStore, variablesToInject))
+            .Bind(x => x.TryFreeze(RootCallerMetadata, _stepFactoryStore, settings))
             .Map(ConvertToUnitStep);
 
         if (stepResult.IsFailure)

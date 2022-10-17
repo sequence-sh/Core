@@ -218,6 +218,25 @@ public record CreateEntityStep
         }
     }
 
+    /// <summary>
+    /// IF this step has a constant value. Convert it to a constant
+    /// </summary>
+    public IStep FoldIfConstant(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables)
+    {
+        var constantValue = TryGetConstantValueAsync(
+                ImmutableDictionary<VariableName, ISCLObject>.Empty,
+                sfs
+            )
+            .Result.Bind(x => x.MaybeAs<Entity>());
+
+        if (constantValue.HasNoValue)
+            return this;
+
+        return new SCLConstant<Entity>(constantValue.Value);
+    }
+
     /// <inheritdoc />
     public bool ShouldBracketWhenSerialized => false;
 }
