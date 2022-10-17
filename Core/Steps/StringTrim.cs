@@ -27,7 +27,7 @@ public sealed class StringTrim : CompoundStep<StringStream>
         new SCLConstant<SCLEnum<TrimSide>>(new SCLEnum<TrimSide>(TrimSide.Both));
 
     /// <inheritdoc />
-    protected override async Task<Result<StringStream, IError>> Run(
+    protected override async ValueTask<Result<StringStream, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

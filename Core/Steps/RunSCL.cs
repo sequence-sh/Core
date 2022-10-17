@@ -8,7 +8,7 @@ namespace Reductech.Sequence.Core.Steps;
 public sealed class RunSCL : CompoundStep<Unit>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Unit, IError>> Run(
+    protected override async ValueTask<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

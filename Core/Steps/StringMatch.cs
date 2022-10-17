@@ -13,7 +13,7 @@ namespace Reductech.Sequence.Core.Steps;
 public sealed class StringMatch : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
-    protected override async Task<Result<SCLBool, IError>> Run(
+    protected override async ValueTask<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

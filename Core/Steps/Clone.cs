@@ -24,7 +24,7 @@ public sealed class Clone<T> : CompoundStep<Array<T>> where T : ISCLObject
     public IStep<SCLInt> Number { get; set; } = new SCLConstant<SCLInt>(1.ConvertToSCLObject());
 
     /// <inheritdoc />
-    protected override async Task<Result<Array<T>, IError>> Run(
+    protected override async ValueTask<Result<Array<T>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

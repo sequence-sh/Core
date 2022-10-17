@@ -10,18 +10,18 @@ public sealed record LazyArray<T>
     public override IAsyncEnumerable<T> GetAsyncEnumerable() => AsyncEnumerable;
 
     /// <inheritdoc />
-    public override Task<Result<bool, IError>> AnyAsync(CancellationToken cancellation)
+    public override ValueTask<Result<bool, IError>> AnyAsync(CancellationToken cancellation)
     {
         return TryRun(AsyncEnumerable, (x, c) => x.AnyAsync(c), cancellation);
     }
 
     /// <inheritdoc />
-    public override Task<Result<int, IError>> CountAsync(CancellationToken cancellation)
+    public override ValueTask<Result<int, IError>> CountAsync(CancellationToken cancellation)
     {
         return TryRun(AsyncEnumerable, (x, c) => x.CountAsync(c), cancellation);
     }
 
-    private static async Task<Result<TResult, IError>> TryRun<TResult>(
+    private static async ValueTask<Result<TResult, IError>> TryRun<TResult>(
         IAsyncEnumerable<T> asyncEnumerable,
         Func<IAsyncEnumerable<T>, CancellationToken, ValueTask<TResult>> func,
         CancellationToken cancellation)
@@ -55,7 +55,8 @@ public sealed record LazyArray<T>
     public override Array<T> Skip(int count) => new LazyArray<T>(AsyncEnumerable.Skip(count));
 
     /// <inheritdoc />
-    public override Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation)
+    public override ValueTask<Result<IArray, IError>> EnsureEvaluated(
+        CancellationToken cancellation)
     {
         var r = Evaluate(cancellation)
             .Map(x => x as IArray);
@@ -64,7 +65,7 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override async Task<Result<EagerArray<T>, IError>> Evaluate(
+    public override async ValueTask<Result<EagerArray<T>, IError>> Evaluate(
         CancellationToken cancellation)
     {
         try
@@ -79,7 +80,7 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override async Task<Result<Unit, IError>> ForEach(
+    public override async ValueTask<Result<Unit, IError>> ForEach(
         Func<T, CancellationToken, ValueTask<Result<Unit, IError>>> func,
         CancellationToken cancellation)
     {
@@ -107,7 +108,7 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override async Task<Result<int, IError>> IndexOfAsync(
+    public override async ValueTask<Result<int, IError>> IndexOfAsync(
         T element,
         CancellationToken cancellation)
     {
@@ -118,7 +119,7 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override async Task<Result<T, IError>> ElementAtAsync(
+    public override async ValueTask<Result<T, IError>> ElementAtAsync(
         int index,
         ErrorLocation location,
         CancellationToken cancellation)
@@ -140,7 +141,7 @@ public sealed record LazyArray<T>
     }
 
     /// <inheritdoc />
-    public override async Task<Result<IReadOnlyList<T>, IError>> GetElementsAsync(
+    public override async ValueTask<Result<IReadOnlyList<T>, IError>> GetElementsAsync(
         CancellationToken cancellation)
     {
         var r = await TryRun(AsyncEnumerable, (x, c) => x.ToListAsync(c), cancellation);
@@ -193,7 +194,7 @@ public sealed record LazyArray<T>
     {
         var stuff =
             GetAsyncEnumerable()
-                .Select(x => x.TryConvertTyped<TElement>("Element"))
+                .Select(x => x.TryConvertTyped<TElement>())
                 .Select(
                     x => x.IsFailure
                         ? throw new ErrorException(

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core;
+﻿namespace Reductech.Sequence.Core.Entities;
 
 /// <summary>
 /// Contains methods for helping with entities.
@@ -9,7 +9,7 @@ public static class EntityHelper
     /// Tries to convert an object into one suitable as an entity property.
     /// </summary>
     [Pure]
-    public static async Task<Result<ISCLObject, IError>> TryUnpackObjectAsync(
+    public static async ValueTask<Result<ISCLObject, IError>> TryUnpackObjectAsync(
         ISCLObject o,
         CancellationToken cancellation)
     {

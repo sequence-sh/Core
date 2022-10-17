@@ -13,7 +13,7 @@
 public sealed class EntityGetProperties : CompoundStep<Array<StringStream>>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Array<StringStream>, IError>> Run(
+    protected override async ValueTask<Result<Array<StringStream>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

@@ -9,14 +9,14 @@ public readonly record struct SCLOneOf<T0, T1>(OneOf<T0, T1> OneOf) : ISCLOneOf
     /// <summary>
     /// Create from an SCLObject
     /// </summary>
-    public static Maybe<SCLOneOf<T0, T1>> TryCreate(string propertyName, ISCLObject obj)
+    public static Maybe<SCLOneOf<T0, T1>> TryCreate(ISCLObject obj)
     {
-        var t0 = obj.TryConvertTyped<T0>(propertyName);
+        var t0 = obj.TryConvertTyped<T0>();
 
         if (t0.IsSuccess)
             return new SCLOneOf<T0, T1>(t0.Value);
 
-        var t1 = obj.TryConvertTyped<T1>(propertyName);
+        var t1 = obj.TryConvertTyped<T1>();
 
         if (t1.IsSuccess)
             return new SCLOneOf<T0, T1>(t1.Value);
@@ -73,19 +73,19 @@ public readonly record struct SCLOneOf<T0, T1, T2>(OneOf<T0, T1, T2> OneOf) : IS
     /// <summary>
     /// Create from an SCLObject
     /// </summary>
-    public static Maybe<SCLOneOf<T0, T1, T2>> TryCreate(string propertyName, ISCLObject obj)
+    public static Maybe<SCLOneOf<T0, T1, T2>> TryCreate(ISCLObject obj)
     {
-        var t0 = obj.TryConvertTyped<T0>(propertyName);
+        var t0 = obj.TryConvertTyped<T0>();
 
         if (t0.IsSuccess)
             return new SCLOneOf<T0, T1, T2>(t0.Value);
 
-        var t1 = obj.TryConvertTyped<T1>(propertyName);
+        var t1 = obj.TryConvertTyped<T1>();
 
         if (t1.IsSuccess)
             return new SCLOneOf<T0, T1, T2>(t1.Value);
 
-        var t2 = obj.TryConvertTyped<T2>(propertyName);
+        var t2 = obj.TryConvertTyped<T2>();
 
         if (t2.IsSuccess)
             return new SCLOneOf<T0, T1, T2>(t2.Value);
@@ -132,24 +132,24 @@ public readonly record struct SCLOneOf<T0, T1, T2, T3>(OneOf<T0, T1, T2, T3> One
     /// <summary>
     /// Create from an SCLObject
     /// </summary>
-    public static Maybe<SCLOneOf<T0, T1, T2, T3>> TryCreate(string propertyName, ISCLObject obj)
+    public static Maybe<SCLOneOf<T0, T1, T2, T3>> TryCreate(ISCLObject obj)
     {
-        var t0 = obj.TryConvertTyped<T0>(propertyName);
+        var t0 = obj.TryConvertTyped<T0>();
 
         if (t0.IsSuccess)
             return new SCLOneOf<T0, T1, T2, T3>(t0.Value);
 
-        var t1 = obj.TryConvertTyped<T1>(propertyName);
+        var t1 = obj.TryConvertTyped<T1>();
 
         if (t1.IsSuccess)
             return new SCLOneOf<T0, T1, T2, T3>(t1.Value);
 
-        var t2 = obj.TryConvertTyped<T2>(propertyName);
+        var t2 = obj.TryConvertTyped<T2>();
 
         if (t2.IsSuccess)
             return new SCLOneOf<T0, T1, T2, T3>(t2.Value);
 
-        var t3 = obj.TryConvertTyped<T3>(propertyName);
+        var t3 = obj.TryConvertTyped<T3>();
 
         if (t3.IsSuccess)
             return new SCLOneOf<T0, T1, T2, T3>(t3.Value);

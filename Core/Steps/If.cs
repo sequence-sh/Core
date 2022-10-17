@@ -8,7 +8,7 @@
 public sealed class If<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
-    protected override async Task<Result<T, IError>> Run(
+    protected override async ValueTask<Result<T, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -22,7 +22,7 @@ public sealed class If<T> : CompoundStep<T> where T : ISCLObject
                     if (Else is not null)
                         return Else.Run(stateMonad, cancellationToken);
 
-                    return Task.FromResult(
+                    return ValueTask.FromResult(
                         Result.Success<T, IError>(DefaultValues.GetDefault<T>())
                     );
                 }

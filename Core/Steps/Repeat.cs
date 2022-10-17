@@ -25,7 +25,7 @@ public sealed class Repeat : CompoundStep<Unit> //TODO replace with a lambda fun
     public IStep<SCLInt> Times { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<Unit, IError>> Run(
+    protected override async ValueTask<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

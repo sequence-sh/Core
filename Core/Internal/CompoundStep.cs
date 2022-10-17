@@ -13,12 +13,12 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     /// Run this step.
     /// Does not activate logging.
     /// </summary>
-    protected abstract Task<Result<T, IError>> Run(
+    protected abstract ValueTask<Result<T, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    public async Task<Result<ISCLObject, IError>> RunUntyped(
+    public async ValueTask<Result<ISCLObject, IError>> RunUntyped(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -29,7 +29,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     }
 
     /// <inheritdoc />
-    async Task<Result<T, IError>> IRunnableStep<T>.Run(
+    async ValueTask<Result<T, IError>> IRunnableStep<T>.Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -63,7 +63,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     }
 
     /// <inheritdoc />
-    public virtual Task<Result<T1, IError>> Run<T1>(
+    public virtual ValueTask<Result<T1, IError>> Run<T1>(
         IStateMonad stateMonad,
         CancellationToken cancellationToken) where T1 : ISCLObject
     {
@@ -197,7 +197,7 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     }
 
     /// <inheritdoc />
-    public async Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public async ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
         StepFactoryStore sfs)
     {

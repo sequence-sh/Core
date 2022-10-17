@@ -58,7 +58,7 @@ public sealed partial record SCLConstantFreezable<T>
             return UnitResult.Success<IError>();
 
         var r = callerMetadata.ExpectedType.TryGetType(typeResolver)
-            .Bind(type => Value.TryConvert(type, callerMetadata.ParameterName))
+            .Bind(type => Value.TryConvert(type))
             .Map(_ => Unit.Default)
             .MapError(x => x.WithLocation(this));
 

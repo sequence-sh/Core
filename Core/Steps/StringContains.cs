@@ -12,7 +12,7 @@
 public sealed class StringContains : CompoundStep<SCLBool>
 {
     /// <inheritdoc />
-    protected override async Task<Result<SCLBool, IError>> Run(
+    protected override async ValueTask<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

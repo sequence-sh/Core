@@ -6,7 +6,7 @@
 public sealed class SetVariable<T> : CompoundStep<Unit> where T : ISCLObject
 {
     /// <inheritdoc />
-    protected override async Task<Result<Unit, IError>> Run(
+    protected override async ValueTask<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

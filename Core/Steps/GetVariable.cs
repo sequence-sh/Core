@@ -8,7 +8,7 @@ public sealed class GetVariable<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
     #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    protected override async Task<Result<T, IError>> Run(
+    protected override async ValueTask<Result<T, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken) =>
         stateMonad.GetVariable<T>(Variable).MapError(x => x.WithLocation(this));

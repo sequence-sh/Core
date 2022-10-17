@@ -105,7 +105,7 @@ public sealed class StateMonad : IStateMonad
         if (!dictionary.TryGetValue(key, out var value))
             return Maybe<T>.None;
 
-        var result = value.TryConvertTyped<T>(key.Serialize(SerializeOptions.Serialize));
+        var result = value.TryConvertTyped<T>();
 
         if (result.IsSuccess)
             return Maybe<T>.From(result.Value);
@@ -121,7 +121,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Set the initial variables for this StateMonad
     /// </summary>
-    public async Task<Result<Unit, IError>> SetInitialVariablesAsync(
+    public async ValueTask<Result<Unit, IError>> SetInitialVariablesAsync(
         IEnumerable<KeyValuePair<VariableName, ISCLObject>> variablesToInject)
     {
         foreach (var (variableName, sclObject) in variablesToInject)
@@ -144,7 +144,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Creates or set the value of this variable.
     /// </summary>
-    public async Task<Result<Unit, IError>> SetVariableAsync<T>(
+    public async ValueTask<Result<Unit, IError>> SetVariableAsync<T>(
         VariableName key,
         T variable,
         bool disposeOld,
@@ -185,7 +185,7 @@ public sealed class StateMonad : IStateMonad
     /// <summary>
     /// Removes the variable if it exists.
     /// </summary>
-    public async Task RemoveVariableAsync(VariableName key, bool dispose, IStep? callingStep)
+    public async ValueTask RemoveVariableAsync(VariableName key, bool dispose, IStep? callingStep)
     {
         if (Disposed)
             throw new ObjectDisposedException("State Monad was disposed");
@@ -203,7 +203,7 @@ public sealed class StateMonad : IStateMonad
     /// <inheritdoc />
     public Entity Settings { get; }
 
-    internal static async Task DisposeVariableAsync(object variable, IStateMonad stateMonad)
+    internal static async ValueTask DisposeVariableAsync(object variable, IStateMonad stateMonad)
     {
         if (variable is IStateDisposable stateDisposable)
             await stateDisposable.DisposeAsync(stateMonad);
@@ -239,5 +239,5 @@ public interface IStateDisposable
     /// Performs application defined functions associated with freeing resources
     /// </summary>
     /// <param name="state"></param>
-    Task DisposeAsync(IStateMonad state);
+    ValueTask DisposeAsync(IStateMonad state);
 }

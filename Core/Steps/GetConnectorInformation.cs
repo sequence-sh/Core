@@ -23,11 +23,12 @@
 public sealed class GetConnectorInformation : CompoundStep<Array<Entity>>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Array<Entity>, IError>> Run(
+    #pragma warning disable CS1998
+    protected override async ValueTask<Result<Array<Entity>, IError>> Run(
+        #pragma warning restore CS1998
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
         var entities = new List<Entity>();
 
         foreach (var (connectorSettings, _) in stateMonad.StepFactoryStore.ConnectorData)

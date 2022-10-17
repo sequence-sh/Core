@@ -16,7 +16,7 @@ public sealed class StringLength : CompoundStep<SCLInt>
     public IStep<StringStream> String { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<SCLInt, IError>> Run(
+    protected override async ValueTask<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

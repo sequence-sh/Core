@@ -14,14 +14,14 @@ public interface IStep : ISerializable
     /// Run this step and return the result, assuming it is the specified type.
     /// Does not activate the logging
     /// </summary>
-    Task<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken)
+    ValueTask<Result<T, IError>> Run<T>(IStateMonad stateMonad, CancellationToken cancellationToken)
         where T : ISCLObject;
 
     /// <summary>
     /// Run this step and return the result, assuming it is the specified type.
     /// Logs data about the step.
     /// </summary>
-    Task<Result<ISCLObject, IError>> RunUntyped(
+    ValueTask<Result<ISCLObject, IError>> RunUntyped(
         IStateMonad stateMonad,
         CancellationToken cancellationToken);
 
@@ -59,7 +59,7 @@ public interface IStep : ISerializable
     /// <summary>
     /// Get the value of this step if it is a constant
     /// </summary>
-    Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
         StepFactoryStore sfs);
 
@@ -124,5 +124,5 @@ public interface IRunnableStep<T>
     /// <summary>
     /// Run this step and return the result.
     /// </summary>
-    Task<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
+    ValueTask<Result<T, IError>> Run(IStateMonad stateMonad, CancellationToken cancellationToken);
 }

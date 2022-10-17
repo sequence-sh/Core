@@ -35,7 +35,7 @@ public sealed class For : CompoundStep<Unit>
     public IStep<SCLInt> Increment { get; set; } = new SCLConstant<SCLInt>(1.ConvertToSCLObject());
 
     /// <inheritdoc />
-    protected override async Task<Result<Unit, IError>> Run(
+    protected override async ValueTask<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

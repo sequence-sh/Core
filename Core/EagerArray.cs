@@ -15,16 +15,18 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     public override IAsyncEnumerable<T> GetAsyncEnumerable() => List.ToAsyncEnumerable();
 
     /// <inheritdoc />
-    public override async Task<Result<bool, IError>> AnyAsync(CancellationToken cancellation)
+    #pragma warning disable CS1998
+    public override async ValueTask<Result<bool, IError>> AnyAsync(CancellationToken cancellation)
+        #pragma warning restore CS1998
     {
-        await Task.CompletedTask;
         return List.Any();
     }
 
     /// <inheritdoc />
-    public override async Task<Result<int, IError>> CountAsync(CancellationToken cancellation)
+    #pragma warning disable CS1998
+    public override async ValueTask<Result<int, IError>> CountAsync(CancellationToken cancellation)
+        #pragma warning restore CS1998
     {
-        await Task.CompletedTask;
         return List.Count;
     }
 
@@ -54,15 +56,16 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override async Task<Result<EagerArray<T>, IError>> Evaluate(
+    #pragma warning disable CS1998
+    public override async ValueTask<Result<EagerArray<T>, IError>> Evaluate(
+        #pragma warning restore CS1998
         CancellationToken cancellation)
     {
-        await Task.CompletedTask;
         return this;
     }
 
     /// <inheritdoc />
-    public override async Task<Result<Unit, IError>> ForEach(
+    public override async ValueTask<Result<Unit, IError>> ForEach(
         Func<T, CancellationToken, ValueTask<Result<Unit, IError>>> func,
         CancellationToken cancellation)
     {
@@ -83,24 +86,25 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override async Task<Result<int, IError>> IndexOfAsync(
+    #pragma warning disable CS1998
+    public override async ValueTask<Result<int, IError>> IndexOfAsync(
+        #pragma warning restore CS1998
         T element,
         CancellationToken cancellation)
     {
-        await Task.CompletedTask;
         var index = List.ToList().IndexOf(element);
 
         return index;
     }
 
     /// <inheritdoc />
-    public override async Task<Result<T, IError>> ElementAtAsync(
+    #pragma warning disable CS1998
+    public override async ValueTask<Result<T, IError>> ElementAtAsync(
+        #pragma warning restore CS1998
         int index,
         ErrorLocation location,
         CancellationToken cancellation)
     {
-        await Task.CompletedTask;
-
         if (index < 0 || index >= List.Count)
             return new SingleError(location, ErrorCode.IndexOutOfBounds);
 
@@ -108,10 +112,11 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     }
 
     /// <inheritdoc />
-    public override async Task<Result<IReadOnlyList<T>, IError>> GetElementsAsync(
+    #pragma warning disable CS1998
+    public override async ValueTask<Result<IReadOnlyList<T>, IError>> GetElementsAsync(
+        #pragma warning restore CS1998
         CancellationToken cancellation)
     {
-        await Task.CompletedTask;
         return Result.Success<IReadOnlyList<T>, IError>(List);
     }
 
@@ -121,10 +126,11 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     bool IEquatable<Array<T>>.Equals(Array<T>? other) => Equals(this, other);
 
     /// <inheritdoc />
-    public override async Task<Result<IArray, IError>> EnsureEvaluated(
+    #pragma warning disable CS1998
+    public override async ValueTask<Result<IArray, IError>> EnsureEvaluated(
+        #pragma warning restore CS1998
         CancellationToken cancellation)
     {
-        await Task.CompletedTask;
         return this;
     }
 
@@ -153,7 +159,7 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     public override Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
     {
         return List
-            .Select(x => x.TryConvertTyped<TElement>("Element"))
+            .Select(x => x.TryConvertTyped<TElement>())
             .Combine(ErrorBuilderList.Combine)
             .Map(x => x.ToSCLArray());
     }

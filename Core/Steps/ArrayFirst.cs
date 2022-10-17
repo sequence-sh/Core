@@ -13,7 +13,7 @@
 public sealed class ArrayFirst<T> : CompoundStep<T> where T : ISCLObject
 {
     /// <inheritdoc />
-    protected override Task<Result<T, IError>> Run(
+    protected override ValueTask<Result<T, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

@@ -9,7 +9,7 @@ public record CreateEntityStep
     (IReadOnlyDictionary<EntityPropertyKey, IStep> Properties) : IStep<Entity>
 {
     /// <inheritdoc />
-    public async Task<Result<Entity, IError>> Run(
+    public async ValueTask<Result<Entity, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
@@ -30,7 +30,7 @@ public record CreateEntityStep
     }
 
     /// <inheritdoc />
-    public Task<Result<ISCLObject, IError>> RunUntyped(
+    public ValueTask<Result<ISCLObject, IError>> RunUntyped(
         IStateMonad stateMonad,
         CancellationToken cancellationToken) =>
         Run(stateMonad, cancellationToken).Map(x => x as ISCLObject);
@@ -39,7 +39,7 @@ public record CreateEntityStep
     public string Name => "Create Entity";
 
     /// <inheritdoc />
-    public async Task<Result<T, IError>> Run<T>(
+    public async ValueTask<Result<T, IError>> Run<T>(
         IStateMonad stateMonad,
         CancellationToken cancellationToken) where T : ISCLObject
     {
@@ -174,7 +174,7 @@ public record CreateEntityStep
 
     /// <inheritdoc />
     /// <inheritdoc />
-    public async Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public async ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
         StepFactoryStore sfs)
     {

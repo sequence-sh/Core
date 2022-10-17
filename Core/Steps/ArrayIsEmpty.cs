@@ -16,7 +16,7 @@ public sealed class ArrayIsEmpty<T> : CompoundStep<SCLBool> where T : ISCLObject
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<SCLBool, IError>> Run(
+    protected override async ValueTask<Result<SCLBool, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

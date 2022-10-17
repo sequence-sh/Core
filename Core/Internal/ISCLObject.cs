@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
+using Namotion.Reflection;
 using ISerializable = Reductech.Sequence.Core.Internal.Serialization.ISerializable;
 
 namespace Reductech.Sequence.Core.Internal;
@@ -20,7 +21,7 @@ public interface ISCLObject : ISerializable
     /// Tries to convert this SCL object to an SCL object of a different type
     /// </summary>
     [Pure]
-    public Result<ISCLObject, IErrorBuilder> TryConvert(Type type, string propertyName)
+    public Result<ISCLObject, IErrorBuilder> TryConvert(Type type)
     {
         if (type.IsInstanceOfType(this))
             return Result.Success<ISCLObject, IErrorBuilder>(this);
@@ -31,22 +32,22 @@ public interface ISCLObject : ISerializable
         )!;
 
         var generic = method.MakeGenericMethod(type);
-        var result  = generic.Invoke(this, new object?[] { propertyName });
+        var result  = generic.Invoke(this, null);
 
         return (Result<ISCLObject, IErrorBuilder>)result!;
     }
 
-    private Result<ISCLObject, IErrorBuilder> TryConvertTyped1<T>(string propertyName)
+    private Result<ISCLObject, IErrorBuilder> TryConvertTyped1<T>()
         where T : ISCLObject
     {
-        return TryConvertTyped<T>(propertyName).Map(x => x as ISCLObject);
+        return TryConvertTyped<T>().Map(x => x as ISCLObject);
     }
 
     /// <summary>
     /// Tries to convert this SCL object to an SCL object of a different type
     /// </summary>
     [Pure]
-    Result<T, IErrorBuilder> TryConvertTyped<T>(string propertyName) where T : ISCLObject
+    Result<T, IErrorBuilder> TryConvertTyped<T>() where T : ISCLObject
     {
         var r = MaybeAs<T>();
 
@@ -63,7 +64,7 @@ public interface ISCLObject : ISerializable
 
                 var createResult = (Maybe<T>)createMethod.Invoke(
                     null,
-                    new object?[] { propertyName, this }
+                    new object?[] { this }
                 )!;
 
                 if (createResult.HasValue)
@@ -73,7 +74,7 @@ public interface ISCLObject : ISerializable
             }
 
             return ErrorCode.InvalidCast.ToErrorBuilder(
-                propertyName,
+                typeof(T).GetDisplayName(),
                 Serialize(SerializeOptions.Name)
             );
         }

@@ -40,7 +40,7 @@ public partial class DeserializationErrorTests
 
             yield return new DeserializationErrorCase(
                 "- 'hello'\r\n- 'world'",
-                ("'InitialSteps[0]' cannot take the value 'hello'",
+                ("'Unit' cannot take the value 'hello'",
                  "hello - Line: 1, Col: 2, Idx: 2 - Line: 1, Col: 8, Idx: 8 Text: 'hello'")
             );
 

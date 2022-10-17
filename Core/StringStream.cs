@@ -37,9 +37,10 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
         public sealed record ConstantData(string Underlying) : StringStreamData
         {
             /// <inheritdoc />
+            #pragma warning disable CS1998
             public override async ValueTask<string> GetStringAsync()
+                #pragma warning restore CS1998
             {
-                await Task.CompletedTask;
                 return Underlying;
             }
 
@@ -168,7 +169,7 @@ public sealed class StringStream : IEquatable<StringStream>, IComparable<StringS
     /// <summary>
     /// If this is a string, return the string, otherwise read the stream as a string.
     /// </summary>
-    public async Task<string> GetStringAsync()
+    public async ValueTask<string> GetStringAsync()
     {
         if (Value is StringStreamData.ConstantData cd)
             return cd.Underlying;

@@ -19,12 +19,12 @@ public abstract record Array<T> : IArray where T : ISCLObject
     /// <summary>
     /// Does this list contain any elements
     /// </summary>
-    public abstract Task<Result<bool, IError>> AnyAsync(CancellationToken cancellation);
+    public abstract ValueTask<Result<bool, IError>> AnyAsync(CancellationToken cancellation);
 
     /// <summary>
     /// Returns the number of elements in the list
     /// </summary>
-    public abstract Task<Result<int, IError>> CountAsync(CancellationToken cancellation);
+    public abstract ValueTask<Result<int, IError>> CountAsync(CancellationToken cancellation);
 
     /// <summary>
     /// Change the order of elements of the array
@@ -44,7 +44,8 @@ public abstract record Array<T> : IArray where T : ISCLObject
     /// <summary>
     /// Evaluate the array - reading the results to memory
     /// </summary>
-    public abstract Task<Result<EagerArray<T>, IError>> Evaluate(CancellationToken cancellation);
+    public abstract ValueTask<Result<EagerArray<T>, IError>> Evaluate(
+        CancellationToken cancellation);
 
     /// <summary>
     /// Change the ordering of the Array
@@ -65,7 +66,7 @@ public abstract record Array<T> : IArray where T : ISCLObject
     /// <summary>
     /// Apply a function for each element of the sequence
     /// </summary>
-    public abstract Task<Result<Unit, IError>> ForEach(
+    public abstract ValueTask<Result<Unit, IError>> ForEach(
         Func<T, CancellationToken, ValueTask<Result<Unit, IError>>> func,
         CancellationToken cancellation);
 
@@ -129,14 +130,14 @@ public abstract record Array<T> : IArray where T : ISCLObject
     /// <summary>
     /// Get the first index of an element
     /// </summary>
-    public abstract Task<Result<int, IError>> IndexOfAsync(
+    public abstract ValueTask<Result<int, IError>> IndexOfAsync(
         T element,
         CancellationToken cancellation);
 
     /// <summary>
     /// Try to get the element at a particular index
     /// </summary>
-    public abstract Task<Result<T, IError>> ElementAtAsync(
+    public abstract ValueTask<Result<T, IError>> ElementAtAsync(
         int index,
         ErrorLocation location,
         CancellationToken cancellation);
@@ -144,11 +145,12 @@ public abstract record Array<T> : IArray where T : ISCLObject
     /// <summary>
     /// Gets the elements from the list asynchronously
     /// </summary>
-    public abstract Task<Result<IReadOnlyList<T>, IError>> GetElementsAsync(
+    public abstract ValueTask<Result<IReadOnlyList<T>, IError>> GetElementsAsync(
         CancellationToken cancellation);
 
     /// <inheritdoc />
-    public Task<Result<List<ISCLObject>, IError>> GetObjectsAsync(CancellationToken cancellation)
+    public ValueTask<Result<List<ISCLObject>, IError>> GetObjectsAsync(
+        CancellationToken cancellation)
     {
         return GetElementsAsync(cancellation).Map(x => x.Cast<ISCLObject>().ToList());
     }
@@ -165,7 +167,8 @@ public abstract record Array<T> : IArray where T : ISCLObject
         where TElement : ISCLObject;
 
     /// <inheritdoc />
-    public abstract Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
+    public abstract ValueTask<Result<IArray, IError>> EnsureEvaluated(
+        CancellationToken cancellation);
 
     /// <inheritdoc />
     public abstract bool IsEvaluated { get; }
@@ -315,7 +318,7 @@ public interface IArray : ISCLObject
     /// <summary>
     /// Try to get the elements of this list, as objects asynchronously.
     /// </summary>
-    Task<Result<List<ISCLObject>, IError>> GetObjectsAsync(CancellationToken cancellation);
+    ValueTask<Result<List<ISCLObject>, IError>> GetObjectsAsync(CancellationToken cancellation);
 
     /// <summary>
     /// Attempts to convert the elements of the array to the chosen type
@@ -327,7 +330,7 @@ public interface IArray : ISCLObject
     /// Ensure that this array is evaluated
     /// </summary>
     [Pure]
-    Task<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
+    ValueTask<Result<IArray, IError>> EnsureEvaluated(CancellationToken cancellation);
 
     /// <summary>
     /// Whether this array is evaluated

@@ -16,7 +16,7 @@
 public sealed class ArrayDistinct<T> : CompoundStep<Array<T>> where T : ISCLObject
 {
     /// <inheritdoc />
-    protected override async Task<Result<Array<T>, IError>> Run(
+    protected override async ValueTask<Result<Array<T>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

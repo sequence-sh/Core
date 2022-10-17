@@ -17,7 +17,7 @@ public sealed class StringToInt : CompoundStep<SCLInt>
     public IStep<StringStream> Integer { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<SCLInt, IError>> Run(
+    protected override async ValueTask<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

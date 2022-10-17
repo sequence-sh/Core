@@ -8,19 +8,19 @@ namespace Reductech.Sequence.Core.Steps;
 public sealed class GetApplicationVersion : CompoundStep<StringStream>
 {
     /// <inheritdoc />
-    protected override async Task<Result<StringStream, IError>> Run(
+    #pragma warning disable CS1998
+    protected override async ValueTask<Result<StringStream, IError>> Run(
+        #pragma warning restore CS1998
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
-
         var entryAssembly = Assembly.GetEntryAssembly();
 
         if (entryAssembly is null)
             return new StringStream("Unknown Version");
 
-        FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
-        string          version         = fileVersionInfo.ProductVersion!;
+        var fileVersionInfo = FileVersionInfo.GetVersionInfo(entryAssembly.Location);
+        var version         = fileVersionInfo.ProductVersion!;
 
         var name = entryAssembly.GetName().Name;
 

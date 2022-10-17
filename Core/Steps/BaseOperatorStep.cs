@@ -21,7 +21,7 @@ public abstract class BaseOperatorStep<TStep, TElement, TOutput> : CompoundStep<
     public override IStepFactory StepFactory { get; } = ChainInfixStepFactory.Instance;
 
     /// <inheritdoc />
-    protected override async Task<Result<TOutput, IError>> Run(
+    protected override async ValueTask<Result<TOutput, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

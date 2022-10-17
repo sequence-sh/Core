@@ -26,7 +26,7 @@ public sealed class ForEach<T> : CompoundStep<Unit> where T : ISCLObject
     public LambdaFunction<T, Unit> Action { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<Unit, IError>> Run(
+    protected override async ValueTask<Result<Unit, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

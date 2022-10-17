@@ -27,7 +27,7 @@ public sealed class CharAtIndex : CompoundStep<StringStream>
     public IStep<SCLInt> Index { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<StringStream, IError>> Run(
+    protected override async ValueTask<Result<StringStream, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

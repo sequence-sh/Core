@@ -23,7 +23,7 @@ public sealed class StringSplit : CompoundStep<Array<StringStream>>
     public IStep<StringStream> Delimiter { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<Array<StringStream>, IError>> Run(
+    protected override async ValueTask<Result<Array<StringStream>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

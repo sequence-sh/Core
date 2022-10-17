@@ -39,7 +39,7 @@ public partial class RunErrorTests
                     },
                     FinalStep = new DoNothing()
                 },
-                new ErrorBuilder(ErrorCode.InvalidCast, "<Foo>", 42)
+                new ErrorBuilder(ErrorCode.InvalidCast, nameof(SCLBool), 42)
                     .WithLocation(new GetVariable<SCLBool> { Variable = FooString })
             );
 

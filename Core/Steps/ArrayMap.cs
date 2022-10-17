@@ -25,7 +25,7 @@ public sealed class ArrayMap<TIn, TOut> : CompoundStep<Array<TOut>>
     where TOut : ISCLObject
 {
     /// <inheritdoc />
-    protected override async Task<Result<Array<TOut>, IError>> Run(
+    protected override async ValueTask<Result<Array<TOut>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

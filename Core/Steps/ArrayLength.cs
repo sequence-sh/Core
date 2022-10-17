@@ -18,7 +18,7 @@ public sealed class ArrayLength<T> : CompoundStep<SCLInt> where T : ISCLObject
     public IStep<Array<T>> Array { get; set; } = null!;
 
     /// <inheritdoc />
-    protected override async Task<Result<SCLInt, IError>> Run(
+    protected override async ValueTask<Result<SCLInt, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

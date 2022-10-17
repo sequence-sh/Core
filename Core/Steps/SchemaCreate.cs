@@ -24,7 +24,7 @@
 public sealed class SchemaCreate : CompoundStep<Entity>
 {
     /// <inheritdoc />
-    protected override async Task<Result<Entity, IError>> Run(
+    protected override async ValueTask<Result<Entity, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

@@ -6,16 +6,17 @@
 public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T : ISCLObject
 {
     /// <inheritdoc />
-    public async Task<Result<T, IError>> Run(
+    #pragma warning disable CS1998
+    public async ValueTask<Result<T, IError>> Run(
+        #pragma warning restore CS1998
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        await Task.CompletedTask;
         return Value;
     }
 
     /// <inheritdoc />
-    public Task<Result<ISCLObject, IError>> RunUntyped(
+    public ValueTask<Result<ISCLObject, IError>> RunUntyped(
         IStateMonad stateMonad,
         CancellationToken cancellationToken) =>
         Run(stateMonad, cancellationToken).Map(x => x as ISCLObject);
@@ -24,13 +25,13 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     public string Name => Value.Serialize(SerializeOptions.Primitive);
 
     /// <inheritdoc />
-    public async Task<Result<T1, IError>> Run<T1>(
+    #pragma warning disable CS1998
+    public async ValueTask<Result<T1, IError>> Run<T1>(
+        #pragma warning restore CS1998
         IStateMonad stateMonad,
         CancellationToken cancellationToken) where T1 : ISCLObject
     {
-        await Task.CompletedTask;
-
-        var r = Value.TryConvertTyped<T1>("Step")
+        var r = Value.TryConvertTyped<T1>()
             .MapError(x => x.WithLocation(this));
 
         return r;
@@ -80,7 +81,7 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
         if (typeof(T) == memberType)
             return this;
 
-        var convertedValue = Value.TryConvert(memberType, propertyName);
+        var convertedValue = Value.TryConvert(memberType);
 
         if (convertedValue.IsFailure)
             return convertedValue.ConvertFailure<IStep>();
@@ -101,9 +102,9 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
     }
 
     /// <inheritdoc />
-    public Task<Maybe<ISCLObject>> TryGetConstantValueAsync(
+    public ValueTask<Maybe<ISCLObject>> TryGetConstantValueAsync(
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
-        StepFactoryStore sfs) => Task.FromResult(Maybe<ISCLObject>.From(Value));
+        StepFactoryStore sfs) => ValueTask.FromResult(Maybe<ISCLObject>.From(Value));
 
     /// <inheritdoc />
     public IEnumerable<(IStep Step, IStepParameter Parameter, IStep Value)> GetParameterValues()

@@ -8,7 +8,7 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3), IError>> RunStepsAsync<T1, T2, T3>(
+    public static async ValueTask<Result<(T1, T2, T3), IError>> RunStepsAsync<T1, T2, T3>(
         this IStateMonad stateMonad,
         IRunnableStep<T1> s1,
         IRunnableStep<T2> s2,
@@ -33,7 +33,7 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3, T4), IError>> RunStepsAsync<T1, T2, T3, T4>(
+    public static async ValueTask<Result<(T1, T2, T3, T4), IError>> RunStepsAsync<T1, T2, T3, T4>(
         this IStateMonad stateMonad,
         IRunnableStep<T1> s1,
         IRunnableStep<T2> s2,
@@ -59,7 +59,7 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3, T4, T5), IError>>
+    public static async ValueTask<Result<(T1, T2, T3, T4, T5), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -87,7 +87,7 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3, T4, T5, T6), IError>>
+    public static async ValueTask<Result<(T1, T2, T3, T4, T5, T6), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -118,7 +118,7 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3, T4, T5, T6, T7), IError>>
+    public static async ValueTask<Result<(T1, T2, T3, T4, T5, T6, T7), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -150,7 +150,7 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8), IError>>
+    public static async ValueTask<Result<(T1, T2, T3, T4, T5, T6, T7, T8), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -183,7 +183,7 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9), IError>>
+    public static async ValueTask<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -217,7 +217,7 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10), IError>>
+    public static async ValueTask<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -264,7 +264,7 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11), IError>>
+    public static async ValueTask<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -314,7 +314,8 @@ public static partial class StepHelpers
     /// Evaluates steps and combines their results
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
-    public static async Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12), IError>>
+    public static async
+        ValueTask<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -367,7 +368,7 @@ public static partial class StepHelpers
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
     public static async
-        Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13), IError>>
+        ValueTask<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -422,7 +423,7 @@ public static partial class StepHelpers
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
     public static async
-        Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14), IError>>
+        ValueTask<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -481,7 +482,8 @@ public static partial class StepHelpers
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
     public static async
-        Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15), IError>>
+        ValueTask<
+            Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15), IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>(
             this IStateMonad stateMonad,
             IRunnableStep<T1> s1,
@@ -544,7 +546,7 @@ public static partial class StepHelpers
     /// </summary>
     [GeneratedCode("CreateStepHelpers", "1")]
     public static async
-        Task<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16),
+        ValueTask<Result<(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16),
             IError>>
         RunStepsAsync<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>(
             this IStateMonad stateMonad,

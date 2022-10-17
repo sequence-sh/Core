@@ -59,7 +59,7 @@ public sealed class ArraySort<T> : CompoundStep<Array<T>> where T : ISCLObject
         new OneOfStep<SCLBool, SCLEnum<SortOrder>>(new SCLConstant<SCLBool>(SCLBool.False));
 
     /// <inheritdoc />
-    protected override async Task<Result<Array<T>, IError>> Run(
+    protected override async ValueTask<Result<Array<T>, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

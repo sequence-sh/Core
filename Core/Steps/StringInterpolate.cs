@@ -16,7 +16,7 @@ namespace Reductech.Sequence.Core.Steps;
 public sealed class StringInterpolate : CompoundStep<StringStream>
 {
     /// <inheritdoc />
-    protected override async Task<Result<StringStream, IError>> Run(
+    protected override async ValueTask<Result<StringStream, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {

@@ -11,7 +11,7 @@ public static class ConnectorManagerExtensions
     /// <summary>
     /// Creates an external context from a connector manager
     /// </summary>
-    public static async Task<Result<IExternalContext, IErrorBuilder>> GetExternalContextAsync(
+    public static async ValueTask<Result<IExternalContext, IErrorBuilder>> GetExternalContextAsync(
         this IConnectorManager connectorManager,
         IExternalProcessRunner externalProcessRunner,
         IRestClientFactory restClientFactory,
@@ -52,7 +52,7 @@ public static class ConnectorManagerExtensions
     /// <summary>
     /// Gets a StepFactory store from a connector manager
     /// </summary>
-    public static async Task<Result<StepFactoryStore, IErrorBuilder>> GetStepFactoryStoreAsync(
+    public static async ValueTask<Result<StepFactoryStore, IErrorBuilder>> GetStepFactoryStoreAsync(
         this IConnectorManager connectorManager,
         IExternalContext externalContext,
         CancellationToken ct = default,
