@@ -31,7 +31,7 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
         IStateMonad stateMonad,
         CancellationToken cancellationToken) where T1 : ISCLObject
     {
-        var r = Value.TryConvertTyped<T1>("Step")
+        var r = Value.TryConvertTyped<T1>()
             .MapError(x => x.WithLocation(this));
 
         return r;
@@ -81,7 +81,7 @@ public sealed record SCLConstant<T>(T Value) : IStep<T>, IConstantStep where T :
         if (typeof(T) == memberType)
             return this;
 
-        var convertedValue = Value.TryConvert(memberType, propertyName);
+        var convertedValue = Value.TryConvert(memberType);
 
         if (convertedValue.IsFailure)
             return convertedValue.ConvertFailure<IStep>();

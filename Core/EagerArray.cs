@@ -159,7 +159,7 @@ public sealed record EagerArray<T>(IReadOnlyList<T> List) : Array<T>, IEquatable
     public override Result<Array<TElement>, IErrorBuilder> TryConvertElements<TElement>()
     {
         return List
-            .Select(x => x.TryConvertTyped<TElement>("Element"))
+            .Select(x => x.TryConvertTyped<TElement>())
             .Combine(ErrorBuilderList.Combine)
             .Map(x => x.ToSCLArray());
     }

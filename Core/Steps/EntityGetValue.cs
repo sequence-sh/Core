@@ -1,6 +1,4 @@
-﻿using Namotion.Reflection;
-
-namespace Reductech.Sequence.Core.Steps;
+﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
 /// Gets the value of a property from an entity
@@ -61,18 +59,18 @@ public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
             return ISCLObject.GetDefaultValue<T1>();
 
         var result = entityValue.GetValueOrThrow()
-            .TryConvertTyped<T1>(typeof(T1).GetDisplayName())
+            .TryConvertTyped<T1>()
             .MapError(x => x.WithLocation(this));
 
         if (result.IsFailure)
         {
-            //Special case - allow conversion to stringstream
+            //Special case - allow conversion to StringStream
             var ss = new StringStream(
                 entityValue.GetValueOrThrow().Serialize(SerializeOptions.Serialize)
             );
 
-            if (ss is T1 t1ss)
-                return t1ss;
+            if (ss is T1 t1StringStream)
+                return t1StringStream;
         }
 
         return result;

@@ -23,7 +23,7 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
         IStateMonad stateMonad,
         CancellationToken cancellationToken) where T : ISCLObject
     {
-        var r = (SCLNull.Instance as ISCLObject).TryConvertTyped<T>("Step")
+        var r = (SCLNull.Instance as ISCLObject).TryConvertTyped<T>()
             .MapError(x => x.WithLocation(TextLocation ?? ErrorLocation.EmptyLocation));
 
         return r;

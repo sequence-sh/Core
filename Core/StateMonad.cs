@@ -105,7 +105,7 @@ public sealed class StateMonad : IStateMonad
         if (!dictionary.TryGetValue(key, out var value))
             return Maybe<T>.None;
 
-        var result = value.TryConvertTyped<T>(key.Serialize(SerializeOptions.Serialize));
+        var result = value.TryConvertTyped<T>();
 
         if (result.IsSuccess)
             return Maybe<T>.From(result.Value);

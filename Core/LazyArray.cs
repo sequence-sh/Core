@@ -194,7 +194,7 @@ public sealed record LazyArray<T>
     {
         var stuff =
             GetAsyncEnumerable()
-                .Select(x => x.TryConvertTyped<TElement>("Element"))
+                .Select(x => x.TryConvertTyped<TElement>())
                 .Select(
                     x => x.IsFailure
                         ? throw new ErrorException(
