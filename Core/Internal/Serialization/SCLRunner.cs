@@ -48,6 +48,11 @@ public sealed class SCLRunner
     }
 
     /// <summary>
+    /// Whether to Optimize the SCL that is run
+    /// </summary>
+    public bool OptimizeSCL { get; set; } = true;
+
+    /// <summary>
     /// The name of the RunId log property.
     /// </summary>
     public const string RunIdName = "RunId";
@@ -85,7 +90,7 @@ public sealed class SCLRunner
         CancellationToken cancellationToken,
         IReadOnlyDictionary<VariableName, InjectedVariable>? variablesToInject = null)
     {
-        var settings = new OptimizationSettings(true, true, variablesToInject);
+        var settings = new OptimizationSettings(OptimizeSCL, OptimizeSCL, variablesToInject);
 
         var stepResult = SCLParsing.TryParseStep(text)
             .Bind(x => x.TryFreeze(RootCallerMetadata, _stepFactoryStore, settings))

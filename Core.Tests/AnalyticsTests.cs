@@ -19,7 +19,7 @@ public partial class AnalyticsTests
             multiLogger,
             sfs,
             mockRepo.OneOf<IExternalContext>()
-        );
+        ) { OptimizeSCL = false };
 
         var scl = "- <a> = 2 + 2\r\n- <b> = 3 + 4\r\n- [1,2,3] | Foreach (<>=> <b> = <> + <b>)";
 
@@ -59,7 +59,7 @@ public partial class AnalyticsTests
             multiLogger,
             sfs,
             mockRepo.OneOf<IExternalContext>()
-        );
+        ) { OptimizeSCL = false };
 
         var scl = "- <a> = 2 / 0";
 

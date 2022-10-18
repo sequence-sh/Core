@@ -170,7 +170,7 @@ public partial class LoggingTests
                 logger,
                 spf,
                 context
-            );
+            ) { OptimizeSCL = false };
 
             var r = await sclRunner.RunSequenceFromTextAsync(
                 SCL,
