@@ -18,7 +18,10 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     /// <summary>
     /// Try to freeze this step.
     /// </summary>
-    Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver);
+    Result<IStep, IError> TryFreeze(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver,
+        OptimizationSettings settings);
 
     /// <summary>
     /// Check that freezing this step is at least possible
@@ -54,7 +57,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         StepFactoryStore stepFactoryStore,
-        IReadOnlyDictionary<VariableName, InjectedVariable>? variablesToInject = null)
+        OptimizationSettings optimizationSettings)
     {
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if (stepFactoryStore is null) //This was happening in some situations. Possibly a race condition with the connector manager
@@ -65,13 +68,15 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
 
         var thisReorganized = ReorganizeNamedArguments(stepFactoryStore);
 
+        //var variables = optimizationSettings.InjectedVariables.GetValueOrDefault();
+
         var typeResolver = TypeResolver
             .TryCreate(
                 stepFactoryStore,
                 callerMetadata,
                 Maybe<VariableName>.None,
                 thisReorganized,
-                variablesToInject
+                optimizationSettings.InjectedVariables
             );
 
         if (typeResolver.IsFailure)
@@ -83,7 +88,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
                 .Value
                 .GroupBy(x => x.VariableName)
                 .Where(x => !x.Any(v => v.WasSet))
-                .Where(x => variablesToInject is null || !variablesToInject.ContainsKey(x.Key))
+                .Where(x => !optimizationSettings.InjectedVariables.ContainsKey(x.Key))
                 .SelectMany(
                     group =>
                         group.Select(
@@ -100,7 +105,11 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
         if (unsetVariableErrors.Any())
             return Result.Failure<IStep, IError>(ErrorList.Combine(unsetVariableErrors));
 
-        var freezeResult = thisReorganized.TryFreeze(callerMetadata, typeResolver.Value);
+        var freezeResult = thisReorganized.TryFreeze(
+            callerMetadata,
+            typeResolver.Value,
+            optimizationSettings
+        );
 
         return freezeResult;
     }

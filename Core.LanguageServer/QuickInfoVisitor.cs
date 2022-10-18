@@ -387,9 +387,11 @@ public class QuickInfoVisitor : SCLBaseVisitor<QuickInfoResponse?>
 
         var callerMetadata = new CallerMetadata("Step", "Parameter", TypeReference.Any.Instance);
 
-        Result<IStep, IError> freezeResult;
-
-        freezeResult = step.Value.TryFreeze(callerMetadata, LazyTypeResolver.Value);
+        var freezeResult = step.Value.TryFreeze(
+            callerMetadata,
+            LazyTypeResolver.Value,
+            OptimizationSettings.None
+        );
 
         if (freezeResult.IsFailure)
             return Error(freezeResult.Error.AsString);

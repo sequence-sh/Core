@@ -28,7 +28,7 @@ public partial class ExampleTests
         var sfs = StepFactoryStore.Create();
 
         var stepResult = SCLParsing.TryParseStep(scl)
-            .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, sfs));
+            .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, sfs, OptimizationSettings.None));
 
         if (stepResult.IsFailure)
             throw new XunitException(

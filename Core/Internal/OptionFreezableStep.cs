@@ -17,14 +17,17 @@ public sealed record OptionFreezableStep(
         other is OptionFreezableStep ofs && Options.SequenceEqual(ofs.Options);
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IStep, IError> TryFreeze(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver,
+        OptimizationSettings settings)
     {
         var optionErrors = new List<(IFreezableStep step, IError error)>();
 
         foreach (var freezableStep in Options)
             //Go through the options - use the first successful option or the first error
         {
-            var r = freezableStep.TryFreeze(callerMetadata, typeResolver);
+            var r = freezableStep.TryFreeze(callerMetadata, typeResolver, settings);
 
             if (r.IsSuccess)
                 return r;
@@ -39,7 +42,8 @@ public sealed record OptionFreezableStep(
         {
             var r = step.TryFreeze(
                 callerMetadata with { ExpectedType = TypeReference.Any.Instance },
-                typeResolver
+                typeResolver,
+                settings
             );
 
             if (
@@ -184,7 +188,11 @@ public sealed record OptionFreezableStep(
 
             if (r.IsSuccess)
             {
-                var freezeResult = freezableStep.TryFreeze(callerMetadata, typeResolver);
+                var freezeResult = freezableStep.TryFreeze(
+                    callerMetadata,
+                    typeResolver,
+                    OptimizationSettings.None
+                );
 
                 if (freezeResult.IsSuccess)
                     return r;

@@ -108,7 +108,8 @@ public abstract partial class StepTestBase<TStep, TOutput>
 
             var freezeResult = deserializeResult.Value.TryFreeze(
                 SCLRunner.RootCallerMetadata,
-                sfs
+                sfs,
+                OptimizationSettings.None
             );
 
             freezeResult.ShouldBeSuccessful();

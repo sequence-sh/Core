@@ -20,7 +20,10 @@ public sealed record EnumConstantFreezable(
     public string StepName => $"{EnumType}.{EnumValue}";
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IStep, IError> TryFreeze(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver,
+        OptimizationSettings settings)
     {
         var convertResult = TryConvert(typeResolver.StepFactoryStore);
 
@@ -39,7 +42,7 @@ public sealed record EnumConstantFreezable(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver)
     {
-        return TryFreeze(callerMetadata, typeResolver);
+        return TryFreeze(callerMetadata, typeResolver, OptimizationSettings.None);
     }
 
     /// <inheritdoc />

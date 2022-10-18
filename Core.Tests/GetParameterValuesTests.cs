@@ -20,7 +20,7 @@ public class GetParameterValuesTests
 
         var parseResult = SCLParsing
             .TryParseStep(text)
-            .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, sfs));
+            .Bind(x => x.TryFreeze(SCLRunner.RootCallerMetadata, sfs, OptimizationSettings.None));
 
         parseResult.ShouldBeSuccessful();
 

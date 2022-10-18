@@ -98,7 +98,8 @@ public class EntityConversionTests
                             nameof(Entity),
                             TypeReference.Entity.NoSchema
                         ),
-                        sfs
+                        sfs,
+                        OptimizationSettings.None
                     )
                 )
                 .Map(

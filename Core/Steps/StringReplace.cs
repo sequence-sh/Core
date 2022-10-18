@@ -23,25 +23,56 @@ namespace Reductech.Sequence.Core.Steps;
 )]
 [Alias("RegexReplace")]
 [AllowConstantFolding]
-public sealed class StringReplace : CompoundStep<StringStream>
+public sealed class StringReplace : CompoundStep<StringStream>, ICompoundStep
 {
     /// <inheritdoc />
     protected override async ValueTask<Result<StringStream, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var dataResult = await stateMonad.RunStepsAsync(
-            String.WrapStringStream(),
-            Pattern.WrapStringStream(),
-            Replace.WrapNullable(StepMaps.String()),
-            IgnoreCase,
-            cancellationToken
-        );
+        var inputResult = await String.WrapStringStream().Run(stateMonad, cancellationToken);
 
-        if (dataResult.IsFailure)
-            return dataResult.ConvertFailure<StringStream>();
+        if (inputResult.IsFailure)
+            return inputResult.ConvertFailure<StringStream>();
 
-        var (input, pattern, replace, ignoreCase) = dataResult.Value;
+        var input = inputResult.Value;
+
+        Regex patternRegex;
+
+        if (_compiledPatternRegex is not null)
+        {
+            patternRegex = _compiledPatternRegex;
+        }
+        else
+        {
+            var dataResult = await stateMonad.RunStepsAsync(
+                Pattern.WrapStringStream(),
+                IgnoreCase,
+                cancellationToken
+            );
+
+            if (dataResult.IsFailure)
+                return dataResult.ConvertFailure<StringStream>();
+
+            var (pattern, ignoreCase) = dataResult.Value;
+
+            var regexOptions = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
+            patternRegex = new Regex(pattern, regexOptions);
+        }
+
+        if (_simpleReplacementString is not null) //optimized happy path
+        {
+            var result = patternRegex.Replace(input, _simpleReplacementString);
+            return new StringStream(result);
+        }
+
+        var replaceResult = await Replace.WrapNullable(StepMaps.String())
+            .Run(stateMonad, cancellationToken);
+
+        if (replaceResult.IsFailure)
+            return replaceResult.ConvertFailure<StringStream>();
+
+        var replace = replaceResult.Value;
 
         if (replace.HasNoValue && Function is null)
         {
@@ -52,18 +83,25 @@ public sealed class StringReplace : CompoundStep<StringStream>
             );
         }
 
-        var currentState = stateMonad.GetState().ToImmutableDictionary();
+        if (replace.HasValue && Function is not null)
+        {
+            return new SingleError(
+                new ErrorLocation(this),
+                ErrorCode.ConflictingParameters,
+                nameof(Replace),
+                nameof(Function)
+            );
+        }
 
-        var regexOptions = RegexOptions.None;
+        var currentState =
+            new Lazy<ImmutableDictionary<VariableName, ISCLObject>>(
+                () => stateMonad.GetState().ToImmutableDictionary()
+            );
 
-        if (ignoreCase.Value)
-            regexOptions |= RegexOptions.IgnoreCase;
-
-        var regex     = new Regex(pattern, regexOptions);
         var sb        = new StringBuilder();
         var lastIndex = 0;
 
-        foreach (Match match in regex.Matches(input))
+        foreach (Match match in patternRegex.Matches(input))
         {
             sb.Append(input, lastIndex, match.Index - lastIndex);
 
@@ -73,7 +111,7 @@ public sealed class StringReplace : CompoundStep<StringStream>
             {
                 await using var scopedMonad = new ScopedStateMonad(
                     stateMonad,
-                    currentState,
+                    currentState.Value,
                     Function.VariableNameOrItem,
                     new KeyValuePair<VariableName, ISCLObject>(
                         Function.VariableNameOrItem,
@@ -175,7 +213,74 @@ public sealed class StringReplace : CompoundStep<StringStream>
     /// <summary>
     /// Regex for matching regex groups
     /// </summary>
-    private static readonly Regex GroupsRegex = new("\\$(?<number>\\d)");
+    private static readonly Regex GroupsRegex = new("\\$(?<number>\\d)", RegexOptions.Compiled);
+
+    private string? _simpleReplacementString;
+    private Regex? _compiledPatternRegex;
+
+    void ICompoundStep.ApplyOptimizations(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables)
+    {
+        var variableValues = new Lazy<IReadOnlyDictionary<VariableName, ISCLObject>>(
+            () => injectedVariables.ToDictionary(x => x.Key, x => x.Value.SCLObject)
+        );
+
+        if (Replace is not null && Replace.HasConstantValue(injectedVariables.Keys))
+        {
+            var cvTask = Replace.TryGetConstantValueAsync(
+                variableValues.Value,
+                sfs
+            );
+
+            if (cvTask.IsCompleted)
+            {
+                var cvTaskString = cvTask.Result.Bind(x => x.MaybeAs<StringStream>())
+                    .Map(x => x.GetString());
+
+                if (cvTaskString.HasValue && !GroupsRegex.IsMatch(cvTaskString.Value))
+                {
+                    _simpleReplacementString = cvTaskString.Value;
+                }
+            }
+        }
+
+        if (Pattern.HasConstantValue(injectedVariables.Keys)
+         && IgnoreCase.HasConstantValue(injectedVariables.Keys))
+        {
+            var patternTask = Pattern.TryGetConstantValueAsync(
+                variableValues.Value,
+                sfs
+            );
+
+            var ignoreCaseTask = IgnoreCase.TryGetConstantValueAsync(
+                variableValues.Value,
+                sfs
+            );
+
+            if (patternTask.IsCompleted && ignoreCaseTask.IsCompleted)
+            {
+                var ignoreCase = ignoreCaseTask.Result.Bind(x => x.MaybeAs<SCLBool>())
+                    .Map(x => x.Value);
+
+                if (ignoreCase.HasValue)
+                {
+                    var patternString = patternTask.Result.Bind(x => x.MaybeAs<StringStream>())
+                        .Map(x => x.GetString());
+
+                    if (patternString.HasValue)
+                    {
+                        var options = ignoreCase.Value
+                            ? RegexOptions.IgnoreCase | RegexOptions.Compiled
+                            : RegexOptions.None | RegexOptions.Compiled;
+
+                        var patternRegex = new Regex(patternString.Value, options);
+                        _compiledPatternRegex = patternRegex;
+                    }
+                }
+            }
+        }
+    }
 
     /// <inheritdoc />
     public override Result<Unit, IError> VerifyThis(StepFactoryStore stepFactoryStore)

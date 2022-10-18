@@ -9,6 +9,14 @@ public interface ICompoundStep : IStep
     /// The factory used to create steps of this type.
     /// </summary>
     IStepFactory StepFactory { get; }
+
+    /// <summary>
+    /// Apply step level optimizations such as compiling regular expressions.
+    /// By default, does nothing
+    /// </summary>
+    void ApplyOptimizations(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables) { }
 }
 
 /// <summary>

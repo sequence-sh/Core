@@ -116,7 +116,8 @@ public abstract class StepFactory : IStepFactory
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver,
-        FreezableStepData freezeData)
+        FreezableStepData freezeData,
+        OptimizationSettings settings)
     {
         var instanceResult = TryCreateInstance(callerMetadata, freezeData, typeResolver);
 
@@ -180,25 +181,29 @@ public abstract class StepFactory : IStepFactory
                     step,
                     vn.VName,
                     stepMember.Location,
-                    typeResolver
+                    typeResolver,
+                    settings
                 ),
                 FreezableStepProperty.Step memberStep => TrySetStep(
                     propertyInfo,
                     step,
                     memberStep.FreezableStep,
-                    typeResolver
+                    typeResolver,
+                    settings
                 ),
                 FreezableStepProperty.StepList sList => TrySetStepList(
                     propertyInfo,
                     step,
                     sList,
-                    typeResolver
+                    typeResolver,
+                    settings
                 ),
                 FreezableStepProperty.Lambda lambda => TrySetLambda(
                     propertyInfo,
                     step,
                     lambda,
-                    typeResolver
+                    typeResolver,
+                    settings
                 ),
 
                 _ => throw new ArgumentException("Step member wrong type"),
@@ -393,7 +398,8 @@ public abstract class StepFactory : IStepFactory
         ICompoundStep parentStep,
         VariableName variableName,
         TextLocation stepMemberLocation,
-        TypeResolver typeResolver)
+        TypeResolver typeResolver,
+        OptimizationSettings optimizationSettings)
     {
         if (propertyInfo.PropertyType.IsInstanceOfType(variableName))
         {
@@ -403,14 +409,15 @@ public abstract class StepFactory : IStepFactory
 
         var step = FreezableFactory.CreateFreezableGetVariable(variableName, stepMemberLocation);
 
-        return TrySetStep(propertyInfo, parentStep, step, typeResolver);
+        return TrySetStep(propertyInfo, parentStep, step, typeResolver, optimizationSettings);
     }
 
     private static Result<Unit, IError> TrySetLambda(
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         FreezableStepProperty.Lambda lambda,
-        TypeResolver typeResolver)
+        TypeResolver typeResolver,
+        OptimizationSettings optimizationSettings)
     {
         var typeToSet = propertyInfo.PropertyType;
 
@@ -443,7 +450,11 @@ public abstract class StepFactory : IStepFactory
         if (typeResolverResult.IsFailure)
             return typeResolverResult.ConvertFailure<Unit>();
 
-        var frozenStep = lambda.FreezableStep.TryFreeze(callerMetadata, typeResolverResult.Value);
+        var frozenStep = lambda.FreezableStep.TryFreeze(
+            callerMetadata,
+            typeResolverResult.Value,
+            optimizationSettings
+        );
 
         if (frozenStep.IsFailure)
             return frozenStep.ConvertFailure<Unit>();
@@ -473,7 +484,8 @@ public abstract class StepFactory : IStepFactory
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         IFreezableStep freezableStep,
-        TypeResolver typeResolver)
+        TypeResolver typeResolver,
+        OptimizationSettings optimizationSettings)
     {
         if (propertyInfo.GetCustomAttribute<FunctionPropertyAttribute>() is not null)
         {
@@ -481,7 +493,8 @@ public abstract class StepFactory : IStepFactory
                 propertyInfo,
                 parentStep,
                 new FreezableStepProperty.Lambda(null, freezableStep, freezableStep.TextLocation),
-                typeResolver
+                typeResolver,
+                optimizationSettings
             );
         }
 
@@ -495,7 +508,8 @@ public abstract class StepFactory : IStepFactory
 
         var freezeResult = freezableStep.TryFreeze(
             callerMetadata,
-            typeResolver
+            typeResolver,
+            optimizationSettings
         );
 
         if (freezeResult.IsFailure)
@@ -521,7 +535,8 @@ public abstract class StepFactory : IStepFactory
         PropertyInfo propertyInfo,
         ICompoundStep parentStep,
         FreezableStepProperty.StepList stepList,
-        TypeResolver typeResolver)
+        TypeResolver typeResolver,
+        OptimizationSettings optimizationSettings)
     {
         if (propertyInfo.GetCustomAttribute<StepListPropertyAttribute>() != null)
             return SetStepList();
@@ -592,7 +607,8 @@ public abstract class StepFactory : IStepFactory
 
                 var freezeResult = freezableStep.TryFreeze(
                     nestedCallerMetadata,
-                    typeResolver
+                    typeResolver,
+                    optimizationSettings
                 );
 
                 if (freezeResult.IsFailure)
@@ -650,7 +666,8 @@ public abstract class StepFactory : IStepFactory
 
                 var freezeResult = freezableStep.TryFreeze(
                     nestedCallerMetadata,
-                    typeResolver
+                    typeResolver,
+                    optimizationSettings
                 );
 
                 if (freezeResult.IsFailure)

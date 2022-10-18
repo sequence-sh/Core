@@ -53,7 +53,10 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     public TextLocation TextLocation { get; set; }
 
     /// <inheritdoc />
-    public Result<IStep, IError> TryFreeze(CallerMetadata callerMetadata, TypeResolver typeResolver)
+    public Result<IStep, IError> TryFreeze(
+        CallerMetadata callerMetadata,
+        TypeResolver typeResolver,
+        OptimizationSettings settings)
     {
         return CheckFreezePossible(callerMetadata, typeResolver).Map(() => this as IStep);
     }
@@ -158,4 +161,9 @@ public class NullConstant : IConstantStep, IConstantFreezableStep, IStep<SCLNull
     {
         yield break;
     }
+
+    /// <inheritdoc />
+    public IStep FoldIfConstant(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables) => this;
 }

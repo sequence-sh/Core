@@ -22,7 +22,7 @@ public static class DiagnosticsHelper
             var freezeResult = initialParseResult.Value.TryFreeze(
                 SCLRunner.RootCallerMetadata,
                 stepFactoryStore,
-                injectedVariables
+                new OptimizationSettings(false, false, injectedVariables)
             );
 
             if (freezeResult.IsSuccess)

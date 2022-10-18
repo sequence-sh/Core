@@ -94,8 +94,28 @@ public partial class StringReplaceTests : StepTestBase<StringReplace, StringStre
         {
             foreach (var errorCase in base.ErrorCases)
             {
-                yield return errorCase;
+                if (errorCase.Name == "Test Error Message: 'Function Error'") { }
+                else
+                {
+                    yield return errorCase;
+                }
             }
+
+            yield return new ErrorCase(
+                "Both Replace and Function are set",
+                new StringReplace()
+                {
+                    String  = Constant("blah"),
+                    Pattern = Constant("Pattern"),
+                    Replace = Constant("foo"),
+                    Function =
+                        new LambdaFunction<StringStream, StringStream>(null, Constant("Bar"))
+                },
+                ErrorCode.ConflictingParameters.ToErrorBuilder(
+                    nameof(StringReplace.Replace),
+                    nameof(StringReplace.Function)
+                )
+            );
 
             yield return new ErrorCase(
                 "Neither Replace nor Function is set",

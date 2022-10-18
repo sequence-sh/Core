@@ -27,7 +27,8 @@ public sealed partial record SCLConstantFreezable<T>
     /// <inheritdoc />
     public Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
-        TypeResolver typeResolver)
+        TypeResolver typeResolver,
+        OptimizationSettings settings)
     {
         return CheckFreezePossible(callerMetadata, typeResolver)
             .Map(() => new SCLConstant<T>(Value) { TextLocation = TextLocation } as IStep);

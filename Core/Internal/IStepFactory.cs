@@ -52,7 +52,8 @@ public interface IStepFactory
     Result<IStep, IError> TryFreeze(
         CallerMetadata callerMetadata,
         TypeResolver typeResolver,
-        FreezableStepData freezeData);
+        FreezableStepData freezeData,
+        OptimizationSettings settings);
 
     /// <summary>
     /// Returns an error if it is impossible to freeze this step regardless of what the unknown types might turn out to be.

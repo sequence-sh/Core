@@ -43,7 +43,11 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
                 return new object[] { Name, properties };
             }
 
-            LogSituation.EnterStep.Log(stateMonad, this, GetEnterStepArgs());
+            LogSituation.EnterStep.Log(
+                stateMonad,
+                this,
+                GetEnterStepArgs()
+            ); //TODO do not create dictionary unless required
 
             var result = await Run(stateMonad, cancellationToken);
 
@@ -394,5 +398,29 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// If this step has a constant value. Convert it to a constant
+    /// </summary>
+    public IStep FoldIfConstant(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables)
+    {
+        var constantValueTask = TryGetConstantValueAsync(
+            ImmutableDictionary<VariableName, ISCLObject>.Empty,
+            sfs
+        );
+
+        if (!constantValueTask.IsCompleted)
+            return this;
+
+        var constantValue = constantValueTask
+            .Result.Bind(x => x.MaybeAs<T>());
+
+        if (constantValue.HasNoValue)
+            return this;
+
+        return new SCLConstant<T>(constantValue.Value);
     }
 }

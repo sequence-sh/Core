@@ -102,6 +102,11 @@ public abstract class OneOfStep : IStep
     {
         return StepValue.GetParameterValues();
     }
+
+    /// <inheritdoc />
+    public abstract IStep FoldIfConstant(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables);
 }
 
 /// <summary>
@@ -148,6 +153,41 @@ public class OneOfStep<T0, T1> : OneOfStep, IStep<SCLOneOf<T0, T1>>
             x => x.Run(stateMonad, cancellationToken).Map(t0 => new SCLOneOf<T0, T1>(t0)),
             x => x.Run(stateMonad, cancellationToken).Map(t1 => new SCLOneOf<T0, T1>(t1))
         );
+    }
+
+    /// <inheritdoc />
+    public override IStep FoldIfConstant(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables)
+    {
+        var constantValueTask = TryGetConstantValueAsync(
+            ImmutableDictionary<VariableName, ISCLObject>.Empty,
+            sfs
+        );
+
+        if (!constantValueTask.IsCompleted)
+            return this;
+
+        var constantValue = constantValueTask.Result;
+
+        if (constantValue.HasNoValue)
+            return this;
+
+        var t0 = constantValue.Value.MaybeAs<T0>();
+
+        if (t0.HasValue)
+            return new OneOfStep<T0, T1>(
+                OneOf<IStep<T0>, IStep<T1>>.FromT0(new SCLConstant<T0>(t0.Value))
+            );
+
+        var t1 = constantValue.Value.MaybeAs<T1>();
+
+        if (t1.HasValue)
+            return new OneOfStep<T0, T1>(
+                OneOf<IStep<T0>, IStep<T1>>.FromT1(new SCLConstant<T1>(t1.Value))
+            );
+
+        return this;
     }
 }
 
@@ -204,5 +244,47 @@ public class OneOfStep<T0, T1, T2> : OneOfStep, IStep<SCLOneOf<T0, T1, T2>>
             x => x.Run(stateMonad, cancellationToken).Map(t1 => new SCLOneOf<T0, T1, T2>(t1)),
             x => x.Run(stateMonad, cancellationToken).Map(t2 => new SCLOneOf<T0, T1, T2>(t2))
         );
+    }
+
+    /// <inheritdoc />
+    public override IStep FoldIfConstant(
+        StepFactoryStore sfs,
+        IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables)
+    {
+        var constantValueTask = TryGetConstantValueAsync(
+            ImmutableDictionary<VariableName, ISCLObject>.Empty,
+            sfs
+        );
+
+        if (!constantValueTask.IsCompleted)
+            return this;
+
+        var constantValue = constantValueTask.Result;
+
+        if (constantValue.HasNoValue)
+            return this;
+
+        var t0 = constantValue.Value.MaybeAs<T0>();
+
+        if (t0.HasValue)
+            return new OneOfStep<T0, T1, T2>(
+                OneOf<IStep<T0>, IStep<T1>, IStep<T2>>.FromT0(new SCLConstant<T0>(t0.Value))
+            );
+
+        var t1 = constantValue.Value.MaybeAs<T1>();
+
+        if (t1.HasValue)
+            return new OneOfStep<T0, T1, T2>(
+                OneOf<IStep<T0>, IStep<T1>, IStep<T2>>.FromT1(new SCLConstant<T1>(t1.Value))
+            );
+
+        var t2 = constantValue.Value.MaybeAs<T2>();
+
+        if (t2.HasValue)
+            return new OneOfStep<T0, T1, T2>(
+                OneOf<IStep<T0>, IStep<T1>, IStep<T2>>.FromT2(new SCLConstant<T2>(t2.Value))
+            );
+
+        return this;
     }
 }
