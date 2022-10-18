@@ -108,7 +108,7 @@ public interface IFreezableStep : IEquatable<IFreezableStep>
         var freezeResult = thisReorganized.TryFreeze(
             callerMetadata,
             typeResolver.Value,
-            OptimizationSettings.None
+            optimizationSettings
         );
 
         return freezeResult;

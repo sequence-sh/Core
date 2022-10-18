@@ -85,7 +85,7 @@ public sealed class SCLRunner
         CancellationToken cancellationToken,
         IReadOnlyDictionary<VariableName, InjectedVariable>? variablesToInject = null)
     {
-        var settings = new OptimizationSettings(true, variablesToInject);
+        var settings = new OptimizationSettings(true, true, variablesToInject);
 
         var stepResult = SCLParsing.TryParseStep(text)
             .Bind(x => x.TryFreeze(RootCallerMetadata, _stepFactoryStore, settings))

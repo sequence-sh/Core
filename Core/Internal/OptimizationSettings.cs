@@ -10,9 +10,11 @@ public sealed class OptimizationSettings
     /// </summary>
     public OptimizationSettings(
         bool foldConstants,
+        bool stepOptimizations,
         IReadOnlyDictionary<VariableName, InjectedVariable>? injectedVariables)
     {
-        FoldConstants = foldConstants;
+        FoldConstants     = foldConstants;
+        StepOptimizations = stepOptimizations;
 
         InjectedVariables = injectedVariables
                          ?? ImmutableDictionary<VariableName, InjectedVariable>.Empty;
@@ -24,6 +26,11 @@ public sealed class OptimizationSettings
     public bool FoldConstants { get; }
 
     /// <summary>
+    /// Enables step level optimizations - e.g. compiling regular expressions
+    /// </summary>
+    public bool StepOptimizations { get; }
+
+    /// <summary>
     /// Variables to inject
     /// </summary>
     public IReadOnlyDictionary<VariableName, InjectedVariable> InjectedVariables { get; }
@@ -31,5 +38,5 @@ public sealed class OptimizationSettings
     /// <summary>
     /// No optimization
     /// </summary>
-    public static OptimizationSettings None { get; } = new(false, null);
+    public static OptimizationSettings None { get; } = new(false, false, null);
 }

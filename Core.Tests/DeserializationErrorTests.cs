@@ -258,7 +258,7 @@ public partial class DeserializationErrorTests
                     x => x.TryFreeze(
                         SCLRunner.RootCallerMetadata,
                         sfs,
-                        new OptimizationSettings(true, VariablesToInject)
+                        new OptimizationSettings(true, true, VariablesToInject)
                     )
                 )
                 .Map(SCLRunner.ConvertToUnitStep);

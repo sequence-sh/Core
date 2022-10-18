@@ -36,17 +36,25 @@ public sealed record CompoundFreezableStep(
                         x.TryFreeze(callerMetadata, typeResolver, FreezableStepData, settings)
                 );
 
+        if (result.IsFailure)
+            return result;
+
+        var step = result.Value;
+
         if (settings.FoldConstants)
         {
-            return result.Map(
-                x => x.FoldIfConstant(
-                    typeResolver.StepFactoryStore,
-                    settings.InjectedVariables
-                )
+            step = step.FoldIfConstant(typeResolver.StepFactoryStore, settings.InjectedVariables);
+        }
+
+        if (settings.StepOptimizations && step is ICompoundStep compoundStep)
+        {
+            compoundStep.ApplyOptimizations(
+                typeResolver.StepFactoryStore,
+                settings.InjectedVariables
             );
         }
-        else
-            return result;
+
+        return Result.Success<IStep, IError>(step);
     }
 
     /// <inheritdoc />

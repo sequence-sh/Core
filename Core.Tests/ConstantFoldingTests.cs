@@ -42,7 +42,7 @@ public class ConstantFoldingTests
                 x => x.TryFreeze(
                     SCLRunner.RootCallerMetadata,
                     sfs,
-                    new OptimizationSettings(true, variables)
+                    new OptimizationSettings(true, true, variables)
                 )
             );
 
@@ -85,7 +85,7 @@ public class ConstantFoldingTests
                 x => x.TryFreeze(
                     SCLRunner.RootCallerMetadata,
                     sfs,
-                    new OptimizationSettings(true, variables)
+                    new OptimizationSettings(true, true, variables)
                 )
             );
 
