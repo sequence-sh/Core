@@ -67,9 +67,12 @@ public class ExternalProcessRunner : IExternalProcessRunner
             argumentString
         );
 
-        foreach (var (key, value) in pProcess.StartInfo.Environment)
+        if (LogSituation.EnvironmentVariable.IsEnabled(stateMonad))
         {
-            LogSituation.EnvironmentVariable.Log(stateMonad, callingStep, key, value);
+            foreach (var (key, value) in pProcess.StartInfo.Environment)
+            {
+                LogSituation.EnvironmentVariable.Log(stateMonad, callingStep, key, value);
+            }
         }
 
         var started = pProcess.Start();

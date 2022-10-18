@@ -35,19 +35,19 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
     {
         using (stateMonad.Logger.BeginScope(Name))
         {
-            object[] GetEnterStepArgs()
+            if (LogSituation.EnterStep.IsEnabled(stateMonad))
             {
                 var properties = AllProperties
                     .ToDictionary(x => x.Name, x => x.Serialize(SerializeOptions.SanitizedName));
 
-                return new object[] { Name, properties };
-            }
+                var args = new object[] { Name, properties };
 
-            LogSituation.EnterStep.Log(
-                stateMonad,
-                this,
-                GetEnterStepArgs()
-            ); //TODO do not create dictionary unless required
+                LogSituation.EnterStep.Log(
+                    stateMonad,
+                    this,
+                    args
+                );
+            }
 
             var result = await Run(stateMonad, cancellationToken);
 
@@ -57,9 +57,11 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
             }
             else
             {
-                var resultValue = result.Value.Serialize(SerializeOptions.SanitizedName);
-
-                LogSituation.ExitStepSuccess.Log(stateMonad, this, Name, resultValue);
+                if (LogSituation.ExitStepSuccess.IsEnabled(stateMonad))
+                {
+                    var resultValue = result.Value.Serialize(SerializeOptions.SanitizedName);
+                    LogSituation.ExitStepSuccess.Log(stateMonad, this, Name, resultValue);
+                }
             }
 
             return result;

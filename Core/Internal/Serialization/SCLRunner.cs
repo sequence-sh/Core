@@ -121,11 +121,14 @@ public sealed class SCLRunner
 
         if (_stepFactoryStore.ConnectorData.Any())
         {
-            LogSituation.ConnectorSettings.Log(
-                stateMonad,
-                null,
-                stateMonad.Settings.Format()
-            );
+            if (LogSituation.ConnectorSettings.IsEnabled(stateMonad))
+            {
+                LogSituation.ConnectorSettings.Log(
+                    stateMonad,
+                    null,
+                    stateMonad.Settings.Format()
+                );
+            }
         }
 
         var runResult = await stepResult.Value.Run(stateMonad, cancellationToken);

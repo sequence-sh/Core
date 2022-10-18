@@ -16,6 +16,11 @@ public abstract record LogSituationBase(string Code, LogLevel LogLevel)
         stateMonad.Logger.LogSituation(this, step, stateMonad, args);
 
     /// <summary>
+    /// Whether this log situation is enabled
+    /// </summary>
+    public bool IsEnabled(IStateMonad stateMonad) => stateMonad.Logger.IsEnabled(LogLevel);
+
+    /// <summary>
     /// Get the format string for this log situation
     /// </summary>
     protected abstract string GetLocalizedString();
