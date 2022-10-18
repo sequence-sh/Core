@@ -43,7 +43,11 @@ public abstract class CompoundStep<T> : ICompoundStep<T> where T : ISCLObject
                 return new object[] { Name, properties };
             }
 
-            LogSituation.EnterStep.Log(stateMonad, this, GetEnterStepArgs());
+            LogSituation.EnterStep.Log(
+                stateMonad,
+                this,
+                GetEnterStepArgs()
+            ); //TODO do not create dictionary unless required
 
             var result = await Run(stateMonad, cancellationToken);
 
