@@ -222,10 +222,14 @@ public sealed class StringReplace : CompoundStep<StringStream>, ICompoundStep
         StepFactoryStore sfs,
         IReadOnlyDictionary<VariableName, InjectedVariable> injectedVariables)
     {
+        var variableValues = new Lazy<IReadOnlyDictionary<VariableName, ISCLObject>>(
+            () => injectedVariables.ToDictionary(x => x.Key, x => x.Value.SCLObject)
+        );
+
         if (Replace is not null && Replace.HasConstantValue(injectedVariables.Keys))
         {
             var cvTask = Replace.TryGetConstantValueAsync(
-                ImmutableDictionary<VariableName, ISCLObject>.Empty,
+                variableValues.Value,
                 sfs
             );
 
@@ -245,12 +249,12 @@ public sealed class StringReplace : CompoundStep<StringStream>, ICompoundStep
          && IgnoreCase.HasConstantValue(injectedVariables.Keys))
         {
             var patternTask = Pattern.TryGetConstantValueAsync(
-                ImmutableDictionary<VariableName, ISCLObject>.Empty,
+                variableValues.Value,
                 sfs
             );
 
             var ignoreCaseTask = IgnoreCase.TryGetConstantValueAsync(
-                ImmutableDictionary<VariableName, ISCLObject>.Empty,
+                variableValues.Value,
                 sfs
             );
 
