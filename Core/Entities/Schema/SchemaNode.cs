@@ -154,7 +154,9 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
 
         if (constantValue is not null)
             enumeratedValuesNodeData =
-                new EnumeratedValuesNodeData(new[] { Entity.Create(constantValue.Value), });
+                new EnumeratedValuesNodeData(
+                    new ISCLObject[] { Entity.Create(constantValue.Value), }
+                );
         else
         {
             var enumValues = schema.Keywords.OfType<EnumKeyword>()
@@ -165,7 +167,7 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
                 enumeratedValuesNodeData =
                     new EnumeratedValuesNodeData(
                         enumValues.WhereNotNull()
-                            .Select(Entity.Create)
+                            .Select(x => Entity.Create(x) as ISCLObject)
                             .ToList()
                     );
 

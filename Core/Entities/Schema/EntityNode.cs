@@ -142,9 +142,9 @@ public record EntityNode(
                 {
                     newEntity = newEntity.WithProperty(
                         entityProperty.Name,
-                        r.Value.GetValueOrThrow(),
-                        node.Order
+                        r.Value.GetValueOrThrow()
                     );
+                    //TODO order
 
                     changed = true;
                 }
@@ -152,9 +152,9 @@ public record EntityNode(
                 {
                     newEntity = newEntity.WithProperty(
                         entityProperty.Name,
-                        entityProperty.Value,
-                        node.Order
+                        entityProperty.Value
                     );
+                    //TODO order
 
                     changed = true;
                 }
@@ -184,7 +184,7 @@ public record EntityNode(
             );
 
         if (changed)
-            return Maybe<ISCLObject>.From(new Entity(newEntity));
+            return Maybe<ISCLObject>.From(newEntity);
 
         return Maybe<ISCLObject>.None;
     }

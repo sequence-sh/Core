@@ -35,7 +35,7 @@ public sealed class EntitySetValue<T> : CompoundStep<Entity> where T : ISCLObjec
 
         var propertyName = await propertyResult.Value.GetStringAsync();
 
-        var newEntity = entityResult.Value.WithProperty(propertyName, valueResult.Value, null);
+        var newEntity = entityResult.Value.WithProperty(propertyName, valueResult.Value);
 
         return newEntity;
     }

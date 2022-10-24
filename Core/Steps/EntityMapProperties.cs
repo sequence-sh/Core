@@ -69,9 +69,8 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
 
                     newEntity = newEntity.WithProperty(
                         newName,
-                        newProperty.Value,
-                        newProperty.Order
-                    );
+                        newProperty.Value
+                    ); //TODO property order
 
                     break;
                 }
