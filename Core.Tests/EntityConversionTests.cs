@@ -109,14 +109,19 @@ public class EntityConversionTests
                     )
                 );
 
+        if (!parseResult.Value.IsCompleted)
+        {
+            throw new Exception("Parse result should complete immediately");
+        }
+
         parseResult.ShouldBeSuccessful();
 
-        var entity = parseResult.Value.Result.GetValueOrThrow() as Entity;
+        var sclObject = parseResult.Value.Result.GetValueOrThrow();
 
-        if (entity is null)
-            throw new Exception("Parse result should be an entity");
+        if (sclObject is Entity entity)
+            return entity;
 
-        return entity;
+        throw new Exception("Parse result should be an entity");
     }
 
     [Fact]
