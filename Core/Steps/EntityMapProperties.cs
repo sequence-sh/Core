@@ -42,10 +42,59 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
             )
             .ToList();
 
-        var newEntityStream = entityStream
-            .Select(e => ChangePropertyNames(e, mappings));
+        if (mappings.All(
+                x => x.Value.Count == 1 && x.Value.Single().KeyNames.Count == 1
+            )) //Simple case of just column renames
+        {
+            var simpleMappings = mappings.Select(x => (x.Key, x.Value.Single().KeyNames.Single()))
+                .ToList();
 
-        return newEntityStream;
+            var headersCache = new HeadersCache();
+
+            var newEntityStream = entityStream
+                .Select(e => ChangePropertyNamesSimple(e, simpleMappings, headersCache));
+
+            return newEntityStream;
+        }
+        else
+        {
+            var newEntityStream = entityStream
+                .Select(e => ChangePropertyNames(e, mappings));
+
+            return newEntityStream;
+        }
+
+        static Entity ChangePropertyNamesSimple(
+            Entity oldEntity,
+            IReadOnlyList<(EntityKey newKey, EntityKey oldKey)> mappings,
+            HeadersCache headersCache)
+        {
+            if (headersCache.Data.HasValue
+             && (headersCache.Data.Value.oldHeaders == oldEntity.Headers
+              || headersCache.Data.Value.oldHeaders.SequenceEqual(oldEntity.Headers)))
+            {
+                var newEntity = oldEntity with { Headers = headersCache.Data.Value.newHeaders };
+                return newEntity;
+            }
+            else
+            {
+                var newEntity = oldEntity;
+
+                foreach (var (newKey, oldKey) in mappings)
+                {
+                    var ne = newEntity.WithPropertyRenamed(oldKey, newKey);
+
+                    if (ne.HasValue)
+                        newEntity = ne.Value;
+                }
+
+                headersCache.Data =
+                    Maybe<(ImmutableArray<EntityKey> oldHeaders, ImmutableArray<EntityKey>
+                        newHeaders)>.From((oldEntity.Headers, newEntity.Headers));
+
+                return newEntity;
+            }
+        }
 
         static Entity ChangePropertyNames(
             Entity oldEntity,
@@ -141,4 +190,17 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<EntityMapProperties, Array<Entity>>();
+
+    /// <summary>
+    /// Caches headers for simple entity renames
+    /// </summary>
+    private class HeadersCache
+    {
+        public Maybe<(ImmutableArray<EntityKey> oldHeaders, ImmutableArray<EntityKey> newHeaders)>
+            Data
+        {
+            get;
+            set;
+        }
+    }
 }
