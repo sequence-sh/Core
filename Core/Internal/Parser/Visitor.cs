@@ -440,12 +440,12 @@ public static partial class SCLParsing
         {
             if (txt.StartsWith("\r\n"))
             {
-                return txt.Substring(2);
+                return txt[2..];
             }
 
             if (txt.StartsWith("\n"))
             {
-                return txt.Substring(1);
+                return txt[1..];
             }
 
             return txt;
@@ -689,12 +689,12 @@ public static partial class SCLParsing
             return new FreezableStepProperty.Step(step, new TextLocation(context));
         }
 
-        private Result<IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty>, IError>
+        private Result<IReadOnlyDictionary<EntityNestedKey, FreezableStepProperty>, IError>
             AggregateEntityProperties(
                 IEnumerable<SCLParser.EntityPropertyContext> entityProperties,
                 ErrorLocation location)
         {
-            var l      = new List<(EntityPropertyKey key, FreezableStepProperty member)>();
+            var l      = new List<(EntityNestedKey key, FreezableStepProperty member)>();
             var errors = new List<IError>();
 
             foreach (var r in entityProperties.Select(GetEntityProperty))
@@ -718,7 +718,7 @@ public static partial class SCLParsing
 
             if (errors.Any())
                 return Result
-                    .Failure<IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty>, IError>(
+                    .Failure<IReadOnlyDictionary<EntityNestedKey, FreezableStepProperty>, IError>(
                         ErrorList.Combine(errors)
                     );
 
@@ -764,21 +764,21 @@ public static partial class SCLParsing
             return dict;
         }
 
-        private Result<(EntityPropertyKey names, FreezableStepProperty value), IError>
+        private Result<(EntityNestedKey names, FreezableStepProperty value), IError>
             GetEntityProperty(SCLParser.EntityPropertyContext context)
         {
             var keyComponents = context.entityPropertyName()
                 .Select(GetContextString)
                 .SelectMany(x => x.Split('.'))
-                .ToList();
+                .ToArray();
 
-            var key = new EntityPropertyKey(keyComponents);
+            var key = new EntityNestedKey(keyComponents);
 
             var value = Visit(context.term());
 
             if (value.IsFailure)
                 return value
-                    .ConvertFailure<(EntityPropertyKey name, FreezableStepProperty value)>();
+                    .ConvertFailure<(EntityNestedKey name, FreezableStepProperty value)>();
 
             return (key, value.Value);
 

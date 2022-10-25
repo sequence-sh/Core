@@ -27,7 +27,7 @@ public sealed record CreateEntityFreezableStep
         if (checkResult.IsFailure)
             return checkResult.ConvertFailure<IStep>();
 
-        var results = new List<Result<(EntityPropertyKey name, IStep value), IError>>();
+        var results = new List<Result<(EntityNestedKey name, IStep value), IError>>();
 
         foreach (var (propertyName, stepMember) in FreezableEntityData.EntityProperties)
         {
@@ -139,10 +139,10 @@ public sealed record CreateEntityFreezableStep
 
             if (remainder.HasNoValue)
             {
-                dict[key] = (newNode, true, order);
+                dict[key.Inner] = (newNode, true, order);
                 order++;
             }
-            else if (dict.TryGetValue(key, out var existing))
+            else if (dict.TryGetValue(key.Inner, out var existing))
             {
                 EntityNode entityNode;
 
@@ -160,14 +160,14 @@ public sealed record CreateEntityFreezableStep
 
                     entityNode = UpdateEntityNode(
                         entityNode,
-                        new EntityPropertyKey(Entity.PrimitiveKey),
+                        new EntityNestedKey(EntityKey.Primitive),
                         existing.Node
                     );
                 }
 
                 var updated = UpdateEntityNode(entityNode, remainder.Value, newNode);
 
-                dict[key] = (updated, existing.Required, existing.Order);
+                dict[key.Inner] = (updated, existing.Required, existing.Order);
             }
             else
             {
@@ -177,14 +177,14 @@ public sealed record CreateEntityFreezableStep
                     EntityPropertiesData.Empty
                 );
 
-                entityNode = UpdateEntityNode(entityNode, remainder.Value, newNode);
-                dict[key]  = (entityNode, true, order);
+                entityNode      = UpdateEntityNode(entityNode, remainder.Value, newNode);
+                dict[key.Inner] = (entityNode, true, order);
                 order++;
             }
 
             static EntityNode UpdateEntityNode(
                 EntityNode node,
-                EntityPropertyKey key,
+                EntityNestedKey key,
                 SchemaNode schemaNode)
             {
                 var (start, remaining) = key.Split();
@@ -194,7 +194,7 @@ public sealed record CreateEntityFreezableStep
 
                 if (remaining.HasNoValue)
                 {
-                    dict[start] = (schemaNode, true, dict.Count);
+                    dict[start.Inner] = (schemaNode, true, dict.Count);
                 }
                 else
                 {
@@ -206,7 +206,7 @@ public sealed record CreateEntityFreezableStep
 
                     childNode = UpdateEntityNode(childNode, remaining.Value, schemaNode);
 
-                    dict[start] = (childNode, true, dict.Count);
+                    dict[start.Inner] = (childNode, true, dict.Count);
                 }
 
                 node = new EntityNode(
@@ -229,7 +229,7 @@ public sealed record CreateEntityFreezableStep
     /// <inheritdoc />
     public IFreezableStep ReorganizeNamedArguments(StepFactoryStore stepFactoryStore)
     {
-        var dict = new Dictionary<EntityPropertyKey, FreezableStepProperty>();
+        var dict = new Dictionary<EntityNestedKey, FreezableStepProperty>();
 
         foreach (var (key, value) in FreezableEntityData.EntityProperties)
         {

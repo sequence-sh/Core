@@ -80,7 +80,7 @@ public class HttpRequest : CompoundStep<StringStream>
         foreach (var (name, sclObject) in entity.Headers.Zip(entity.Values))
         {
             request = request.AddHeader(
-                name,
+                name.Inner,
                 sclObject.Serialize(SerializeOptions.Primitive)
             );
         }

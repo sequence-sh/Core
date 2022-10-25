@@ -38,16 +38,13 @@ public static class SCLObjectHelper
             case JsonValueKind.Undefined: return SCLNull.Instance;
             case JsonValueKind.Object:
             {
-                var keys   = ImmutableArray.CreateBuilder<string>();
+                var keys   = ImmutableArray.CreateBuilder<EntityKey>();
                 var values = ImmutableArray.CreateBuilder<ISCLObject>();
-
-                var index = 0;
 
                 foreach (var prop in element.EnumerateObject())
                 {
-                    keys[index]   = prop.Name;
-                    values[index] = ConvertToSCLObject(prop.Value);
-                    index++;
+                    keys.Add(new EntityKey(prop.Name));
+                    values.Add(ConvertToSCLObject(prop.Value));
                 }
 
                 var entity = new Entity(keys.ToImmutable(), values.ToImmutable());

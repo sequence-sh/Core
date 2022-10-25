@@ -58,7 +58,7 @@ public partial class TryGetSettingsTest
     private static Result<MySettings, IErrorBuilder> TryGetMySettings(Entity settings)
     {
         var connectorEntityValue = settings.TryGetValue(
-            new EntityPropertyKey(
+            new EntityNestedKey(
                 StateMonad.ConnectorsKey,
                 ConnectorKey,
                 "Settings"

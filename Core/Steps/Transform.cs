@@ -98,7 +98,6 @@ public sealed class Transform : CompoundStep<Array<Entity>>
                 else
                     yield return entity; //no change
             }
-
             else
             {
                 switch (errorBehavior.Value)

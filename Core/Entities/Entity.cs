@@ -12,9 +12,14 @@ namespace Reductech.Sequence.Core;
 /// </summary>
 [JsonConverter(typeof(EntityJsonConverter))]
 public partial record struct Entity(
-    [property: OrderedEquality] ImmutableArray<string> Headers,
+    [property: OrderedEquality] ImmutableArray<EntityKey> Headers,
     [property: OrderedEquality] ImmutableArray<ISCLObject> Values)
 {
+    /// <summary>
+    /// Nullable equality
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Equals(Entity? other)
     {
         return other.HasValue && Equals(other.Value);
@@ -24,7 +29,7 @@ public partial record struct Entity(
     public bool Equals(Entity other)
     {
         return
-            OrderedEqualityComparer<string>.Default.Equals(Headers, other.Headers)
+            OrderedEqualityComparer<EntityKey>.Default.Equals(Headers, other.Headers)
          && OrderedEqualityComparer<ISCLObject>.Default.Equals(Values, other.Values)
             ;
     }
@@ -36,7 +41,7 @@ public partial record struct Entity(
 
         hashCode.Add(
             Headers,
-            OrderedEqualityComparer<string>.Default
+            OrderedEqualityComparer<EntityKey>.Default
         );
 
         hashCode.Add(
@@ -48,26 +53,21 @@ public partial record struct Entity(
     }
 }
 
-public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
+public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<EntityKey, ISCLObject>>
 {
     /// <summary>
     /// Empty EntityStruct
     /// </summary>
     public static readonly Entity Empty = new(
-        ImmutableArray<string>.Empty,
+        ImmutableArray<EntityKey>.Empty,
         ImmutableArray<ISCLObject>.Empty
     );
 
     /// <inheritdoc />
     public TypeReference GetTypeReference() => TypeReference.Entity.NoSchema;
 
-    /// <summary>
-    /// The default property name if the EntityStruct represents a single primitive.
-    /// </summary>
-    public const string PrimitiveKey = "value";
-
-    private static readonly ImmutableArray<string> PrimitiveKeyHeaders =
-        ImmutableArray<string>.Empty.Add("value");
+    private static readonly ImmutableArray<EntityKey> PrimitiveKeyHeaders =
+        ImmutableArray<EntityKey>.Empty.Add(EntityKey.Primitive);
 
     /// <summary>
     /// Create an entity with a single primitive value
@@ -83,7 +83,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
     [Pure]
     public static Entity Create(params (string key, object? value)[] properties) => Create(
         properties.Select(
-            x => (new EntityPropertyKey(x.key), ISCLObject.CreateFromCSharpObject(x.value))
+            x => (new EntityNestedKey(x.key), ISCLObject.CreateFromCSharpObject(x.value))
         )
     );
 
@@ -93,7 +93,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
     [Pure]
     public static Entity Create(IDictionary dictionary)
     {
-        var keys   = new string[dictionary.Count];
+        var keys   = new EntityKey[dictionary.Count];
         var values = new ISCLObject[dictionary.Count];
         //List<EntityProperty> properties = new();
         var enumerator = dictionary.GetEnumerator();
@@ -104,7 +104,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
         {
             var k       = enumerator.Key.ToString()!;
             var vObject = ISCLObject.CreateFromCSharpObject(enumerator.Value);
-            keys[i]   = k;
+            keys[i]   = new EntityKey(k);
             values[i] = vObject;
             i++;
         }
@@ -133,15 +133,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
     public static Entity Create(JsonNode node)
     {
         var rootElement = node.ToJsonDocument()?.RootElement;
-
-        if (rootElement.HasValue)
-        {
-            return Create(rootElement.Value);
-        }
-        else
-        {
-            return Empty;
-        }
+        return rootElement.HasValue ? Create(rootElement.Value) : Empty;
     }
 
     /// <summary>
@@ -169,9 +161,9 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
     /// Creates a new EntityStruct
     /// </summary>
     [Pure]
-    public static Entity Create(IEnumerable<(EntityPropertyKey key, ISCLObject value)> properties)
+    public static Entity Create(IEnumerable<(EntityNestedKey key, ISCLObject value)> properties)
     {
-        var keys   = ImmutableArray.CreateBuilder<string>();
+        var keys   = ImmutableArray.CreateBuilder<EntityKey>();
         var values = ImmutableArray.CreateBuilder<ISCLObject>();
 
         var allProperties =
@@ -184,32 +176,76 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
                 )
                 .GroupBy(x => x.firstKey, x => (x.remainder, x.value))
                 .Select(
-                    (group, i) =>
+                    group =>
                     {
-                        var ev = CreateFromProperties(group.ToList());
+                        var value = CreateFromProperties(group.ToList());
 
-                        return new EntityProperty(group.Key, ev, i);
+                        return (group.Key, value);
                     }
                 );
 
-        foreach (var ep in allProperties)
+        foreach (var (key, value) in allProperties)
         {
-            keys.Add(ep.Name);
-            values.Add(ep.Value);
+            keys.Add(key);
+            values.Add(value);
         }
 
         return new Entity(keys.ToImmutable(), values.ToImmutable());
     }
 
     /// <summary>
+    /// Creates a copy of this with the property added. Does not check if a property with that name already exists
+    /// </summary>
+    [Pure]
+    public Entity WithPropertyAdded(EntityKey key, ISCLObject newValue, int? index)
+    {
+        ImmutableArray<EntityKey>  newHeaders;
+        ImmutableArray<ISCLObject> newValues;
+
+        if (index.HasValue)
+        {
+            newHeaders = Headers.Insert(index.Value, key);
+            newValues  = Values.Insert(index.Value, newValue);
+        }
+        else
+        {
+            newHeaders = Headers.Add(key);
+            newValues  = Values.Add(newValue);
+        }
+
+        return new Entity(newHeaders, newValues);
+    }
+
+    /// <summary>
+    /// Change the index of a property. Returns none if the property was not present of had the same index.
+    /// </summary>
+    public Maybe<Entity> WithPropertyMoved(EntityKey key, int newIndex)
+    {
+        var oldIndex = Headers.IndexOf(key);
+
+        if (oldIndex < 0 || oldIndex == newIndex)
+        {
+            return Maybe<Entity>.None;
+        }
+
+        var value = Values[oldIndex];
+
+        var newHeaders = Headers.RemoveAt(oldIndex).Insert(newIndex, key);
+        var newValues  = Values.RemoveAt(oldIndex).Insert(newIndex, value);
+
+        return new Entity(newHeaders, newValues);
+    }
+
+    /// <summary>
     /// Creates a copy of this with the property added or updated
     /// </summary>
     [Pure]
-    public Entity WithProperty(string key, ISCLObject newValue)
+    public Entity WithPropertyAddedOrUpdated(EntityKey key, ISCLObject newValue)
     {
-        ImmutableArray<string>     newHeaders;
+        ImmutableArray<EntityKey>  newHeaders;
         ImmutableArray<ISCLObject> newValues;
-        var                        index = Headers.IndexOf(key, StringComparer.OrdinalIgnoreCase);
+
+        var index = Headers.IndexOf(key);
 
         if (index < 0) //Add as a new property
         {
@@ -226,12 +262,27 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
     }
 
     /// <summary>
+    /// Rename a property of this entity
+    /// </summary>
+    [Pure]
+    public Maybe<Entity> WithPropertyRenamed(EntityKey oldKey, EntityKey newKey)
+    {
+        var index = Headers.IndexOf(oldKey);
+
+        if (index < 0)
+            return Maybe<Entity>.None; //No property to remove
+
+        var newHeaders = Headers.SetItem(index, newKey);
+        return this with { Headers = newHeaders };
+    }
+
+    /// <summary>
     /// Returns a copy of this EntityStruct with the specified property removed
     /// </summary>
     [Pure]
-    public Entity RemoveProperty(string propertyName)
+    public Entity WithPropertyRemoved(EntityKey key)
     {
-        var index = this.Headers.IndexOf(propertyName, StringComparer.OrdinalIgnoreCase);
+        var index = Headers.IndexOf(key);
 
         if (index < 0)
             return this; //No property to remove
@@ -243,41 +294,14 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
     }
 
     /// <summary>
-    /// Remove properties from an EntityStruct.
-    /// Removing the last nested property on an EntityStruct will also remove that EntityStruct
-    /// </summary>
-    [Pure]
-    public Maybe<Entity> TryRemoveProperties(IEnumerable<EntityPropertyKey> properties)
-    {
-        var newEntityStruct = this;
-        var changed         = false;
-
-        foreach (var EntityPropertyKey in properties)
-        {
-            var e = newEntityStruct.TryRemoveProperty(EntityPropertyKey);
-
-            if (e.HasValue)
-            {
-                newEntityStruct = e.GetValueOrThrow();
-                changed         = true;
-            }
-        }
-
-        if (!changed)
-            return Maybe<Entity>.None;
-
-        return newEntityStruct;
-    }
-
-    /// <summary>
     /// Try to remove a property from the EntityStruct
     /// Removing the last nested property on an EntityStruct will also remove that EntityStruct
     /// </summary>
-    public Maybe<Entity> TryRemoveProperty(EntityPropertyKey EntityPropertyKey)
+    public Maybe<Entity> WithNestedPropertyRemoved(EntityNestedKey entityNestedKey)
     {
-        var (firstKey, remainder) = EntityPropertyKey.Split();
+        var (firstKey, remainder) = entityNestedKey.Split();
 
-        var index = Headers.IndexOf(firstKey, StringComparer.OrdinalIgnoreCase);
+        var index = Headers.IndexOf(firstKey);
 
         if (index < 0)
             return Maybe<Entity>.None;
@@ -297,7 +321,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
 
         {
             var rem = remainder.GetValueOrThrow();
-            var em  = nestedEntityStruct.TryRemoveProperty(rem);
+            var em  = nestedEntityStruct.WithNestedPropertyRemoved(rem);
 
             if (!em.TryGetValue(out var newNestedEntityStruct))
                 return Maybe<Entity>.None;
@@ -327,7 +351,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
         var current = this;
 
         foreach (var ep in other)
-            current = current.WithProperty(ep.Name, ep.Value);
+            current = current.WithPropertyAddedOrUpdated(ep.Key, ep.Value);
 
         return current;
     }
@@ -336,45 +360,45 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
     /// Try to get the value of a particular property
     /// </summary>
     [Pure]
-    public Maybe<ISCLObject> TryGetValue(string key) => TryGetValue(new EntityPropertyKey(key));
+    public Maybe<ISCLObject> TryGetValue(string key) => TryGetValue(new EntityNestedKey(key));
 
     /// <summary>
     /// Try to get the value of a particular property
     /// </summary>
     [Pure]
-    public Maybe<ISCLObject> TryGetValue(EntityPropertyKey key) =>
+    public Maybe<ISCLObject> TryGetValue(EntityNestedKey key) =>
         TryGetProperty(key).Map(x => x.Value);
 
     /// <summary>
     /// Try to get a particular property
     /// </summary>
     [Pure]
-    public Maybe<EntityProperty> TryGetProperty(EntityPropertyKey key)
+    public Maybe<KeyValuePair<EntityKey, ISCLObject>> TryGetProperty(EntityNestedKey key)
     {
         var (firstKey, remainder) = key.Split();
 
-        var index = Headers.IndexOf(firstKey, StringComparer.OrdinalIgnoreCase);
+        var index = Headers.IndexOf(firstKey);
 
         if (index < 0)
-            return Maybe<EntityProperty>.None;
+            return Maybe<KeyValuePair<EntityKey, ISCLObject>>.None;
 
         var value = Values[index];
 
         if (remainder.HasNoValue)
-            return new EntityProperty(firstKey, value, index);
+            return new KeyValuePair<EntityKey, ISCLObject>(firstKey, value);
 
         if (value is Entity nestedEntityStruct)
             return nestedEntityStruct.TryGetProperty(remainder.GetValueOrThrow());
         //We can't get the nested property as this is not an EntityStruct
 
         return
-            Maybe<EntityProperty>.None;
+            Maybe<KeyValuePair<EntityKey, ISCLObject>>.None;
     }
 
     /// <inheritdoc />
     [Pure]
-    public IEnumerator<EntityProperty> GetEnumerator() => this.Headers.Zip(this.Values)
-        .Select(((tuple, i) => new EntityProperty(tuple.First, tuple.Second, i)))
+    public IEnumerator<KeyValuePair<EntityKey, ISCLObject>> GetEnumerator() => Headers.Zip(Values)
+        .Select(tuple => new KeyValuePair<EntityKey, ISCLObject>(tuple.First, tuple.Second))
         .GetEnumerator();
 
     /// <inheritdoc />
@@ -386,8 +410,8 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
 
         var results = new List<string>();
 
-        foreach (var (name, EntityStructValue, _) in this)
-            results.Add($"'{name}': {EntityStructValue.Serialize(options)}");
+        foreach (var (key, value) in this)
+            results.Add($"'{key}': {value.Serialize(options)}");
 
         sb.AppendJoin(" ", results);
 
@@ -409,10 +433,10 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
     {
         var dictionary = new Dictionary<string, object?>();
 
-        foreach (var (name, sclObject, _) in this)
+        foreach (var (key, sclObject) in this)
         {
             var value = sclObject.ToCSharpObject();
-            dictionary.Add(name, value);
+            dictionary.Add(key.Inner, value);
         }
 
         return dictionary;
@@ -446,7 +470,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
 
             //TODO use compound names for nested entities
 
-            foreach (var (name, sclObject, _) in this)
+            foreach (var (name, sclObject) in this)
             {
                 indentationStringBuilder.Append($"{name}: ");
 
@@ -466,7 +490,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
 
             //TODO use compound names for nested entities
 
-            var longestPropertyName = Headers.Select(x => x.Length).Max();
+            var longestPropertyName = Headers.Select(x => x.Inner.Length).Max();
 
             indentationStringBuilder.AppendJoin(
                 "",
@@ -475,7 +499,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
                 ep =>
                 {
                     indentationStringBuilder.Append(
-                        $"{$"'{ep.Name}'".PadRight(longestPropertyName + 2)}: "
+                        $"{$"'{ep.Key.Inner}'".PadRight(longestPropertyName + 2)}: "
                     );
 
                     ep.Value.Format(
@@ -497,7 +521,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
     /// </summary>
     [Pure]
     private static ISCLObject CreateFromProperties(
-        IReadOnlyList<(Maybe<EntityPropertyKey> key, ISCLObject argValue)> properties)
+        IReadOnlyList<(Maybe<EntityNestedKey> key, ISCLObject argValue)> properties)
     {
         if (properties.Count == 0)
             return SCLNull.Instance;
@@ -506,53 +530,41 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
             return properties.Single().argValue;
 
         var entityStructProperties =
-            new Dictionary<string, EntityProperty>(StringComparer.OrdinalIgnoreCase);
+            new Dictionary<EntityKey, ISCLObject>();
 
-        void SetEntityProperty(string key, ISCLObject ev)
+        void SetEntityProperty(EntityKey key, ISCLObject ev)
         {
-            EntityProperty newProperty;
+            ISCLObject newValue;
 
             if (entityStructProperties.TryGetValue(key, out var existingValue))
             {
                 if (ev is Entity nestedEntityStruct)
                 {
-                    if (existingValue.Value is Entity existingNestedEntityStruct)
+                    if (existingValue is Entity existingNestedEntityStruct)
                     {
-                        var nEntityStruct = existingNestedEntityStruct.Combine(nestedEntityStruct);
-
-                        newProperty = new EntityProperty(
-                            key,
-                            nEntityStruct,
-                            existingValue.Order
-                        );
+                        newValue = existingNestedEntityStruct.Combine(nestedEntityStruct);
                     }
                     else
                     {
                         //Ignore the old property
-                        newProperty = new EntityProperty(key, ev, existingValue.Order);
+                        newValue = ev;
                     }
                 }
-                else if (existingValue.Value is Entity existingNestedEntityStruct)
+                else if (existingValue is Entity existingNestedEntityStruct)
                 {
-                    var nEntityStruct =
-                        existingNestedEntityStruct.WithProperty(
-                            Entity.PrimitiveKey,
+                    newValue =
+                        existingNestedEntityStruct.WithPropertyAddedOrUpdated(
+                            EntityKey.Primitive,
                             ev
                         );
-
-                    newProperty = new EntityProperty(
-                        key,
-                        nEntityStruct,
-                        existingValue.Order
-                    );
                 }
                 else //overwrite the existing property
-                    newProperty = new EntityProperty(key, ev, existingValue.Order);
+                    newValue = ev;
             }
             else //New property
-                newProperty = new EntityProperty(key, ev, entityStructProperties.Count);
+                newValue = ev;
 
-            entityStructProperties[key] = newProperty;
+            entityStructProperties[key] = newValue;
         }
 
         foreach (var (key, argValue) in properties)
@@ -561,9 +573,9 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
             {
                 if (argValue is Entity ne)
                     foreach (var ep in ne)
-                        SetEntityProperty(ep.Name, ep.Value);
+                        SetEntityProperty(ep.Key, ep.Value);
                 else
-                    SetEntityProperty(PrimitiveKey, argValue);
+                    SetEntityProperty(EntityKey.Primitive, argValue);
             }
             else
             {
@@ -575,10 +587,9 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
             }
         }
 
-        //TODO improve performance
         var newEntityStruct = new Entity(
             entityStructProperties.Keys.ToImmutableArray(),
-            entityStructProperties.Values.Select(x => x.Value).ToImmutableArray()
+            entityStructProperties.Values.ToImmutableArray()
         );
 
         return newEntityStruct;
@@ -604,8 +615,8 @@ public partial record struct Entity : ISCLObject, IEnumerable<EntityProperty>
 
         foreach (var ep in this)
         {
-            var node = ep.Value.ToSchemaNode($"{path}/{ep.Name}", schemaConversionOptions);
-            dictionary[ep.Name] = (node, true, order);
+            var node = ep.Value.ToSchemaNode($"{path}/{ep.Key.Inner}", schemaConversionOptions);
+            dictionary[ep.Key.Inner] = (node, true, order);
             order++;
         }
 

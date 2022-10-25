@@ -22,7 +22,7 @@ public sealed class EntityGetProperties : CompoundStep<Array<StringStream>>
         if (entity.IsFailure)
             return entity.ConvertFailure<Array<StringStream>>();
 
-        var array = entity.Value.Headers.Select(x => new StringStream(x)).ToSCLArray();
+        var array = entity.Value.Headers.Select(x => new StringStream(x.Inner)).ToSCLArray();
 
         return array;
     }
