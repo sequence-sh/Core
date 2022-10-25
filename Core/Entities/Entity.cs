@@ -230,8 +230,11 @@ public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<Entit
 
         var value = Values[oldIndex];
 
-        var newHeaders = Headers.RemoveAt(oldIndex).Insert(newIndex, key);
-        var newValues  = Values.RemoveAt(oldIndex).Insert(newIndex, value);
+        var newHeaders = Headers.RemoveAt(oldIndex);
+        newIndex   = Math.Min(newHeaders.Length, newIndex); //prevent exception
+        newHeaders = newHeaders.Insert(newIndex, key);
+
+        var newValues = Values.RemoveAt(oldIndex).Insert(newIndex, value);
 
         return new Entity(newHeaders, newValues);
     }

@@ -120,7 +120,7 @@ public record EntityNode(
                 .IsSuccess;
         }
 
-        foreach (var ((key, sclObject), order) in nestedEntity.Select((x, i) => (x, i)))
+        foreach (var (key, sclObject) in nestedEntity)
         {
             if (sclObject.IsEmpty())
             {
