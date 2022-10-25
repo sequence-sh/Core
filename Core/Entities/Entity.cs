@@ -11,47 +11,10 @@ namespace Reductech.Sequence.Core;
 /// An SCL entity object
 /// </summary>
 [JsonConverter(typeof(EntityJsonConverter))]
+[Equatable]
 public partial record struct Entity(
     [property: OrderedEquality] ImmutableArray<EntityKey> Headers,
-    [property: OrderedEquality] ImmutableArray<ISCLObject> Values)
-{
-    /// <summary>
-    /// Nullable equality
-    /// </summary>
-    /// <param name="other"></param>
-    /// <returns></returns>
-    public bool Equals(Entity? other)
-    {
-        return other.HasValue && Equals(other.Value);
-    }
-
-    /// <inheritdoc/>
-    public bool Equals(Entity other)
-    {
-        return
-            OrderedEqualityComparer<EntityKey>.Default.Equals(Headers, other.Headers)
-         && OrderedEqualityComparer<ISCLObject>.Default.Equals(Values, other.Values)
-            ;
-    }
-
-    /// <inheritdoc/>
-    public override int GetHashCode()
-    {
-        var hashCode = new HashCode();
-
-        hashCode.Add(
-            Headers,
-            OrderedEqualityComparer<EntityKey>.Default
-        );
-
-        hashCode.Add(
-            Values,
-            OrderedEqualityComparer<ISCLObject>.Default
-        );
-
-        return hashCode.ToHashCode();
-    }
-}
+    [property: OrderedEquality] ImmutableArray<ISCLObject> Values) { }
 
 public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<EntityKey, ISCLObject>>
 {
