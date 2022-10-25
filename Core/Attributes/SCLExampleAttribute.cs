@@ -92,20 +92,6 @@ public sealed class SCLExampleAttribute : Attribute
         VariableInjections,
         ExecuteInTests
     );
-
-    //private object? ConvertValue(object? o)
-    //{
-    //    var ev = ISCLObject.CreateFromObject(o);
-
-    //    if (ev is IArray nl)
-    //    {
-    //        return nl.Value.Select(x => ConvertValue(x.ObjectValue)).ToSCLArray();
-    //    }
-
-    //    var ov = ev.ObjectValue;
-
-    //    return ov;
-    //}
 }
 
 /// <summary>

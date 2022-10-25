@@ -6,14 +6,14 @@ namespace Reductech.Sequence.Core.Internal;
 /// A step that creates and returns an entity.
 /// </summary>
 public record CreateEntityStep
-    (IReadOnlyDictionary<EntityPropertyKey, IStep> Properties) : IStep<Entity>
+    (IReadOnlyDictionary<EntityNestedKey, IStep> Properties) : IStep<Entity>
 {
     /// <inheritdoc />
     public async ValueTask<Result<Entity, IError>> Run(
         IStateMonad stateMonad,
         CancellationToken cancellationToken)
     {
-        var pairs = new List<(EntityPropertyKey, ISCLObject)>();
+        var pairs = new List<(EntityNestedKey, ISCLObject)>();
 
         foreach (var (key, step) in Properties)
         {
@@ -178,7 +178,7 @@ public record CreateEntityStep
         IReadOnlyDictionary<VariableName, ISCLObject> variableValues,
         StepFactoryStore sfs)
     {
-        var properties = new List<(EntityPropertyKey entityPropertyKey, ISCLObject value)>();
+        var properties = new List<(EntityNestedKey entityPropertyKey, ISCLObject value)>();
 
         foreach (var (key, step) in Properties)
         {

@@ -417,13 +417,13 @@ public abstract partial class StepTestBase<TStep, TOutput>
         static Entity CreateSimpleEntity(ref int index1)
         {
             var pairs =
-                new List<(EntityPropertyKey, ISCLObject)>
+                new List<(EntityNestedKey, ISCLObject)>
                 {
-                    (new EntityPropertyKey("Prop1"), new StringStream($"Val{index1}"))
+                    (new EntityNestedKey("Prop1"), new StringStream($"Val{index1}"))
                 };
 
             index1++;
-            pairs.Add((new EntityPropertyKey("Prop2"), new StringStream($"Val{index1}")));
+            pairs.Add((new EntityNestedKey("Prop2"), new StringStream($"Val{index1}")));
             index1++;
 
             var entity = Entity.Create(pairs);

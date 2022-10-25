@@ -71,14 +71,14 @@ public class Formatter : OneOfBase<IReadOnlyList<string>,
         {
             if (prop.Value is IArray nl)
                 dict.Add(
-                    prop.Name,
+                    prop.Key.Inner,
                     nl.ListIfEvaluated()
                         .Value.Select(x => x.Serialize(SerializeOptions.Primitive))
                         .ToList()
                 );
             else
                 dict.Add(
-                    prop.Name,
+                    prop.Key.Inner,
                     new List<string>() { prop.Value.Serialize(SerializeOptions.Primitive) }
                 );
         }

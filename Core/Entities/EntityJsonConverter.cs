@@ -19,8 +19,7 @@ public class EntityJsonConverter : JsonConverter<Entity>
         JsonSerializerOptions options)
     {
         using JsonDocument document = JsonDocument.ParseValue(ref reader);
-
-        return Entity.Create(document.RootElement.Clone()); //TODO remove the Clone
+        return Entity.Create(document.RootElement);
     }
 
     /// <inheritdoc />

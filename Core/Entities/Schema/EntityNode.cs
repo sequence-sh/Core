@@ -19,18 +19,19 @@ public record EntityNode(
     /// <summary>
     /// Gets possible keys into this entity
     /// </summary>
-    public IEnumerable<(EntityPropertyKey, SchemaNode)> GetKeyNodePairs()
+    public IEnumerable<(EntityNestedKey, SchemaNode)> GetKeyNodePairs()
     {
         foreach (var node in EntityPropertiesData.Nodes)
         {
-            yield return (new EntityPropertyKey(node.Key), node.Value.Node);
+            yield return (new EntityNestedKey(node.Key), node.Value.Node);
 
             if (node.Value.Node is EntityNode nested)
             {
                 foreach (var (nestedKey, nestedNode) in nested.GetKeyNodePairs())
                 {
-                    yield return (new EntityPropertyKey(nestedKey.KeyNames.Prepend(node.Key)),
-                                  nestedNode);
+                    yield return (
+                        new EntityNestedKey(nestedKey.KeyNames.Prepend(new EntityKey(node.Key))),
+                        nestedNode);
                 }
             }
         }
@@ -66,11 +67,11 @@ public record EntityNode(
     /// <summary>
     /// Gets the type reference of a particular property
     /// </summary>
-    public Maybe<TypeReference> GetPropertyTypeReference(EntityPropertyKey epk)
+    public Maybe<TypeReference> GetPropertyTypeReference(EntityNestedKey epk)
     {
         var (key, remainder) = epk.Split();
 
-        var childNode = EntityPropertiesData.Nodes.TryGetValue(key, out var child)
+        var childNode = EntityPropertiesData.Nodes.TryGetValue(key.Inner, out var child)
             ? child.Node
             : EntityAdditionalItems.AdditionalItems;
 
@@ -103,7 +104,7 @@ public record EntityNode(
         var remainingRequiredProperties =
             EntityPropertiesData.Nodes.Where(x => x.Value.Required)
                 .Select(x => x.Key)
-                .ToHashSet();
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         var newEntity = nestedEntity;
         var changed   = false;
@@ -119,53 +120,53 @@ public record EntityNode(
                 .IsSuccess;
         }
 
-        foreach (var entityProperty in nestedEntity)
+        foreach (var ((key, sclObject), order) in nestedEntity.Select((x, i) => (x, i)))
         {
-            if (entityProperty.Value.IsEmpty())
+            if (sclObject.IsEmpty())
             {
                 changed   = true;
-                newEntity = newEntity.RemoveProperty(entityProperty.Name);
+                newEntity = newEntity.WithPropertyRemoved(key);
                 continue;
             }
 
-            if (EntityPropertiesData.Nodes.TryGetValue(entityProperty.Name, out var node))
+            if (EntityPropertiesData.Nodes.TryGetValue(key.Inner, out var node))
             {
                 var r = node.Node.TryTransform(
-                    propertyName + "." + entityProperty.Name,
-                    entityProperty.Value,
+                    propertyName + "." + key.Inner,
+                    sclObject,
                     transformSettings
                 );
 
                 if (r.IsFailure)
                     errors.Add(r.Error);
-                else if (r.Value.HasValue)
+                else
                 {
-                    newEntity = newEntity.WithProperty(
-                        entityProperty.Name,
-                        r.Value.GetValueOrThrow()
-                    );
-                    //TODO order
+                    if (r.Value.HasValue) //Change the property value{
+                    {
+                        newEntity = newEntity.WithPropertyAddedOrUpdated(
+                            key,
+                            r.Value.GetValueOrThrow()
+                        );
 
-                    changed = true;
-                }
-                else if (entityProperty.Order != node.Order)
-                {
-                    newEntity = newEntity.WithProperty(
-                        entityProperty.Name,
-                        entityProperty.Value
-                    );
-                    //TODO order
+                        changed = true;
+                    }
 
-                    changed = true;
+                    var withMoved = newEntity.WithPropertyMoved(key, node.Order);
+
+                    if (withMoved.HasValue)
+                    {
+                        newEntity = withMoved.Value;
+                        changed   = true;
+                    }
                 }
             }
             else if (allowExtra)
             {
-                newEntity = newEntity.RemoveProperty(entityProperty.Name);
+                newEntity = newEntity.WithPropertyRemoved(key);
                 changed   = true;
             }
 
-            remainingRequiredProperties.Remove(entityProperty.Name);
+            remainingRequiredProperties.Remove(key.Inner);
         }
 
         foreach (var remainingRequiredProperty in remainingRequiredProperties)

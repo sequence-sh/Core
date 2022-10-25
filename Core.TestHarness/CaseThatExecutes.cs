@@ -21,9 +21,7 @@ public abstract partial class StepTestBase<TStep, TOutput>
                 new LoggingConfig() { LogLevel = OutputLogLevel }
             );
 
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            //var restClient = RESTClientSetupHelper.GetRESTClient(mockRepository, FinalChecks);
+            var mockRepository    = new MockRepository(MockBehavior.Strict);
             var restClientFactory = RESTClientSetupHelper.GetRESTClientFactory(mockRepository);
 
             var externalContext =
