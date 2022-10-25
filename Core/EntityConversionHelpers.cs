@@ -55,9 +55,8 @@ public static class EntityConversionHelpers
     {
         var properties = obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-        var props = new List<EntityProperty>();
-
-        var i = 0;
+        var keys   = ImmutableArray.CreateBuilder<EntityKey>();
+        var values = ImmutableArray.CreateBuilder<ISCLObject>();
 
         foreach (var propertyInfo in properties)
         {
@@ -65,14 +64,12 @@ public static class EntityConversionHelpers
 
             if (value is not null)
             {
+                keys.Add(new EntityKey(propertyInfo.Name));
                 var ev = ISCLObject.CreateFromCSharpObject(value);
-                var ep = new EntityProperty(propertyInfo.Name, ev, i);
-                props.Add(ep);
+                values.Add(ev);
             }
-
-            i++;
         }
 
-        return new Entity(props);
+        return new Entity(keys.ToImmutable(), values.ToImmutable());
     }
 }

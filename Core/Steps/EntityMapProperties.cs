@@ -1,7 +1,7 @@
 ﻿namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
-/// Rename entity properties
+/// Rename entity properties.
 /// </summary>
 [Alias("RenameEntityFields")]
 [Alias("RenameProperties")]
@@ -31,77 +31,141 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
         if (r.IsFailure)
             return r.ConvertFailure<Array<Entity>>();
 
-        var (entityStream, mappings) = r.Value;
+        var (entityStream, mappingsEntity) = r.Value;
 
-        var mappingsDict = mappings.ToDictionary(
-            x => x.Name,
-            x => GetStringList(x.Value),
-            StringComparer.OrdinalIgnoreCase
-        );
+        var mappings = mappingsEntity
+            .Select(
+                x => new KeyValuePair<EntityKey, IReadOnlyList<EntityNestedKey>>(
+                    x.Key,
+                    GetStringList(x.Value)
+                )
+            )
+            .ToList();
 
-        var propertiesToRemove = mappingsDict
-            .SelectMany(x => x.Value)
-            .ToHashSet();
+        if (mappings.All(
+                x => x.Value.Count == 1 && x.Value.Single().KeyNames.Count == 1
+            )) //Simple case of just column renames
+        {
+            var simpleMappings = mappings.Select(x => (x.Key, x.Value.Single().KeyNames.Single()))
+                .ToList();
 
-        var newEntityStream = entityStream
-            .Select(e => ChangePropertyNames(e, mappingsDict, propertiesToRemove));
+            var headersCache = new HeadersCache();
 
-        return newEntityStream;
+            var newEntityStream = entityStream
+                .Select(e => ChangePropertyNamesSimple(e, simpleMappings, headersCache));
+
+            return newEntityStream;
+        }
+        else
+        {
+            var newEntityStream = entityStream
+                .Select(e => ChangePropertyNames(e, mappings));
+
+            return newEntityStream;
+        }
+
+        static Entity ChangePropertyNamesSimple(
+            Entity oldEntity,
+            IReadOnlyList<(EntityKey newKey, EntityKey oldKey)> mappings,
+            HeadersCache headersCache)
+        {
+            if (headersCache.Data.HasValue
+             && (headersCache.Data.Value.oldHeaders == oldEntity.Headers
+              || headersCache.Data.Value.oldHeaders.SequenceEqual(oldEntity.Headers)))
+            {
+                var newEntity = oldEntity with { Headers = headersCache.Data.Value.newHeaders };
+                return newEntity;
+            }
+            else
+            {
+                var newEntity = oldEntity;
+
+                foreach (var (newKey, oldKey) in mappings)
+                {
+                    var ne = newEntity.WithPropertyRenamed(oldKey, newKey);
+
+                    if (ne.HasValue)
+                        newEntity = ne.Value;
+                }
+
+                headersCache.Data =
+                    Maybe<(ImmutableArray<EntityKey> oldHeaders, ImmutableArray<EntityKey>
+                        newHeaders)>.From((oldEntity.Headers, newEntity.Headers));
+
+                return newEntity;
+            }
+        }
 
         static Entity ChangePropertyNames(
-            Entity entity,
-            IReadOnlyDictionary<string, IReadOnlyList<EntityPropertyKey>> mappings,
-            IEnumerable<EntityPropertyKey> propertiesToRemove)
+            Entity oldEntity,
+            IReadOnlyList<KeyValuePair<EntityKey, IReadOnlyList<EntityNestedKey>>> mappings)
         {
-            var changed = false;
-
-            var newEntity = entity;
+            var newEntity = oldEntity;
 
             foreach (var (newName, propertyKeys) in mappings)
-            foreach (var entityPropertyKey in propertyKeys)
             {
-                var value = entity.TryGetProperty(entityPropertyKey);
+                var done = false;
 
-                if (value.HasValue)
+                foreach (var entityPropertyKey in propertyKeys)
                 {
-                    changed = true;
-                    var newProperty = value.GetValueOrThrow();
+                    if (done)
+                    {
+                        newEntity = newEntity.WithNestedPropertyRemoved(entityPropertyKey)
+                            .GetValueOrDefault(newEntity);
+                    }
+                    else if (entityPropertyKey.KeyNames.Count
+                          == 1) //simply rename an existing column
+                    {
+                        var renamed = newEntity.WithPropertyRenamed(
+                            entityPropertyKey.KeyNames.Single(),
+                            newName
+                        );
 
-                    newEntity = newEntity.WithProperty(
-                        newName,
-                        newProperty.Value,
-                        newProperty.Order
-                    );
+                        if (renamed.HasValue)
+                        {
+                            done      = true;
+                            newEntity = renamed.Value;
+                        }
+                    }
+                    else //remap a nested property - the new column will be appended
+                    {
+                        var value = newEntity.TryGetProperty(entityPropertyKey);
 
-                    break;
+                        if (value.HasValue)
+                        {
+                            done = true;
+                            var newProperty = value.GetValueOrThrow();
+
+                            var index =
+                                newEntity.Headers.IndexOf(entityPropertyKey.KeyNames.First());
+
+                            newEntity = newEntity.WithPropertyAdded(
+                                newName,
+                                newProperty.Value,
+                                index
+                            );
+
+                            newEntity = newEntity.WithNestedPropertyRemoved(entityPropertyKey)
+                                .GetValueOrDefault(newEntity);
+                        }
+                    }
                 }
             }
-
-            var withoutProperties = newEntity.TryRemoveProperties(propertiesToRemove);
-
-            if (withoutProperties.HasValue)
-            {
-                newEntity = withoutProperties.GetValueOrThrow();
-                changed   = true;
-            }
-
-            if (!changed)
-                return entity;
 
             return newEntity;
         }
 
-        static IReadOnlyList<EntityPropertyKey> GetStringList(ISCLObject ev)
+        static IReadOnlyList<EntityNestedKey> GetStringList(ISCLObject ev)
         {
             if (ev is IArray nestedList)
             {
                 return nestedList.ListIfEvaluated()
                     .Value
-                    .Select(x => EntityPropertyKey.Create(x.Serialize(SerializeOptions.Primitive)))
+                    .Select(x => EntityNestedKey.Create(x.Serialize(SerializeOptions.Primitive)))
                     .ToList();
             }
 
-            return new[] { EntityPropertyKey.Create(ev.Serialize(SerializeOptions.Primitive)) };
+            return new[] { EntityNestedKey.Create(ev.Serialize(SerializeOptions.Primitive)) };
         }
     }
 
@@ -126,4 +190,17 @@ public class EntityMapProperties : CompoundStep<Array<Entity>>
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =
         new SimpleStepFactory<EntityMapProperties, Array<Entity>>();
+
+    /// <summary>
+    /// Caches headers for simple entity renames
+    /// </summary>
+    private class HeadersCache
+    {
+        public Maybe<(ImmutableArray<EntityKey> oldHeaders, ImmutableArray<EntityKey> newHeaders)>
+            Data
+        {
+            get;
+            set;
+        }
+    }
 }

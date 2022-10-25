@@ -4,7 +4,7 @@
 /// The data used by a Freezable Step.
 /// </summary>
 public record FreezableEntityData(
-    IReadOnlyDictionary<EntityPropertyKey, FreezableStepProperty> EntityProperties,
+    IReadOnlyDictionary<EntityNestedKey, FreezableStepProperty> EntityProperties,
     TextLocation Location)
 {
     /// <inheritdoc />

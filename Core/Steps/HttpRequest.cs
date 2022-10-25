@@ -77,10 +77,10 @@ public class HttpRequest : CompoundStep<StringStream>
 
     static RestRequest AddHeaders(RestRequest request, Entity entity)
     {
-        foreach (var (name, sclObject, _) in entity.Dictionary.Values)
+        foreach (var (name, sclObject) in entity.Headers.Zip(entity.Values))
         {
             request = request.AddHeader(
-                name,
+                name.Inner,
                 sclObject.Serialize(SerializeOptions.Primitive)
             );
         }

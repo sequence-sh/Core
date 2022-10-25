@@ -366,12 +366,12 @@ public class CompletionVisitor : SCLBaseVisitor<CompletionResponse?>
     }
 
     private static CompletionResponse EntityPropertiesCompletionResponse(
-        IEnumerable<(EntityPropertyKey, SchemaNode)> pairs,
+        IEnumerable<(EntityNestedKey, SchemaNode)> pairs,
         TextRange range)
     {
         var items = pairs.Select(x => CreateCompletionItem(x.Item1, x.Item2)).ToList();
 
-        CompletionItem CreateCompletionItem(EntityPropertyKey key, SchemaNode node)
+        CompletionItem CreateCompletionItem(EntityNestedKey key, SchemaNode node)
         {
             var type = node.ToTypeReference().Match(x => x.HumanReadableTypeName, () => "Unknown");
 

@@ -38,19 +38,16 @@ public static class SCLObjectHelper
             case JsonValueKind.Undefined: return SCLNull.Instance;
             case JsonValueKind.Object:
             {
-                var dict = element.EnumerateObject()
-                    .GroupBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
-                    .Select(
-                        (x, i) =>
-                            new EntityProperty(
-                                x.First().Name,
-                                ConvertToSCLObject(x.First().Value),
-                                i
-                            )
-                    )
-                    .ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+                var keys   = ImmutableArray.CreateBuilder<EntityKey>();
+                var values = ImmutableArray.CreateBuilder<ISCLObject>();
 
-                var entity = new Entity(dict);
+                foreach (var prop in element.EnumerateObject())
+                {
+                    keys.Add(new EntityKey(prop.Name));
+                    values.Add(ConvertToSCLObject(prop.Value));
+                }
+
+                var entity = new Entity(keys.ToImmutable(), values.ToImmutable());
                 return entity;
             }
             case JsonValueKind.Array:

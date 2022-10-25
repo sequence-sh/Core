@@ -82,7 +82,7 @@ public sealed class Transform : CompoundStep<Array<Entity>>
 
             var result = topNode.TryTransform(
                 "",
-                new Entity(entity),
+                entity,
                 transformSettings
             );
 
@@ -93,21 +93,11 @@ public sealed class Transform : CompoundStep<Array<Entity>>
                     if (result.Value.GetValueOrThrow() is Entity ne)
                         yield return ne;
                     else
-                        yield return new Entity(
-                            new[]
-                            {
-                                new EntityProperty(
-                                    Entity.PrimitiveKey,
-                                    result.Value.GetValueOrThrow(),
-                                    1
-                                )
-                            }.ToImmutableDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase)
-                        );
+                        yield return Entity.CreatePrimitive(result.Value.GetValueOrThrow());
                 }
                 else
                     yield return entity; //no change
             }
-
             else
             {
                 switch (errorBehavior.Value)

@@ -29,7 +29,7 @@ public sealed class EntityRemoveProperty : CompoundStep<Entity>
         if (property.IsFailure)
             return property.ConvertFailure<Entity>();
 
-        var newEntity = entity.Value.RemoveProperty(property.Value);
+        var newEntity = entity.Value.WithPropertyRemoved(new EntityKey(property.Value));
 
         return newEntity;
     }

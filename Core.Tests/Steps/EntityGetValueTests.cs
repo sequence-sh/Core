@@ -38,10 +38,10 @@ public partial class EntityGetValueTests : StepTestBase<EntityGetValue<StringStr
                 new EntityGetValue<StringStream>()
                 {
                     Entity = new CreateEntityStep(
-                        new Dictionary<EntityPropertyKey, IStep>()
+                        new Dictionary<EntityNestedKey, IStep>()
                         {
                             {
-                                new EntityPropertyKey("Foo"),
+                                new EntityNestedKey("Foo"),
                                 new StringSubstring()
                                 {
                                     String = Constant("Hello World"), Length = Constant(5)

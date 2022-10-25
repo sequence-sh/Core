@@ -41,16 +41,16 @@ public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
 
         var (entity, property) = r.Value;
 
-        EntityPropertyKey epk;
+        EntityNestedKey epk;
 
         if (property.StartsWith("$"))
         {
-            epk = new EntityPropertyKey(property.TrimStart('$'));
+            epk = new EntityNestedKey(property.TrimStart('$'));
         }
         else
         {
-            var keys = property.Split(".");
-            epk = new EntityPropertyKey(keys);
+            var keys = property.Split(".").Select(x => new EntityKey(x));
+            epk = new EntityNestedKey(keys);
         }
 
         var entityValue = entity.TryGetValue(epk);
@@ -166,7 +166,7 @@ public sealed class EntityGetValue<T> : CompoundStep<T> where T : ISCLObject
                             if (propNameMaybe.HasValue
                              && propNameMaybe.Value is StringStream propName)
                             {
-                                var epk = EntityPropertyKey.Create(propName.GetString());
+                                var epk = EntityNestedKey.Create(propName.GetString());
 
                                 var typeReference = currentNode.GetPropertyTypeReference(epk);
 

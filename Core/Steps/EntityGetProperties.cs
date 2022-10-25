@@ -22,9 +22,7 @@ public sealed class EntityGetProperties : CompoundStep<Array<StringStream>>
         if (entity.IsFailure)
             return entity.ConvertFailure<Array<StringStream>>();
 
-        var array = entity.Value.Dictionary.OrderBy(x => x.Value.Order)
-            .Select(x => new StringStream(x.Key))
-            .ToSCLArray();
+        var array = entity.Value.Headers.Select(x => new StringStream(x.Inner)).ToSCLArray();
 
         return array;
     }

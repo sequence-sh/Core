@@ -76,7 +76,7 @@
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
     <PackageReference Include="Antlr4BuildTasks" Version="11.5.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.35.1" />
-    <PackageReference Include="Generator.Equals" Version="2.5.1" />
+    <PackageReference Include="Generator.Equals" Version="2.6.0" />
     <PackageReference Include="JsonSchema.Net" Version="3.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
