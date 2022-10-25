@@ -30,14 +30,14 @@ public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<Entit
     public TypeReference GetTypeReference() => TypeReference.Entity.NoSchema;
 
     private static readonly ImmutableArray<EntityKey> PrimitiveKeyHeaders =
-        ImmutableArray<EntityKey>.Empty.Add(EntityKey.Primitive);
+        ImmutableArray.Create(EntityKey.Primitive);
 
     /// <summary>
     /// Create an entity with a single primitive value
     /// </summary>
     public static Entity CreatePrimitive(ISCLObject value)
     {
-        return new Entity(PrimitiveKeyHeaders, ImmutableArray<ISCLObject>.Empty.Add(value));
+        return new Entity(PrimitiveKeyHeaders, ImmutableArray.Create(value));
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<Entit
         if (ev is Entity nestedEntityStruct)
             return nestedEntityStruct;
 
-        return new Entity(PrimitiveKeyHeaders, new ImmutableArray<ISCLObject>() { ev });
+        return new Entity(PrimitiveKeyHeaders, ImmutableArray.Create(ev));
     }
 
     /// <summary>
@@ -560,6 +560,43 @@ public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<Entit
         );
 
         return newEntityStruct;
+    }
+
+    /// <summary>
+    /// Recursively flatten this entity
+    /// </summary>
+    [Pure]
+    public Entity Flattened()
+    {
+        if (!Values.Any(x => x is Entity))
+            return this; //No need
+
+        var newPairs = this.SelectMany(
+                x =>
+                {
+                    if (x.Value is Entity nested)
+                    {
+                        return nested.Flattened()
+                            .Select(
+                                n =>
+                                    new KeyValuePair<EntityKey, ISCLObject>(
+                                        new EntityKey(x.Key.Inner + "." + n.Key.Inner),
+                                        n.Value
+                                    )
+                            );
+                    }
+                    else
+                    {
+                        return new[] { x };
+                    }
+                }
+            )
+            .ToList();
+
+        var headers = newPairs.Select(x => x.Key).ToImmutableArray();
+        var values  = newPairs.Select(x => x.Value).ToImmutableArray();
+
+        return new Entity(headers, values);
     }
 
     /// <inheritdoc />
