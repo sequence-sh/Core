@@ -14,7 +14,7 @@ namespace Reductech.Sequence.Core;
 [Equatable]
 public partial record struct Entity(
     [property: OrderedEquality] ImmutableArray<EntityKey> Headers,
-    [property: OrderedEquality] ImmutableArray<ISCLObject> Values) { }
+    [property: OrderedEquality] ImmutableArray<ISCLObject> Values);
 
 public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<EntityKey, ISCLObject>>
 {
@@ -95,6 +95,7 @@ public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<Entit
     [Pure]
     public static Entity Create(JsonNode node)
     {
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         var rootElement = node.ToJsonDocument()?.RootElement;
         return rootElement.HasValue ? Create(rootElement.Value) : Empty;
     }
