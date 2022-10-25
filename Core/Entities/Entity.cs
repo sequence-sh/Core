@@ -562,6 +562,43 @@ public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<Entit
         return newEntityStruct;
     }
 
+    /// <summary>
+    /// Recursively flatten this entity
+    /// </summary>
+    [Pure]
+    public Entity Flattened()
+    {
+        if (!Values.Any(x => x is Entity))
+            return this; //No need
+
+        var newPairs = this.SelectMany(
+                x =>
+                {
+                    if (x.Value is Entity nested)
+                    {
+                        return nested.Flattened()
+                            .Select(
+                                n =>
+                                    new KeyValuePair<EntityKey, ISCLObject>(
+                                        new EntityKey(x.Key.Inner + "." + n.Key.Inner),
+                                        n.Value
+                                    )
+                            );
+                    }
+                    else
+                    {
+                        return new[] { x };
+                    }
+                }
+            )
+            .ToList();
+
+        var headers = newPairs.Select(x => x.Key).ToImmutableArray();
+        var values  = newPairs.Select(x => x.Value).ToImmutableArray();
+
+        return new Entity(headers, values);
+    }
+
     /// <inheritdoc />
     public Maybe<T> MaybeAs<T>() where T : ISCLObject
     {
