@@ -189,6 +189,9 @@
   <data name="ExternalProcessNotFound" xml:space="preserve">
     <value>Could not find process '{0}'</value>
   </data>
+  <data name="IdNotPresent" xml:space="preserve">
+    <value>The id '{0}' does not exist.</value>
+  </data>
   <data name="IndexOutOfBounds" xml:space="preserve">
     <value>Index was outside the bounds of the array.</value>
   </data>

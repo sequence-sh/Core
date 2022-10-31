@@ -133,6 +133,15 @@ namespace Reductech.Sequence.Core.Internal.Logging {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The id &apos;{Id}&apos; does not exist..
+        /// </summary>
+        internal static string IdNotPresent {
+            get {
+                return ResourceManager.GetString("IdNotPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Item to Delete did not Exist: {Path}.
         /// </summary>
         internal static string ItemToDeleteDidNotExist {

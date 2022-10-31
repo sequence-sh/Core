@@ -149,4 +149,12 @@ public sealed record LogSituation : LogSituationBase
         nameof(EnvironmentVariable),
         LogLevel.Trace
     );
+
+    /// <summary>
+    /// The id '{Id}' does not exist.
+    /// </summary>
+    public static readonly LogSituation IdNotPresent = new(
+        nameof(IdNotPresent),
+        LogLevel.Warning
+    );
 }

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using OneOf.Types;
 
 namespace Reductech.Sequence.Core.Internal.Errors;
 
@@ -433,6 +434,11 @@ public sealed record ErrorCode : ErrorCodeBase
     /// </summary>
     public static readonly ErrorCode AttemptToSetInjectedVariable =
         new(nameof(AttemptToSetInjectedVariable));
+
+    /// <summary>
+    /// The id '{0}' does not exist.
+    /// </summary>
+    public static readonly ErrorCode IdNotPresent = new(nameof(IdNotPresent));
 
 #endregion
 }
