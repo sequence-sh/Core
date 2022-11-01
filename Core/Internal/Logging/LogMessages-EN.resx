@@ -141,6 +141,9 @@
   <data name="FileDeleted" xml:space="preserve">
     <value>File Deleted: {Path}</value>
   </data>
+  <data name="IdNotPresent" xml:space="preserve">
+    <value>The id '{Id}' does not exist.</value>
+  </data>
   <data name="ItemToDeleteDidNotExist" xml:space="preserve">
     <value>Item to Delete did not Exist: {Path}</value>
   </data>

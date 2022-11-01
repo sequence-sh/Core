@@ -277,6 +277,15 @@ namespace Reductech.Sequence.Core.Internal.Errors {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The id &apos;{0}&apos; does not exist..
+        /// </summary>
+        internal static string IdNotPresent {
+            get {
+                return ResourceManager.GetString("IdNotPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Index was outside the bounds of the array..
         /// </summary>
         internal static string IndexOutOfBounds {
