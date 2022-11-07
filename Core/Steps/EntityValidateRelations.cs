@@ -85,6 +85,13 @@ public class EntityValidateRelations : CompoundStep<Array<Entity>>
             return new ValueTask<Result<Unit, IError>>(Unit.Default);
         }
 
+        var evaluated = await entities.EnsureEvaluated(cancellationToken);
+
+        if (evaluated.IsFailure)
+            return evaluated.ConvertFailure<Array<Entity>>();
+
+        entities = (Array<Entity>)evaluated.Value;
+
         var runResult = await entities.ForEach(CheckEntity, cancellationToken);
 
         if (runResult.IsFailure)
