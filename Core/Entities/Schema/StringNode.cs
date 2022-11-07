@@ -49,9 +49,10 @@ public record StringNode(
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
-        var r1 = Format.TryTransform(propertyName, value, transformSettings);
+        var r1 = Format.TryTransform(propertyName, value, transformSettings, transformRoot);
 
         if (r1.IsFailure)
             return r1;
@@ -61,7 +62,7 @@ public record StringNode(
 
         var s = r1.Value.GetValueOrDefault(value).Serialize(SerializeOptions.Primitive);
 
-        var testResult = StringRestrictions.Test(s, propertyName);
+        var testResult = StringRestrictions.Test(s, propertyName, transformRoot);
 
         if (testResult.IsFailure)
             return testResult.ConvertFailure<Maybe<ISCLObject>>();

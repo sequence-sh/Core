@@ -52,7 +52,10 @@ public record NumberNode(
         new(
             () =>
                 new TypeReference.OneOf(
-                    new[] { TypeReference.Actual.Integer, TypeReference.Actual.Double, }
+                    new TypeReference[]
+                    {
+                        TypeReference.Actual.Integer, TypeReference.Actual.Double,
+                    }
                 )
         );
 
@@ -60,11 +63,12 @@ public record NumberNode(
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         if (value is SCLInt evInteger)
         {
-            var restrictionResult = Restrictions.Test(evInteger.Value, propertyName);
+            var restrictionResult = Restrictions.Test(evInteger.Value, propertyName, transformRoot);
 
             if (restrictionResult.IsFailure)
                 return restrictionResult.ConvertFailure<Maybe<ISCLObject>>();
@@ -74,7 +78,7 @@ public record NumberNode(
         else if (value is SCLDouble evDouble)
 
         {
-            var restrictionResult = Restrictions.Test(evDouble.Value, propertyName);
+            var restrictionResult = Restrictions.Test(evDouble.Value, propertyName, transformRoot);
 
             if (restrictionResult.IsFailure)
                 return restrictionResult.ConvertFailure<Maybe<ISCLObject>>();
@@ -85,9 +89,14 @@ public record NumberNode(
         var v = value.Serialize(SerializeOptions.Primitive);
 
         if (!double.TryParse(v, out var d))
-            return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Number", propertyName);
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
+                "Should Be Number",
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
+            );
 
-        var restrictionResult2 = Restrictions.Test(d, propertyName);
+        var restrictionResult2 = Restrictions.Test(d, propertyName, transformRoot);
 
         if (restrictionResult2.IsFailure)
             return restrictionResult2.ConvertFailure<Maybe<ISCLObject>>();

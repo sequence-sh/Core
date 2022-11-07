@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using OneOf.Types;
 
 namespace Reductech.Sequence.Core.Internal.Errors;
 
@@ -288,12 +287,12 @@ public sealed record ErrorCode : ErrorCodeBase
         );
 
     /// <summary>
-    /// SchemaViolation: '{0}' at '{1}'.
+    /// SchemaViolation: '{0}' at '{1}' on row '{2}', entity: '{3}'.
     /// </summary>
     public static readonly ErrorCode
-        SchemaViolation = new(
+        SchemaViolated = new(
             nameof(
-                SchemaViolation)
+                SchemaViolated)
         );
 
     /// <summary>

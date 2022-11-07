@@ -367,11 +367,11 @@ namespace Reductech.Sequence.Core.Internal.Errors {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SchemaViolation: &apos;{0}&apos; at &apos;{1}&apos;..
+        ///   Looks up a localized string similar to SchemaViolation: &apos;{0}&apos; at &apos;{1}&apos; on row &apos;{2}&apos;, entity: &apos;{3}&apos;..
         /// </summary>
-        internal static string SchemaViolation {
+        internal static string SchemaViolated {
             get {
-                return ResourceManager.GetString("SchemaViolation", resourceCulture);
+                return ResourceManager.GetString("SchemaViolated", resourceCulture);
             }
         }
         

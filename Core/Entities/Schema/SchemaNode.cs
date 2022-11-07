@@ -327,15 +327,18 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
     public Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
         ISCLObject entityValue,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         if (!EnumeratedValuesNodeData.Allow(entityValue, transformSettings))
-            return ErrorCode.SchemaViolation.ToErrorBuilder(
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
                 $"Value not allowed: {entityValue}",
-                propertyName
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
             );
 
-        var r = TryTransform1(propertyName, entityValue, transformSettings);
+        var r = TryTransform1(propertyName, entityValue, transformSettings, transformRoot);
 
         return r;
     }
@@ -346,5 +349,11 @@ public abstract record SchemaNode(EnumeratedValuesNodeData EnumeratedValuesNodeD
     protected abstract Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings);
+        TransformSettings transformSettings,
+        TransformRoot transformRoot);
 }
+
+/// <summary>
+/// The root entity of a transform
+/// </summary>
+public sealed record TransformRoot(int RowNumber, Entity Entity);

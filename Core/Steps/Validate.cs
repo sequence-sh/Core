@@ -30,12 +30,15 @@ public sealed class Validate : CompoundStep<Array<Entity>>
 
         var (entityStream, schema, errorBehavior) = r.Value;
 
+        var rowNumber = 0;
         var newStream = entityStream.SelectMany(ApplySchema);
 
         return newStream;
 
         async IAsyncEnumerable<Entity> ApplySchema(Entity entity)
         {
+            var transformRoot = new TransformRoot(rowNumber, entity);
+            rowNumber += 1;
             await ValueTask.CompletedTask;
             var jsonElement = entity.ToJsonElement();
 
@@ -54,11 +57,13 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                     {
                         var errors =
                             ErrorBuilderList.Combine(
-                                    result.GetErrorMessages()
+                                    result.GetErrorMessages(transformRoot)
                                         .Select(
-                                            x => ErrorCode.SchemaViolation.ToErrorBuilder(
+                                            x => ErrorCode.SchemaViolated.ToErrorBuilder(
                                                 x.message,
-                                                x.location
+                                                x.location,
+                                                transformRoot.RowNumber,
+                                                transformRoot.Entity
                                             )
                                         )
                                 )
@@ -68,7 +73,7 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                     }
                     case Enums.ErrorBehavior.Error:
                     {
-                        foreach (var errorMessage in result.GetErrorMessages())
+                        foreach (var errorMessage in result.GetErrorMessages(transformRoot))
                         {
                             LogWarning(errorMessage);
                         }
@@ -77,7 +82,7 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                     }
                     case Enums.ErrorBehavior.Warning:
                     {
-                        foreach (var errorMessage in result.GetErrorMessages())
+                        foreach (var errorMessage in result.GetErrorMessages(transformRoot))
                         {
                             LogWarning(errorMessage);
                         }
@@ -98,9 +103,16 @@ public sealed class Validate : CompoundStep<Array<Entity>>
             }
         }
 
-        void LogWarning((string message, string location) pair)
+        void LogWarning((string message, string location, TransformRoot transformRoot) pair)
         {
-            LogSituation.SchemaViolation.Log(stateMonad, this, pair.message, pair.location);
+            LogSituation.SchemaViolated.Log(
+                stateMonad,
+                this,
+                pair.message,
+                pair.location,
+                pair.transformRoot.RowNumber,
+                pair.transformRoot.Entity
+            );
         }
     }
 

@@ -103,10 +103,10 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// Schema violation: '{message}' at '{location}'.
+    /// SchemaViolation: '{0}' at '{1}' on row '{2}', entity: '{3}'.
     /// </summary>
-    public static readonly LogSituation SchemaViolation = new(
-        nameof(SchemaViolation),
+    public static readonly LogSituation SchemaViolated = new(
+        nameof(SchemaViolated),
         LogLevel.Warning
     );
 

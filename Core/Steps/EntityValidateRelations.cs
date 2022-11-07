@@ -7,6 +7,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// For each entity in the stream, check that the value of the `ParentIdProperty` is the value of the `IdProperty` for at least one entity in the stream.
 /// </summary>
 [AllowConstantFolding]
+[Alias("ValidateRelations")]
 [SCLExample(
     $"EntityValidateRelations {ExampleEntities} 'id' 'parentid' 'Error'",
     ValidExampleEntities,

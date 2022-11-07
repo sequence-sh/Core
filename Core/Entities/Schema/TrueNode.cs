@@ -38,7 +38,8 @@ public record TrueNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         return Maybe<ISCLObject>.None;
     }

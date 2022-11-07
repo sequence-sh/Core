@@ -52,17 +52,23 @@ public record OneOfNode(OneOfNodeData Data) : SchemaNode<OneOfNodeData>(
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         foreach (var possible in Data.Options)
         {
-            var v = possible.TryTransform(propertyName, value, transformSettings);
+            var v = possible.TryTransform(propertyName, value, transformSettings, transformRoot);
 
             if (v.IsSuccess)
                 return v;
         }
 
-        return ErrorCode.SchemaViolation.ToErrorBuilder("Does not match any option", propertyName);
+        return ErrorCode.SchemaViolated.ToErrorBuilder(
+            "Does not match any option",
+            propertyName,
+            transformRoot.RowNumber,
+            transformRoot.Entity
+        );
     }
 }
 

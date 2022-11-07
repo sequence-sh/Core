@@ -94,10 +94,16 @@ public record EntityNode(
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         if (value is not Entity nestedEntity)
-            return ErrorCode.SchemaViolation.ToErrorBuilder("Should be Entity", propertyName);
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
+                "Should be Entity",
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
+            );
 
         var errors = new List<IErrorBuilder>();
 
@@ -116,7 +122,7 @@ public record EntityNode(
         else
         {
             allowExtra = EntityAdditionalItems.AdditionalItems
-                .TryTransform(propertyName, value, transformSettings)
+                .TryTransform(propertyName, value, transformSettings, transformRoot)
                 .IsSuccess;
         }
 
@@ -134,7 +140,8 @@ public record EntityNode(
                 var r = node.Node.TryTransform(
                     propertyName + "." + key.Inner,
                     sclObject,
-                    transformSettings
+                    transformSettings,
+                    transformRoot
                 );
 
                 if (r.IsFailure)
@@ -172,9 +179,11 @@ public record EntityNode(
         foreach (var remainingRequiredProperty in remainingRequiredProperties)
         {
             errors.Add(
-                ErrorCode.SchemaViolation.ToErrorBuilder(
+                ErrorCode.SchemaViolated.ToErrorBuilder(
                     $"Missing Property '{remainingRequiredProperty}'",
-                    propertyName
+                    propertyName,
+                    transformRoot.RowNumber,
+                    transformRoot.Entity
                 )
             );
         }

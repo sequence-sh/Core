@@ -148,9 +148,11 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 new List<Entity> { fooHello },
                 new JsonSchemaBuilder().Title(SchemaName)
                     .Properties(("Foo", new JsonSchemaBuilder().Type(SchemaValueType.Integer))),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Value is \"string\" but should be \"integer\"",
-                "#/properties/Foo/type"
+                "properties.Foo.type",
+                0,
+                fooHello
             );
 
             yield return CreateCase(
@@ -158,9 +160,11 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 new List<Entity> { fooFish },
                 new JsonSchemaBuilder()
                     .Properties(("Foo", EnumProperty("Apple", "Orange"))),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Expected value to match one of the values specified by the enum",
-                "#/properties/Foo/enum"
+                "properties.Foo.enum",
+                0,
+                fooFish
             );
 
             yield return CreateCase(
@@ -173,9 +177,11 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                              .Pattern("apple|orange")
                              .Build())
                     ),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "The string value was not a match for the indicated regular expression",
-                "#/properties/Foo/pattern"
+                "properties.Foo.pattern",
+                0,
+                fooFish
             );
 
             yield return CreateCase(
@@ -187,9 +193,11 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                         ("Bar", AnyString)
                     )
                     .Required("Foo", "Bar"),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Required properties [\"Bar\"] were not present",
-                "#/required"
+                "required",
+                0,
+                fooFish
             );
 
             yield return CreateCase(
@@ -198,9 +206,11 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 new JsonSchemaBuilder()
                     .Properties(("Bar", AnyString))
                     .AdditionalProperties(JsonSchema.False),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "All values fail against the false schema",
-                "#/additionalProperties"
+                "additionalProperties",
+                0,
+                fooFish
             );
 
             yield return CreateCase(
@@ -209,9 +219,11 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 new JsonSchemaBuilder()
                     .Properties(("Foo", AnyString))
                     .Required("Foo"),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Required properties [\"Foo\"] were not present",
-                "#/required"
+                "required",
+                1,
+                Entity.Create(("Foo", ""))
             );
         }
     }
