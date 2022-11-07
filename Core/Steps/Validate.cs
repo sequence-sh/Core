@@ -51,6 +51,40 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                 yield return entity;
             else
             {
+                if (OnInvalid is not null)
+                {
+                    var stateDict = stateMonad.GetState()
+                        .ToImmutableDictionary();
+
+                    foreach (var (m, l, tr) in result.GetErrorMessages(transformRoot))
+                    {
+                        var scoped =
+                            new ScopedStateMonad(
+                                stateMonad,
+                                stateDict,
+                                OnInvalid.VariableNameOrItem,
+                                new KeyValuePair<VariableName, ISCLObject>(
+                                    OnInvalid.VariableNameOrItem,
+                                    Entity.Create(
+                                        new (EntityNestedKey key, ISCLObject value)[]
+                                        {
+                                            (EntityNestedKey.Create("RowNumber"),
+                                             new SCLInt(tr.RowNumber)),
+                                            (EntityNestedKey.Create("ErrorMessage"),
+                                             new StringStream(m)),
+                                            (EntityNestedKey.Create("Location"),
+                                             new StringStream(l)),
+                                            (EntityNestedKey.Create("Entity"),
+                                             tr.Entity),
+                                        }
+                                    )
+                                )
+                            );
+
+                        await OnInvalid.StepTyped.Run(scoped, cancellationToken);
+                    }
+                }
+
                 switch (errorBehavior.Value)
                 {
                     case Enums.ErrorBehavior.Fail:
@@ -129,6 +163,15 @@ public sealed class Validate : CompoundStep<Array<Entity>>
     [StepProperty(2)]
     [Required]
     public IStep<Entity> Schema { get; set; } = null!;
+
+    /// <summary>
+    /// A function that does something with every entity that fails validation.  
+    /// The actions defined in ErrorBehaviour will also happen.
+    /// This function takes an entity with three properties: 'RowNumber', 'ErrorMessage', 'Location', and 'Entity' where 'Entity' contains the entity that failed to validate
+    /// </summary>
+    [FunctionProperty]
+    [DefaultValueExplanation("Either this or 'Replace' must be set.")]
+    public LambdaFunction<Entity, Unit>? OnInvalid { get; set; } = null!;
 
     /// <summary>
     /// How to behave if an error occurs.

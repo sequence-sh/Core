@@ -104,6 +104,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             static ErrorCase CreateCase(
                 string name,
                 List<Entity> entities,
+                List<string>? logOnInvalidMessages,
                 JsonSchema schema,
                 ErrorCode expectedErrorCode,
                 params object[] expectedErrorArgs)
@@ -114,10 +115,22 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 {
                     EntityStream  = Array(entities.ToArray()),
                     Schema        = Constant(schemaEntity),
-                    ErrorBehavior = Constant(ErrorBehavior.Fail)
+                    ErrorBehavior = Constant(ErrorBehavior.Fail),
                 };
 
-                return new ErrorCase(
+                if (logOnInvalidMessages is not null)
+                    enforceSchema.OnInvalid = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log()
+                        {
+                            Value = GetEntityVariable,
+                            Severity = new SCLConstant<SCLEnum<Severity>>(
+                                new SCLEnum<Severity>(Severity.Error)
+                            )
+                        }
+                    );
+
+                var errorCase = new ErrorCase(
                     name,
                     new Sequence<Unit>
                     {
@@ -138,6 +151,15 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                         new ErrorLocation(enforceSchema)
                     )
                 );
+
+                if (logOnInvalidMessages is not null)
+                {
+                    errorCase.IgnoreLoggedValues   = false;
+                    errorCase.CheckLogLevel        = LogLevel.Warning;
+                    errorCase.ExpectedLoggedValues = logOnInvalidMessages;
+                }
+
+                return errorCase;
             }
 
             var fooHello = Entity.Create(("Foo", "Hello"));
@@ -146,6 +168,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             yield return CreateCase(
                 "Could not cast",
                 new List<Entity> { fooHello },
+                null,
                 new JsonSchemaBuilder().Title(SchemaName)
                     .Properties(("Foo", new JsonSchemaBuilder().Type(SchemaValueType.Integer))),
                 ErrorCode.SchemaViolated,
@@ -158,6 +181,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             yield return CreateCase(
                 "Missing enum value",
                 new List<Entity> { fooFish },
+                null,
                 new JsonSchemaBuilder()
                     .Properties(("Foo", EnumProperty("Apple", "Orange"))),
                 ErrorCode.SchemaViolated,
@@ -170,6 +194,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             yield return CreateCase(
                 "Regex not matched",
                 new List<Entity> { fooFish },
+                null,
                 new JsonSchemaBuilder()
                     .Properties(
                         ("Foo",
@@ -187,6 +212,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             yield return CreateCase(
                 "Missing property",
                 new List<Entity> { fooFish },
+                null,
                 new JsonSchemaBuilder()
                     .Properties(
                         ("Foo", AnyString),
@@ -203,6 +229,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             yield return CreateCase(
                 "Extra property",
                 new List<Entity> { fooFish },
+                null,
                 new JsonSchemaBuilder()
                     .Properties(("Bar", AnyString))
                     .AdditionalProperties(JsonSchema.False),
@@ -216,6 +243,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             yield return CreateCase(
                 "Required Empty property should not validate",
                 new List<Entity>() { Entity.Create(("Foo", "Bar")), Entity.Create(("Foo", "")), },
+                null,
                 new JsonSchemaBuilder()
                     .Properties(("Foo", AnyString))
                     .Required("Foo"),
@@ -224,6 +252,26 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 "required",
                 1,
                 Entity.Create(("Foo", ""))
+            );
+
+            yield return CreateCase(
+                "Missing property With OnInvalid",
+                new List<Entity> { fooFish },
+                new List<string>
+                {
+                    "('RowNumber': 0 'ErrorMessage': \"Required properties [\\\"Bar\\\"] were not present\" 'Location': \"required\" 'Entity': ('Foo': \"Fish\"))"
+                },
+                new JsonSchemaBuilder()
+                    .Properties(
+                        ("Foo", AnyString),
+                        ("Bar", AnyString)
+                    )
+                    .Required("Foo", "Bar"),
+                ErrorCode.SchemaViolated,
+                "Required properties [\"Bar\"] were not present",
+                "required",
+                0,
+                fooFish
             );
         }
     }
