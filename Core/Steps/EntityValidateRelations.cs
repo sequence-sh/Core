@@ -4,18 +4,18 @@ using Reductech.Sequence.Core.Internal.Logging;
 namespace Reductech.Sequence.Core.Steps;
 
 /// <summary>
-/// Rename entity properties.
+/// For each entity in the stream, check that the value of the `ParentIdProperty` is the value of the `IdProperty` for at least one entity in the stream.
 /// </summary>
 [AllowConstantFolding]
 [SCLExample(
     $"EntityValidateRelations {ExampleEntities} 'id' 'parentid' 'Error'",
     ValidExampleEntities,
-    ExpectedLogs = new[] { "The id '4' does not exist." }
+    ExpectedLogs = new[] { "The id '100' does not exist." }
 )]
 [SCLExample(
     $"EntityValidateRelations {ExampleEntities} 'id' 'parentid' 'Warning'",
     ExampleEntities,
-    ExpectedLogs = new[] { "The id '4' does not exist." }
+    ExpectedLogs = new[] { "The id '100' does not exist." }
 )]
 [SCLExample(
     $"EntityValidateRelations {ExampleEntities} 'id' 'parentid' 'Skip'",
@@ -28,10 +28,10 @@ namespace Reductech.Sequence.Core.Steps;
 public class EntityValidateRelations : CompoundStep<Array<Entity>>
 {
     private const string ExampleEntities =
-        @"[('id': 1), ('id': 2 'parentid': 1), ('parentid': 1), ('id': 3 'parentid': 4)]";
+        @"[('id': 1), ('id': 2 'parentid': 1), ('parentid': 1), ('id': 3 'parentid': 100), ('id': 4 'parentid': """")]";
 
     private const string ValidExampleEntities =
-        @"[('id': 1), ('id': 2 'parentid': 1), ('parentid': 1)]";
+        @"[('id': 1), ('id': 2 'parentid': 1), ('parentid': 1), ('id': 4 'parentid': """")]";
 
     /// <inheritdoc />
     protected override async ValueTask<Result<Array<Entity>, IError>> Run(
@@ -44,13 +44,14 @@ public class EntityValidateRelations : CompoundStep<Array<Entity>>
                 IdProperty.WrapStringStream(),
                 ParentIdProperty.WrapStringStream(),
                 ErrorBehavior,
+                IgnoreEmpty,
                 cancellationToken
             );
 
         if (data.IsFailure)
             return data.ConvertFailure<Array<Entity>>();
 
-        var (entities, idProperty, parentIdProperty, errorBehaviour) = data.Value;
+        var (entities, idProperty, parentIdProperty, errorBehaviour, ignoreIfEmpty) = data.Value;
 
         var failedIds = new HashSet<ISCLObject>();
         var ids       = new HashSet<ISCLObject>();
@@ -62,17 +63,23 @@ public class EntityValidateRelations : CompoundStep<Array<Entity>>
         {
             var id = entity.TryGetProperty(idKey);
 
-            if (id.HasValue)
+            if (id.TryGetValue(out var kvp))
             {
-                ids.Add(id.Value.Value);
+                ids.Add(kvp.Value);
             }
 
             var parentId = entity.TryGetProperty(parentIdKey);
 
-            if (parentId.HasValue)
+            if (parentId.TryGetValue(out var parentKvp))
             {
-                if (!ids.Contains(parentId.Value.Value))
-                    failedIds.Add(parentId.Value.Value);
+                if (ignoreIfEmpty && parentKvp.Value.IsEmpty())
+                {
+                    //do nothing
+                }
+                else if (!ids.Contains(parentKvp.Value))
+                {
+                    failedIds.Add(parentKvp.Value);
+                }
             }
 
             return new ValueTask<Result<Unit, IError>>(Unit.Default);
@@ -162,24 +169,31 @@ public class EntityValidateRelations : CompoundStep<Array<Entity>>
     }
 
     /// <summary>
-    /// The stream of entities to change the field names of.
+    /// The stream of entities to validate
     /// </summary>
     [StepProperty(1)]
     [Required]
     public IStep<Array<Entity>> EntityStream { get; set; } = null!;
 
     /// <summary>
-    /// The name of the Entity Id property
+    /// The entity property which will be used to create a lookup table.
     /// </summary>
+
     [StepProperty(2)]
     [Required]
+    [Alias("ExistsIn")]
+
     public IStep<StringStream> IdProperty { get; set; } = null!;
 
     /// <summary>
-    /// The name of the Entity ParentId property
+    /// The step will check that the value of this entity property exists in
+    /// the lookup table.
     /// </summary>
+
     [StepProperty(3)]
     [Required]
+    [Alias("LookupThat")]
+
     public IStep<StringStream> ParentIdProperty { get; set; } = null!;
 
     /// <summary>
@@ -191,6 +205,14 @@ public class EntityValidateRelations : CompoundStep<Array<Entity>>
         new SCLConstant<SCLEnum<ErrorBehavior>>(
             new SCLEnum<ErrorBehavior>(Enums.ErrorBehavior.Error)
         );
+
+    /// <summary>
+    /// If true, empty values will be ignored
+    /// </summary>
+    [StepProperty(5)]
+    [DefaultValueExplanation("true")]
+    public IStep<SCLBool> IgnoreEmpty { get; set; } =
+        new SCLConstant<SCLBool>(SCLBool.True);
 
     /// <inheritdoc />
     public override IStepFactory StepFactory { get; } =

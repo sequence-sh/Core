@@ -132,7 +132,10 @@ public partial class ExternalProcessTests
 
         var messages = loggerFactory.Sink.LogEntries.Select(x => x.Message).ToList();
 
-        messages.Should().BeEquivalentTo("[91mWrite-Error: [91mtest error[0m", "hello");
+        messages.Should().HaveCount(2);
+
+        messages.Should().Contain(x => x.Contains("Write-Error"));
+        messages.Should().Contain(x => x.Contains("hello"));
     }
 
     [Fact]
@@ -266,7 +269,8 @@ public partial class ExternalProcessTests
         startProcessResult.Value.WaitForExit(1000);
         startProcessResult.Value.Dispose();
 
-        outputLines.Should().Contain(("[91mWrite-Error: [91mtest error[0m", StreamSource.Error));
+        outputLines.Should()
+            .Contain(x => x.line.Contains("Write-Error") && x.source == StreamSource.Error);
     }
 
 #endregion
