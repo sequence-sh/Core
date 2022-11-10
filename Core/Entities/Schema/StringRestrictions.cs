@@ -100,25 +100,34 @@ public record StringRestrictions
     /// <summary>
     /// Test if these restrictions are met
     /// </summary>
-    public Result<Unit, IErrorBuilder> Test(string value, string propertyName)
+    public Result<Unit, IErrorBuilder> Test(
+        string value,
+        string propertyName,
+        TransformRoot transformRoot)
     {
         if (MinLength.HasValue && value.Length < MinLength)
-            return ErrorCode.SchemaViolation.ToErrorBuilder(
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
                 $"Should have length >= {MinLength}",
-                propertyName
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
             );
 
         if (MaxLength.HasValue && value.Length > MaxLength)
-            return ErrorCode.SchemaViolation.ToErrorBuilder(
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
                 $"Should have length <= {MaxLength}",
-                propertyName
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
             );
 
         if (PatternRegex is not null && !PatternRegex.IsMatch(value))
         {
-            return ErrorCode.SchemaViolation.ToErrorBuilder(
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
                 $"Should match Regex: {PatternRegex}",
-                propertyName
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
             );
         }
 

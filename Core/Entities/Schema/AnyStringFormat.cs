@@ -16,7 +16,8 @@ public record AnyStringFormat : StringFormat
     public override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
         ISCLObject isclObject,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         return Maybe<ISCLObject>.None;
     }

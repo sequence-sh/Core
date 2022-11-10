@@ -24,17 +24,20 @@ public static class SchemaExtensions
     /// <summary>
     /// Get error messages from validation results
     /// </summary>
-    public static IEnumerable<(string message, string location)> GetErrorMessages(
-        this ValidationResults validationResults)
+    public static IEnumerable<(string message, string location, TransformRoot transformRoot)>
+        GetErrorMessages(this ValidationResults validationResults, TransformRoot transformRoot)
     {
         if (!validationResults.IsValid)
         {
             if (validationResults.Message is not null)
                 yield return (validationResults.Message,
-                              validationResults.SchemaLocation.ToString());
+                              string.Join(
+                                  ".",
+                                  validationResults.SchemaLocation.Segments.Select(x => x.Value)
+                              ), transformRoot);
 
             foreach (var nestedResult in validationResults.NestedResults)
-            foreach (var errorMessage in GetErrorMessages(nestedResult))
+            foreach (var errorMessage in GetErrorMessages(nestedResult, transformRoot))
                 yield return errorMessage;
         }
     }

@@ -30,12 +30,15 @@ public sealed class Validate : CompoundStep<Array<Entity>>
 
         var (entityStream, schema, errorBehavior) = r.Value;
 
+        var rowNumber = 0;
         var newStream = entityStream.SelectMany(ApplySchema);
 
         return newStream;
 
         async IAsyncEnumerable<Entity> ApplySchema(Entity entity)
         {
+            var transformRoot = new TransformRoot(rowNumber, entity);
+            rowNumber += 1;
             await ValueTask.CompletedTask;
             var jsonElement = entity.ToJsonElement();
 
@@ -48,17 +51,53 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                 yield return entity;
             else
             {
+                if (OnInvalid is not null)
+                {
+                    var stateDict = stateMonad.GetState()
+                        .ToImmutableDictionary();
+
+                    foreach (var (m, l, tr) in result.GetErrorMessages(transformRoot))
+                    {
+                        var scoped =
+                            new ScopedStateMonad(
+                                stateMonad,
+                                stateDict,
+                                OnInvalid.VariableNameOrItem,
+                                new KeyValuePair<VariableName, ISCLObject>(
+                                    OnInvalid.VariableNameOrItem,
+                                    Entity.Create(
+                                        new (EntityNestedKey key, ISCLObject value)[]
+                                        {
+                                            (EntityNestedKey.Create("RowNumber"),
+                                             new SCLInt(tr.RowNumber)),
+                                            (EntityNestedKey.Create("ErrorMessage"),
+                                             new StringStream(m)),
+                                            (EntityNestedKey.Create("Location"),
+                                             new StringStream(l)),
+                                            (EntityNestedKey.Create("Entity"),
+                                             tr.Entity),
+                                        }
+                                    )
+                                )
+                            );
+
+                        await OnInvalid.StepTyped.Run(scoped, cancellationToken);
+                    }
+                }
+
                 switch (errorBehavior.Value)
                 {
                     case Enums.ErrorBehavior.Fail:
                     {
                         var errors =
                             ErrorBuilderList.Combine(
-                                    result.GetErrorMessages()
+                                    result.GetErrorMessages(transformRoot)
                                         .Select(
-                                            x => ErrorCode.SchemaViolation.ToErrorBuilder(
+                                            x => ErrorCode.SchemaViolated.ToErrorBuilder(
                                                 x.message,
-                                                x.location
+                                                x.location,
+                                                transformRoot.RowNumber,
+                                                transformRoot.Entity
                                             )
                                         )
                                 )
@@ -68,7 +107,7 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                     }
                     case Enums.ErrorBehavior.Error:
                     {
-                        foreach (var errorMessage in result.GetErrorMessages())
+                        foreach (var errorMessage in result.GetErrorMessages(transformRoot))
                         {
                             LogWarning(errorMessage);
                         }
@@ -77,7 +116,7 @@ public sealed class Validate : CompoundStep<Array<Entity>>
                     }
                     case Enums.ErrorBehavior.Warning:
                     {
-                        foreach (var errorMessage in result.GetErrorMessages())
+                        foreach (var errorMessage in result.GetErrorMessages(transformRoot))
                         {
                             LogWarning(errorMessage);
                         }
@@ -98,9 +137,16 @@ public sealed class Validate : CompoundStep<Array<Entity>>
             }
         }
 
-        void LogWarning((string message, string location) pair)
+        void LogWarning((string message, string location, TransformRoot transformRoot) pair)
         {
-            LogSituation.SchemaViolation.Log(stateMonad, this, pair.message, pair.location);
+            LogSituation.SchemaViolated.Log(
+                stateMonad,
+                this,
+                pair.message,
+                pair.location,
+                pair.transformRoot.RowNumber,
+                pair.transformRoot.Entity
+            );
         }
     }
 
@@ -117,6 +163,15 @@ public sealed class Validate : CompoundStep<Array<Entity>>
     [StepProperty(2)]
     [Required]
     public IStep<Entity> Schema { get; set; } = null!;
+
+    /// <summary>
+    /// A function that does something with every entity that fails validation.  
+    /// The actions defined in ErrorBehaviour will also happen.
+    /// This function takes an entity with three properties: 'RowNumber', 'ErrorMessage', 'Location', and 'Entity' where 'Entity' contains the entity that failed to validate
+    /// </summary>
+    [FunctionProperty]
+    [DefaultValueExplanation("Either this or 'Replace' must be set.")]
+    public LambdaFunction<Entity, Unit>? OnInvalid { get; set; } = null!;
 
     /// <summary>
     /// How to behave if an error occurs.

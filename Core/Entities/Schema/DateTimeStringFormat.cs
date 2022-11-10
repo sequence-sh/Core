@@ -30,7 +30,8 @@ public record DateTimeStringFormat : StringFormat
     public override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
         ISCLObject entityValue,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         if (entityValue is SCLDateTime)
         {
@@ -54,9 +55,11 @@ public record DateTimeStringFormat : StringFormat
             return Maybe<ISCLObject>.From(new SCLDateTime(dt2));
         }
 
-        return ErrorCode.SchemaViolation.ToErrorBuilder(
+        return ErrorCode.SchemaViolated.ToErrorBuilder(
             $"Should be DateTime",
-            propertyName
+            propertyName,
+            transformRoot.RowNumber,
+            transformRoot.Entity
         );
     }
 

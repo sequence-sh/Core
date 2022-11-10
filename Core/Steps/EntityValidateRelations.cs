@@ -7,6 +7,7 @@ namespace Reductech.Sequence.Core.Steps;
 /// For each entity in the stream, check that the value of the `ParentIdProperty` is the value of the `IdProperty` for at least one entity in the stream.
 /// </summary>
 [AllowConstantFolding]
+[Alias("ValidateRelations")]
 [SCLExample(
     $"EntityValidateRelations {ExampleEntities} 'id' 'parentid' 'Error'",
     ValidExampleEntities,
@@ -84,6 +85,13 @@ public class EntityValidateRelations : CompoundStep<Array<Entity>>
 
             return new ValueTask<Result<Unit, IError>>(Unit.Default);
         }
+
+        var evaluated = await entities.EnsureEvaluated(cancellationToken);
+
+        if (evaluated.IsFailure)
+            return evaluated.ConvertFailure<Array<Entity>>();
+
+        entities = (Array<Entity>)evaluated.Value;
 
         var runResult = await entities.ForEach(CheckEntity, cancellationToken);
 

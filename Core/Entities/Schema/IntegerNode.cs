@@ -39,11 +39,12 @@ public record IntegerNode(
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         if (value is SCLInt evInteger)
         {
-            var restrictionResult = Restrictions.Test(evInteger.Value, propertyName);
+            var restrictionResult = Restrictions.Test(evInteger.Value, propertyName, transformRoot);
 
             if (restrictionResult.IsFailure)
                 return restrictionResult.ConvertFailure<Maybe<ISCLObject>>();
@@ -58,9 +59,11 @@ public record IntegerNode(
             i = (int)Math.Round(evDouble.Value);
 
             if (Math.Abs(evDouble.Value - i) > transformSettings.RoundingPrecision)
-                return ErrorCode.SchemaViolation.ToErrorBuilder(
+                return ErrorCode.SchemaViolated.ToErrorBuilder(
                     "Too far from the nearest Integer",
-                    propertyName
+                    propertyName,
+                    transformRoot.RowNumber,
+                    transformRoot.Entity
                 );
         }
         else
@@ -73,18 +76,25 @@ public record IntegerNode(
                 i = (int)Math.Round(d);
 
                 if (Math.Abs(d - i) > transformSettings.RoundingPrecision)
-                    return ErrorCode.SchemaViolation.ToErrorBuilder(
+                    return ErrorCode.SchemaViolated.ToErrorBuilder(
                         "Too far from the nearest Integer",
-                        propertyName
+                        propertyName,
+                        transformRoot.RowNumber,
+                        transformRoot.Entity
                     );
             }
             else
             {
-                return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Integer", propertyName);
+                return ErrorCode.SchemaViolated.ToErrorBuilder(
+                    "Should Be Integer",
+                    propertyName,
+                    transformRoot.RowNumber,
+                    transformRoot.Entity
+                );
             }
         }
 
-        var restrictionResult2 = Restrictions.Test(i, propertyName);
+        var restrictionResult2 = Restrictions.Test(i, propertyName, transformRoot);
 
         if (restrictionResult2.IsFailure)
             return restrictionResult2.ConvertFailure<Maybe<ISCLObject>>();

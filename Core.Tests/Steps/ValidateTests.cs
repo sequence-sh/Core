@@ -93,272 +93,6 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                     ),
                 "('MyDate': \"1990-01-06\")"
             );
-
-            //yield return CreateCase(
-            //    "Cast int",
-            //    new List<Entity> { Entity.Create(("Foo", "100")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Integer, Multiplicity.ExactlyOne)
-            //    ),
-            //    "('Foo': 100)"
-            //);
-
-            //yield return CreateCase(
-            //    "Cast double",
-            //    new List<Entity> { Entity.Create(("Foo", "100.345")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Double, Multiplicity.ExactlyOne)
-            //    ),
-            //    "('Foo': 100.345)"
-            //);
-
-            //yield return CreateCase(
-            //    "Cast bool",
-            //    new List<Entity> { Entity.Create(("Foo", "true")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Bool, Multiplicity.ExactlyOne)
-            //    ),
-            //    "('Foo': True)"
-            //);
-
-            //yield return CreateCase(
-            //    "Cast date time",
-            //    new List<Entity> { Entity.Create(("Foo", "11/10/2020 3:45:44 PM")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Date, Multiplicity.ExactlyOne)
-            //    ),
-            //    "('Foo': 2020-10-11T15:45:44.0000000)"
-            //);
-
-            //yield return CreateCase(
-            //    "Cast date time with input format",
-            //    new List<Entity> { Entity.Create(("Foo", "2020")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
-            //         new List<string> { "yyyy" }, null)
-            //    ),
-            //    "('Foo': 2020-01-01T00:00:00.0000000)"
-            //);
-
-            //yield return CreateCase(
-            //    "Cast date time with default input format",
-            //    new List<Entity> { Entity.Create(("Foo", "2020")) },
-            //    new Schema()
-            //    {
-            //        Name                    = SchemaName,
-            //        DefaultDateInputFormats = new List<string> { "yyyy" },
-            //        DefaultErrorBehavior    = ErrorBehavior.Fail,
-            //        Properties = new Dictionary<string, SchemaProperty>()
-            //        {
-            //            {
-            //                "Foo",
-            //                new SchemaProperty
-            //                {
-            //                    Type = SCLType.Date, Multiplicity = Multiplicity.ExactlyOne
-            //                }
-            //            }
-            //        }.ToImmutableSortedDictionary()
-            //    },
-            //    "('Foo': 2020-01-01T00:00:00.0000000)"
-            //);
-
-            //yield return CreateCase(
-            //    "Cast date time with input format and output format",
-            //    new List<Entity> { Entity.Create(("Foo", "2020")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Date, null, Multiplicity.ExactlyOne, null, null,
-            //         new List<string> { "yyyy" }, "yyyy-mm-dd")
-            //    ),
-            //    "('Foo': 2020-00-01)"
-            //);
-
-            //yield return CreateCase(
-            //    "Cast date time with default input format and default output format",
-            //    new List<Entity> { Entity.Create(("Foo", "2020")) },
-            //    new Schema()
-            //    {
-            //        Name                    = SchemaName,
-            //        DefaultDateInputFormats = new List<string> { "yyyy" },
-            //        DefaultDateOutputFormat = "yyyy-mm-dd",
-            //        DefaultErrorBehavior    = ErrorBehavior.Fail,
-            //        Properties = new Dictionary<string, SchemaProperty>()
-            //        {
-            //            {
-            //                "Foo",
-            //                new SchemaProperty
-            //                {
-            //                    Type = SCLType.Date, Multiplicity = Multiplicity.ExactlyOne
-            //                }
-            //            }
-            //        }.ToImmutableSortedDictionary()
-            //    },
-            //    "('Foo': 2020-00-01)"
-            //);
-
-            //yield return CreateCase(
-            //    "Match regex",
-            //    new List<Entity> { Entity.Create(("Foo", "100")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, @"\d+", null,
-            //         null, null)
-            //    ),
-            //    "('Foo': 100)"
-            //);
-
-            //yield return CreateCase(
-            //    "Match enum",
-            //    new List<Entity> { Entity.Create(("Foo", "hello")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Enum, "Word", Multiplicity.ExactlyOne, null,
-            //         new List<string> { "Hello", "World" }, null, null)
-            //    ),
-            //    "('Foo': Word.hello)"
-            //);
-
-            //yield return CreateCase(
-            //    "Null with multiplicity any",
-            //    new List<Entity> { Entity.Create(("Foo", null)) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Integer, null, Multiplicity.Any, null,
-            //         null, null, null)
-            //    ),
-            //    "('Foo': null)"
-            //);
-
-            //yield return CreateCase(
-            //    "Null with multiplicity UpToOne",
-            //    new List<Entity> { Entity.Create(("Foo", null)) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Fail,
-            //        ("Foo", SCLType.Integer, null, Multiplicity.UpToOne, null,
-            //         null, null, null)
-            //    ),
-            //    "('Foo': null)"
-            //);
-
-            //yield return CreateCase(
-            //    "Null with multiplicity ExactlyOne",
-            //    new List<Entity> { Entity.Create(("Foo", null)) },
-            //    SchemaCreate(
-            //            SchemaName,
-            //            ExtraPropertyBehavior.Fail,
-            //            ("Foo", SCLType.Integer, null, Multiplicity.ExactlyOne, null,
-            //             null, null, null)
-            //        ) with
-            //        {
-            //            DefaultErrorBehavior = ErrorBehavior.Error
-            //        },
-            //    "Schema violation: Expected 'Foo' to not be null in ('Foo': null)"
-            //);
-
-            //yield return CreateCase(
-            //    "Could not cast: Behavior: Error",
-            //    new List<Entity> { Entity.Create(("Foo", "Hello")) },
-            //    SchemaCreate(
-            //            SchemaName,
-            //            ExtraPropertyBehavior.Fail,
-            //            ("Foo", SCLType.Integer, Multiplicity.Any)
-            //        ) with
-            //        {
-            //            DefaultErrorBehavior = ErrorBehavior.Error
-            //        },
-            //    "Schema violation: 'Hello' is not a Integer in ('Foo': \"Hello\")"
-            //);
-
-            //yield return CreateCase(
-            //    "Could not cast: Behavior: Warning",
-            //    new List<Entity> { Entity.Create(("Foo", "Hello")) },
-            //    SchemaCreate(
-            //            SchemaName,
-            //            ExtraPropertyBehavior.Fail,
-            //            ("Foo", SCLType.Integer, Multiplicity.Any)
-            //        ) with
-            //        {
-            //            DefaultErrorBehavior = ErrorBehavior.Warning
-            //        },
-            //    "Schema violation: 'Hello' is not a Integer in ('Foo': \"Hello\")",
-            //    "('Foo': \"Hello\")"
-            //);
-
-            //yield return CreateCase(
-            //    "Could not cast: Behavior: Skip",
-            //    new List<Entity> { Entity.Create(("Foo", "Hello")) },
-            //    SchemaCreate(
-            //            SchemaName,
-            //            ExtraPropertyBehavior.Fail,
-            //            ("Foo", SCLType.Integer, Multiplicity.Any)
-            //        ) with
-            //        {
-            //            DefaultErrorBehavior = ErrorBehavior.Skip
-            //        }
-            //);
-
-            //yield return CreateCase(
-            //    "Could not cast: Behavior: Ignore",
-            //    new List<Entity> { Entity.Create(("Foo", "Hello")) },
-            //    SchemaCreate(
-            //            SchemaName,
-            //            ExtraPropertyBehavior.Fail,
-            //            ("Foo", SCLType.Integer, Multiplicity.Any)
-            //        ) with
-            //        {
-            //            DefaultErrorBehavior = ErrorBehavior.Ignore
-            //        },
-            //    "('Foo': \"Hello\")"
-            //);
-
-            //yield return CreateCase(
-            //    "Extra Property: Allow",
-            //    new List<Entity> { Entity.Create(("Foo", "Hello"), ("Bar", "World")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Allow,
-            //        ("Foo", SCLType.String, Multiplicity.Any)
-            //    ),
-            //    "('Foo': \"Hello\" 'Bar': \"World\")"
-            //);
-
-            //yield return CreateCase(
-            //    "Extra Property: Remove",
-            //    new List<Entity> { Entity.Create(("Foo", "Hello"), ("Bar", "World")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Remove,
-            //        ("Foo", SCLType.String, Multiplicity.Any)
-            //    ),
-            //    "('Foo': \"Hello\")"
-            //);
-
-            //yield return CreateCase(
-            //    "Extra Property: Warning",
-            //    new List<Entity> { Entity.Create(("Foo", "Hello"), ("Bar", "World")) },
-            //    SchemaCreate(
-            //        SchemaName,
-            //        ExtraPropertyBehavior.Warn,
-            //        ("Foo", SCLType.String, Multiplicity.Any)
-            //    ),
-            //    "Schema violation: Unexpected Property: 'Bar' in ('Foo': \"Hello\" 'Bar': \"World\")",
-            //    "('Foo': \"Hello\")"
-            //);
         }
     }
 
@@ -370,6 +104,7 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             static ErrorCase CreateCase(
                 string name,
                 List<Entity> entities,
+                List<string>? logOnInvalidMessages,
                 JsonSchema schema,
                 ErrorCode expectedErrorCode,
                 params object[] expectedErrorArgs)
@@ -380,10 +115,22 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                 {
                     EntityStream  = Array(entities.ToArray()),
                     Schema        = Constant(schemaEntity),
-                    ErrorBehavior = Constant(ErrorBehavior.Fail)
+                    ErrorBehavior = Constant(ErrorBehavior.Fail),
                 };
 
-                return new ErrorCase(
+                if (logOnInvalidMessages is not null)
+                    enforceSchema.OnInvalid = new LambdaFunction<Entity, Unit>(
+                        null,
+                        new Log()
+                        {
+                            Value = GetEntityVariable,
+                            Severity = new SCLConstant<SCLEnum<Severity>>(
+                                new SCLEnum<Severity>(Severity.Error)
+                            )
+                        }
+                    );
+
+                var errorCase = new ErrorCase(
                     name,
                     new Sequence<Unit>
                     {
@@ -404,6 +151,15 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                         new ErrorLocation(enforceSchema)
                     )
                 );
+
+                if (logOnInvalidMessages is not null)
+                {
+                    errorCase.IgnoreLoggedValues   = false;
+                    errorCase.CheckLogLevel        = LogLevel.Warning;
+                    errorCase.ExpectedLoggedValues = logOnInvalidMessages;
+                }
+
+                return errorCase;
             }
 
             var fooHello = Entity.Create(("Foo", "Hello"));
@@ -412,26 +168,33 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
             yield return CreateCase(
                 "Could not cast",
                 new List<Entity> { fooHello },
+                null,
                 new JsonSchemaBuilder().Title(SchemaName)
                     .Properties(("Foo", new JsonSchemaBuilder().Type(SchemaValueType.Integer))),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Value is \"string\" but should be \"integer\"",
-                "#/properties/Foo/type"
+                "properties.Foo.type",
+                0,
+                fooHello
             );
 
             yield return CreateCase(
                 "Missing enum value",
                 new List<Entity> { fooFish },
+                null,
                 new JsonSchemaBuilder()
                     .Properties(("Foo", EnumProperty("Apple", "Orange"))),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Expected value to match one of the values specified by the enum",
-                "#/properties/Foo/enum"
+                "properties.Foo.enum",
+                0,
+                fooFish
             );
 
             yield return CreateCase(
                 "Regex not matched",
                 new List<Entity> { fooFish },
+                null,
                 new JsonSchemaBuilder()
                     .Properties(
                         ("Foo",
@@ -439,34 +202,76 @@ public partial class ValidateTests : StepTestBase<Validate, Array<Entity>>
                              .Pattern("apple|orange")
                              .Build())
                     ),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "The string value was not a match for the indicated regular expression",
-                "#/properties/Foo/pattern"
+                "properties.Foo.pattern",
+                0,
+                fooFish
             );
 
             yield return CreateCase(
                 "Missing property",
                 new List<Entity> { fooFish },
+                null,
                 new JsonSchemaBuilder()
                     .Properties(
                         ("Foo", AnyString),
                         ("Bar", AnyString)
                     )
                     .Required("Foo", "Bar"),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Required properties [\"Bar\"] were not present",
-                "#/required"
+                "required",
+                0,
+                fooFish
             );
 
             yield return CreateCase(
                 "Extra property",
                 new List<Entity> { fooFish },
+                null,
                 new JsonSchemaBuilder()
                     .Properties(("Bar", AnyString))
                     .AdditionalProperties(JsonSchema.False),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "All values fail against the false schema",
-                "#/additionalProperties"
+                "additionalProperties",
+                0,
+                fooFish
+            );
+
+            yield return CreateCase(
+                "Required Empty property should not validate",
+                new List<Entity>() { Entity.Create(("Foo", "Bar")), Entity.Create(("Foo", "")), },
+                null,
+                new JsonSchemaBuilder()
+                    .Properties(("Foo", AnyString))
+                    .Required("Foo"),
+                ErrorCode.SchemaViolated,
+                "Required properties [\"Foo\"] were not present",
+                "required",
+                1,
+                Entity.Create(("Foo", ""))
+            );
+
+            yield return CreateCase(
+                "Missing property With OnInvalid",
+                new List<Entity> { fooFish },
+                new List<string>
+                {
+                    "('RowNumber': 0 'ErrorMessage': \"Required properties [\\\"Bar\\\"] were not present\" 'Location': \"required\" 'Entity': ('Foo': \"Fish\"))"
+                },
+                new JsonSchemaBuilder()
+                    .Properties(
+                        ("Foo", AnyString),
+                        ("Bar", AnyString)
+                    )
+                    .Required("Foo", "Bar"),
+                ErrorCode.SchemaViolated,
+                "Required properties [\"Bar\"] were not present",
+                "required",
+                0,
+                fooFish
             );
         }
     }

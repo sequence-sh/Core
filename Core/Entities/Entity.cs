@@ -402,8 +402,11 @@ public partial record struct Entity : ISCLObject, IEnumerable<KeyValuePair<Entit
 
         foreach (var (key, sclObject) in this)
         {
-            var value = sclObject.ToCSharpObject();
-            dictionary.Add(key.Inner, value);
+            if (!sclObject.IsEmpty())
+            {
+                var value = sclObject.ToCSharpObject();
+                dictionary.Add(key.Inner, value);
+            }
         }
 
         return dictionary;

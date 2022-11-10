@@ -26,7 +26,8 @@ public abstract record StringFormat : NodeData<StringFormat>
     public abstract Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform(
         string propertyName,
         ISCLObject entityValue,
-        TransformSettings transformSettings);
+        TransformSettings transformSettings,
+        TransformRoot transformRoot);
 
     /// <inheritdoc />
     public override StringFormat Combine(StringFormat other)

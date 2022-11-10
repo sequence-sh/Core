@@ -171,7 +171,12 @@ public partial class SchemaNodeTests
         {
             testOutputHelper.WriteLine(EntityValue.Serialize(SerializeOptions.Name));
 
-            var result = Node.TryTransform("TestProperty", EntityValue, Settings);
+            var result = Node.TryTransform(
+                "TestProperty",
+                EntityValue,
+                Settings,
+                new TransformRoot(0, Entity.CreatePrimitive(EntityValue))
+            );
 
             result.ShouldBeSuccessful();
 
@@ -191,7 +196,12 @@ public partial class SchemaNodeTests
         {
             testOutputHelper.WriteLine(EntityValue.Serialize(SerializeOptions.Name));
 
-            var result = Node.TryTransform("TestProperty", EntityValue, Settings);
+            var result = Node.TryTransform(
+                "TestProperty",
+                EntityValue,
+                Settings,
+                new TransformRoot(0, Entity.CreatePrimitive(EntityValue))
+            );
 
             result.ShouldBeFailure();
 

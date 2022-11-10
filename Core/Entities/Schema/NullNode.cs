@@ -38,7 +38,8 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         if (value is SCLNull)
             return Maybe<ISCLObject>.None;
@@ -52,6 +53,11 @@ public record NullNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
             ))
             return Maybe<ISCLObject>.From(SCLNull.Instance);
 
-        return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Null", propertyName);
+        return ErrorCode.SchemaViolated.ToErrorBuilder(
+            "Should Be Null",
+            propertyName,
+            transformRoot.RowNumber,
+            transformRoot.Entity
+        );
     }
 }

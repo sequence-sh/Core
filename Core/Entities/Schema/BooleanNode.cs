@@ -41,7 +41,8 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         if (value is SCLBool)
             return Maybe<ISCLObject>.None;
@@ -62,6 +63,11 @@ public record BooleanNode(EnumeratedValuesNodeData EnumeratedValuesNodeData) : S
             ))
             return Maybe<ISCLObject>.From(SCLBool.False);
 
-        return ErrorCode.SchemaViolation.ToErrorBuilder("Should Be Boolean", propertyName);
+        return ErrorCode.SchemaViolated.ToErrorBuilder(
+            "Should Be Boolean",
+            propertyName,
+            transformRoot.RowNumber,
+            transformRoot.Entity
+        );
     }
 }

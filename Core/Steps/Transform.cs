@@ -72,18 +72,22 @@ public sealed class Transform : CompoundStep<Array<Entity>>
             removeExtraMaybe.Map(x => x.Value)
         );
 
+        var rowNumber       = 0;
         var newEntityStream = entityStream.SelectMany(TryTransform);
 
         return newEntityStream;
 
         async IAsyncEnumerable<Entity> TryTransform(Entity entity)
         {
+            var transformRoot = new TransformRoot(rowNumber, entity);
+            rowNumber += 1;
             await ValueTask.CompletedTask;
 
             var result = topNode.TryTransform(
                 "",
                 entity,
-                transformSettings
+                transformSettings,
+                transformRoot
             );
 
             if (result.IsSuccess)
@@ -141,10 +145,10 @@ public sealed class Transform : CompoundStep<Array<Entity>>
                 }
             }
             else if (errorBuilder is ErrorBuilder(var errorCodeBase, var errorData)
-                  && errorCodeBase == ErrorCode.SchemaViolation
+                  && errorCodeBase == ErrorCode.SchemaViolated
                   && errorData is ErrorData.ObjectData objData)
             {
-                LogSituation.SchemaViolation.Log(stateMonad, this, objData.Arguments);
+                LogSituation.SchemaViolated.Log(stateMonad, this, objData.Arguments);
             }
         }
     }

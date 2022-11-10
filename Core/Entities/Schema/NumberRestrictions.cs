@@ -86,40 +86,58 @@ public record NumberRestrictions(
     /// <summary>
     /// Test if these restrictions are met
     /// </summary>
-    public Result<Unit, IErrorBuilder> Test(int i, string propertyName)
+    public Result<Unit, IErrorBuilder> Test(int i, string propertyName, TransformRoot transformRoot)
     {
         if (i < Min)
-            return ErrorCode.SchemaViolation.ToErrorBuilder($"Should be >= {Min}", propertyName);
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
+                $"Should be >= {Min}",
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
+            );
 
         if (i > Max)
-            return ErrorCode.SchemaViolation.ToErrorBuilder($"Should be <= {Max}", propertyName);
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
+                $"Should be <= {Max}",
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
+            );
 
         if (i <= ExclusiveMin)
-            return ErrorCode.SchemaViolation.ToErrorBuilder(
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
                 $"Should be > {ExclusiveMin}",
-                propertyName
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
             );
 
         if (i <= ExclusiveMax)
-            return ErrorCode.SchemaViolation.ToErrorBuilder(
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
                 $"Should be < {ExclusiveMax}",
-                propertyName
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
             );
 
         if (MultipleOf.HasValue)
         {
             if (MultipleOf.Value == 0)
-                return ErrorCode.SchemaViolation.ToErrorBuilder(
+                return ErrorCode.SchemaViolated.ToErrorBuilder(
                     $"Cannot be a multiple of 0",
-                    propertyName
+                    propertyName,
+                    transformRoot.RowNumber,
+                    transformRoot.Entity
                 );
 
             var rem = i % MultipleOf.Value;
 
             if (rem != 0)
-                return ErrorCode.SchemaViolation.ToErrorBuilder(
+                return ErrorCode.SchemaViolated.ToErrorBuilder(
                     $"Should be a multiple of {MultipleOf}",
-                    propertyName
+                    propertyName,
+                    transformRoot.RowNumber,
+                    transformRoot.Entity
                 );
         }
 
@@ -129,40 +147,61 @@ public record NumberRestrictions(
     /// <summary>
     /// Test if these restrictions are met
     /// </summary>
-    public Result<Unit, IErrorBuilder> Test(double d, string propertyName)
+    public Result<Unit, IErrorBuilder> Test(
+        double d,
+        string propertyName,
+        TransformRoot transformRoot)
     {
         if (d < Min)
-            return ErrorCode.SchemaViolation.ToErrorBuilder($"Should be >= {Min}", propertyName);
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
+                $"Should be >= {Min}",
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
+            );
 
         if (d > Max)
-            return ErrorCode.SchemaViolation.ToErrorBuilder($"Should be <= {Max}", propertyName);
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
+                $"Should be <= {Max}",
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
+            );
 
         if (d <= ExclusiveMin)
-            return ErrorCode.SchemaViolation.ToErrorBuilder(
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
                 $"Should be > {ExclusiveMin}",
-                propertyName
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
             );
 
         if (d <= ExclusiveMax)
-            return ErrorCode.SchemaViolation.ToErrorBuilder(
+            return ErrorCode.SchemaViolated.ToErrorBuilder(
                 $"Should be < {ExclusiveMax}",
-                propertyName
+                propertyName,
+                transformRoot.RowNumber,
+                transformRoot.Entity
             );
 
         if (MultipleOf.HasValue)
         {
             if (MultipleOf.Value == 0)
-                return ErrorCode.SchemaViolation.ToErrorBuilder(
+                return ErrorCode.SchemaViolated.ToErrorBuilder(
                     $"Cannot be a multiple of 0",
-                    propertyName
+                    propertyName,
+                    transformRoot.RowNumber,
+                    transformRoot.Entity
                 );
 
             var rem = d % MultipleOf.Value;
 
             if (rem != 0)
-                return ErrorCode.SchemaViolation.ToErrorBuilder(
+                return ErrorCode.SchemaViolated.ToErrorBuilder(
                     $"Should be a multiple of {MultipleOf}",
-                    propertyName
+                    propertyName,
+                    transformRoot.RowNumber,
+                    transformRoot.Entity
                 );
         }
 

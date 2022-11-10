@@ -219,8 +219,8 @@
   <data name="RequirementNotMet" xml:space="preserve">
     <value>Requirement '{0}' not met.</value>
   </data>
-  <data name="SchemaViolation" xml:space="preserve">
-    <value>SchemaViolation: '{0}' at '{1}'.</value>
+  <data name="SchemaViolated" xml:space="preserve">
+    <value>SchemaViolation: '{0}' at '{1}' on row '{2}', entity: '{3}'.</value>
   </data>
   <data name="SCLSyntaxError" xml:space="preserve">
     <value>Syntax Error: {0}</value>

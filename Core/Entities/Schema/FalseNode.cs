@@ -35,8 +35,14 @@ public record FalseNode() : SchemaNode(EnumeratedValuesNodeData.Empty)
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
-        return ErrorCode.SchemaViolation.ToErrorBuilder("Always False", propertyName);
+        return ErrorCode.SchemaViolated.ToErrorBuilder(
+            "Always False",
+            propertyName,
+            transformRoot.RowNumber,
+            transformRoot.Entity
+        );
     }
 }

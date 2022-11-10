@@ -323,9 +323,11 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                     .Title(SchemaName)
                     .AdditionalItems(false)
                     .Properties(("Bar", AnyDateTime)),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Should be DateTime",
-                ".Bar"
+                ".Bar",
+                0,
+                Entity.Create(("Bar", "1990--01--06"))
             );
 
             yield return CreateCase(
@@ -335,9 +337,11 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                     .Title(SchemaName)
                     .AdditionalItems(false)
                     .Properties(("Foo", AnyInt)),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Too far from the nearest Integer",
-                ".Foo"
+                ".Foo",
+                0,
+                Entity.Create(("Foo", 9.1))
             );
 
             yield return CreateCase(
@@ -347,9 +351,11 @@ public partial class TransformTests : StepTestBase<Transform, Array<Entity>>
                     .Title(SchemaName)
                     .AdditionalItems(false)
                     .Properties(("Foo", AnyInt)),
-                ErrorCode.SchemaViolation,
+                ErrorCode.SchemaViolated,
                 "Too far from the nearest Integer",
-                ".Foo"
+                ".Foo",
+                0,
+                Entity.Create(("Foo", "9.1"))
             );
 
             foreach (var baseErrorCase in base.ErrorCases)

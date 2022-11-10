@@ -50,7 +50,8 @@ public record ArrayNode(
     protected override Result<Maybe<ISCLObject>, IErrorBuilder> TryTransform1(
         string propertyName,
         ISCLObject value,
-        TransformSettings transformSettings)
+        TransformSettings transformSettings,
+        TransformRoot transformRoot)
     {
         ImmutableList<ISCLObject> immutableList;
         bool                      changed;
@@ -90,7 +91,8 @@ public record ArrayNode(
             var transformResult = schemaNode.TryTransform(
                 $"{propertyName}[{i}]",
                 ev,
-                transformSettings
+                transformSettings,
+                transformRoot
             );
 
             if (transformResult.IsFailure)
