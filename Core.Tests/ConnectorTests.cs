@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using Reductech.Sequence.ConnectorManagement.Base;
+using Sequence.ConnectorManagement.Base;
 using Divergic.Logging.Xunit;
-using Reductech.Sequence.ConnectorManagement;
+using Sequence.ConnectorManagement;
 
 namespace Sequence.Core.Tests;
 

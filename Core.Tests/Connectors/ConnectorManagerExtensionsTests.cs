@@ -3,8 +3,8 @@ using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using MELT;
 using NuGet.Packaging;
-using Reductech.Sequence.ConnectorManagement;
-using Reductech.Sequence.ConnectorManagement.Base;
+using Sequence.ConnectorManagement;
+using Sequence.ConnectorManagement.Base;
 using Sequence.Core.Connectors;
 
 namespace Sequence.Core.Tests.Connectors;

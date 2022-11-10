@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json;
-using Reductech.Sequence.ConnectorManagement.Base;
+using Sequence.ConnectorManagement.Base;
 
 namespace Sequence.Core.Tests;
 

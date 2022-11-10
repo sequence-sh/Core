@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using Reductech.Sequence.ConnectorManagement.Base;
+using Sequence.ConnectorManagement.Base;
 using Sequence.Core.Internal.Parser;
 
 namespace Sequence.Core.Tests;

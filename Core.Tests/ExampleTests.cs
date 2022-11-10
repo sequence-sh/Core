@@ -16,9 +16,7 @@ public partial class ExampleTests
     [Theory(Skip = SkipString)]
     #pragma warning restore xUnit1004 // Test methods should not be skipped
     [Trait("Category", "Integration")]
-    [InlineData(@"C:\Users\wainw\source\repos\Reductech\sequence\Examples\Sort.scl")]
-    [InlineData(@"C:\Users\wainw\source\repos\Reductech\sequence\Examples\EntityMapProperties.scl")]
-    [InlineData(@"C:\Users\wainw\source\repos\Reductech\sequence\Examples\ChangeCase.scl")]
+    [InlineData(@".\Sequence\Examples\Sort.scl")]
     public async Task RunSCLFromFile(string path)
     {
         var scl = await File.ReadAllTextAsync(path);

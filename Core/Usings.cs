@@ -20,6 +20,6 @@ global using Sequence.Core.Attributes;
 global using Sequence.Core.Entities;
 global using Sequence.Core.Entities.Schema;
 global using Sequence.Core.Internal;
-global using Reductech.Sequence.ConnectorManagement.Base;
+global using Sequence.ConnectorManagement.Base;
 global using Entity = Sequence.Core.Entity;
 global using CSharpFunctionalExtensions.ValueTasks;

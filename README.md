@@ -1,6 +1,6 @@
 # Sequence® Core SDK
 
-[Sequence®](https://gitlab.com/reductech/sequence) is a collection of libraries
+[Sequence®](https://gitlab.com/sequence) is a collection of libraries
 that automates cross-application e-discovery and forensic workflows.
 
 The foundation of Sequence is the Core SDK which allows developers to
@@ -36,7 +36,7 @@ https://sequence.sh/playground
 
 # Package Releases
 
-Can be downloaded from the [Releases page](https://gitlab.com/reductech/sequence/core/-/releases).
+Can be downloaded from the [Releases page](https://gitlab.com/sequence/core/-/releases).
 
 # NuGet Packages
 
