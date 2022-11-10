@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Reductech.Sequence.Core;
+namespace Sequence.Core;
 
 /// <summary>
 /// JSONConverter for Requirements

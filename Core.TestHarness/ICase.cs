@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.TestHarness.Rest;
+﻿using Sequence.Core.TestHarness.Rest;
 
-namespace Reductech.Sequence.Core.TestHarness;
+namespace Sequence.Core.TestHarness;
 
 /// <summary>
 /// A case that executes a step.

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.LanguageServer;
+﻿namespace Sequence.Core.LanguageServer;
 
 /// <summary>
 /// General helper methods for the Language Server

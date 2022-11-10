@@ -1,8 +1,8 @@
 ﻿using System.Text;
-using Reductech.Sequence.Core.Internal.Parser;
-using static Reductech.Sequence.Core.TestHarness.SpaceCompressor;
+using Sequence.Core.Internal.Parser;
+using static Sequence.Core.TestHarness.SpaceCompressor;
 
-namespace Reductech.Sequence.Core.TestHarness;
+namespace Sequence.Core.TestHarness;
 
 public abstract partial class StepTestBase<TStep, TOutput>
 {

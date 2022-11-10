@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.ExternalProcesses;
+﻿namespace Sequence.Core.ExternalProcesses;
 
 /// <summary>
 /// Determines how to handle errors coming from an external step.

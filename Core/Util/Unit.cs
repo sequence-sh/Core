@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Util;
+﻿namespace Sequence.Core.Util;
 
 /// <summary>
 /// The result of a step with not return value.

@@ -1,6 +1,6 @@
 ﻿using Namotion.Reflection;
 
-namespace Reductech.Sequence.Core.LanguageServer;
+namespace Sequence.Core.LanguageServer;
 
 /// <summary>
 /// Visits SCL to find quick info

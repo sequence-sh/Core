@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using Generator.Equals;
 
 // ReSharper disable once CheckNamespace
-namespace Reductech.Sequence.Core;
+namespace Sequence.Core;
 
 /// <summary>
 /// An SCL entity object

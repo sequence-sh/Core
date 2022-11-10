@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace Reductech.Sequence.Core.Tests.Steps;
+namespace Sequence.Core.Tests.Steps;
 
 public partial class ArrayNewTests : StepTestBase<ArrayNew<SCLInt>, Array<SCLInt>>
 {

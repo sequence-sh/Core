@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Reductech.Sequence.Core;
+namespace Sequence.Core;
 
 /// <summary>
 /// Additional configuration that may be needed in some use cases.

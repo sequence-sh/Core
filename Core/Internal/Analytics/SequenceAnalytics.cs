@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal.Analytics;
+﻿namespace Sequence.Core.Internal.Analytics;
 
 /// <summary>
 /// Analysis produced by a Sequence Logger

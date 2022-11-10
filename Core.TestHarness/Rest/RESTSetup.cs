@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Reductech.Sequence.Core.TestHarness.Rest;
+namespace Sequence.Core.TestHarness.Rest;
 
 public sealed class RESTSetup : IRestSetup
 {

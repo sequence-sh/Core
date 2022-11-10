@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Internal.Documentation;
+﻿using Sequence.Core.Internal.Documentation;
 
-namespace Reductech.Sequence.Core.Internal;
+namespace Sequence.Core.Internal;
 
 /// <summary>
 /// A reference to a type

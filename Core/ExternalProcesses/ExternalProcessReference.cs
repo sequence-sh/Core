@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Channels;
 
-namespace Reductech.Sequence.Core.ExternalProcesses;
+namespace Sequence.Core.ExternalProcesses;
 
 /// <summary>
 /// A reference to a running external process.

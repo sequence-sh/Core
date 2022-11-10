@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using Reductech.Sequence.Core.Entities.Schema;
+using Sequence.Core.Entities.Schema;
 
-namespace Reductech.Sequence.Core.LanguageServer;
+namespace Sequence.Core.LanguageServer;
 
 /// <summary>
 /// Visits SCL for completion

@@ -1,7 +1,7 @@
 ﻿using Generator.Equals;
 using Namotion.Reflection;
 
-namespace Reductech.Sequence.Core.Internal;
+namespace Sequence.Core.Internal;
 
 /// <summary>
 /// A step parameter that uses a property info

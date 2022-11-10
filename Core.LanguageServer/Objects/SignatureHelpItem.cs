@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.LanguageServer.Objects;
+﻿namespace Sequence.Core.LanguageServer.Objects;
 
 /// <summary>
 /// A language server signature help item

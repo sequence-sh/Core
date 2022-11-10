@@ -1,6 +1,6 @@
 ﻿using Generator.Equals;
 
-namespace Reductech.Sequence.Core.Internal;
+namespace Sequence.Core.Internal;
 
 /// <summary>
 /// A freezable step which represents a constant value.

@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Internal.Logging;
+﻿using Sequence.Core.Internal.Logging;
 
-namespace Reductech.Sequence.Core.Steps;
+namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Tries to execute a step and recovers if that step results in failure.

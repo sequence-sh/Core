@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Steps;
+﻿using Sequence.Core.Steps;
 
-namespace Reductech.Sequence.Core.Internal.Serialization;
+namespace Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// Serializer for steps with chain infix operators

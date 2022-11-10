@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using Divergic.Logging.Xunit;
-using Reductech.Sequence.Core.Internal.Parser;
+using Sequence.Core.Internal.Parser;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 /// <summary>
 /// These are not really tests but ways to quickly and easily run steps
@@ -16,9 +16,7 @@ public partial class ExampleTests
     [Theory(Skip = SkipString)]
     #pragma warning restore xUnit1004 // Test methods should not be skipped
     [Trait("Category", "Integration")]
-    [InlineData(@"C:\Users\wainw\source\repos\Reductech\sequence\Examples\Sort.scl")]
-    [InlineData(@"C:\Users\wainw\source\repos\Reductech\sequence\Examples\EntityMapProperties.scl")]
-    [InlineData(@"C:\Users\wainw\source\repos\Reductech\sequence\Examples\ChangeCase.scl")]
+    [InlineData(@".\Sequence\Examples\Sort.scl")]
     public async Task RunSCLFromFile(string path)
     {
         var scl = await File.ReadAllTextAsync(path);

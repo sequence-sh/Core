@@ -1,10 +1,10 @@
-﻿namespace Reductech.Sequence.Core.Tests;
+﻿namespace Sequence.Core.Tests;
 
 [UseTestOutputHelper]
 public partial class RequirementsTests
 {
     public static readonly List<Requirement> BaseRequirements =
-        new() { new ConnectorRequirement("Reductech.Sequence.Core.Tests") };
+        new() { new ConnectorRequirement("Sequence.Core.Tests") };
 
     [Fact]
     public void BasicStepShouldHaveNoRequirements()
@@ -26,7 +26,7 @@ public partial class RequirementsTests
         requirements.Should()
             .BeEquivalentTo(
                 BaseRequirements.Append(
-                    new VersionRequirement("Reductech.Sequence.Core.Tests", "FixedRequirement")
+                    new VersionRequirement("Sequence.Core.Tests", "FixedRequirement")
                 )
             );
     }
@@ -41,7 +41,7 @@ public partial class RequirementsTests
         requirements.Should()
             .BeEquivalentTo(
                 BaseRequirements.Append(
-                    new VersionRequirement("Reductech.Sequence.Core.Tests", "FixedRequirement")
+                    new VersionRequirement("Sequence.Core.Tests", "FixedRequirement")
                 )
             );
     }
@@ -57,7 +57,7 @@ public partial class RequirementsTests
             .BeEquivalentTo(
                 BaseRequirements.Append(
                     new VersionRequirement(
-                        "Reductech.Sequence.Core.Tests",
+                        "Sequence.Core.Tests",
                         "MySoftware",
                         new Version("1.0.0"),
                         new Version("2.0.0")
@@ -77,7 +77,7 @@ public partial class RequirementsTests
             .BeEquivalentTo(
                 BaseRequirements.Append(
                     new VersionRequirement(
-                        "Reductech.Sequence.Core.Tests",
+                        "Sequence.Core.Tests",
                         "MySoftware",
                         new Version("1.0.0"),
                         new Version("2.0.0")
@@ -134,7 +134,7 @@ public partial class RequirementsTests
 
             /// <inheritdoc />
             public override IEnumerable<Requirement> Requirements => base.Requirements.Prepend(
-                new VersionRequirement("Reductech.Sequence.Core.Tests", "FixedRequirement")
+                new VersionRequirement("Sequence.Core.Tests", "FixedRequirement")
             );
         }
     }

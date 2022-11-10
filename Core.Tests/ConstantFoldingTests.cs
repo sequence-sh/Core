@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Internal.Parser;
+﻿using Sequence.Core.Internal.Parser;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 public class ConstantFoldingTests
 {

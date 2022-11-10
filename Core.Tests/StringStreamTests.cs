@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 public class StringStreamTests
 {

@@ -1,9 +1,9 @@
-﻿using Reductech.Sequence.Core.Steps;
+﻿using Sequence.Core.Steps;
 using StepParameterDict =
-    System.Collections.Generic.Dictionary<Reductech.Sequence.Core.Internal.StepParameterReference,
-        Reductech.Sequence.Core.Internal.FreezableStepProperty>;
+    System.Collections.Generic.Dictionary<Sequence.Core.Internal.StepParameterReference,
+        Sequence.Core.Internal.FreezableStepProperty>;
 
-namespace Reductech.Sequence.Core.Internal;
+namespace Sequence.Core.Internal;
 
 /// <summary>
 /// Methods to create freezable types

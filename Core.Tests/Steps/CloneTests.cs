@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Tests.Steps;
+﻿namespace Sequence.Core.Tests.Steps;
 
 public partial class CloneTests : StepTestBase<Clone<SCLInt>, Array<SCLInt>>
 {

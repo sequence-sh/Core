@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.TestHarness;
+﻿namespace Sequence.Core.TestHarness;
 
 /// <summary>
 /// A test that tests the behaviour of a step

@@ -3,8 +3,8 @@ include:
     file: .gitlab-ci.linux.yml
 
 variables:
-  PACKAGE_NAME_NUGET: Reductech.Sequence.Core
-  PACKAGE_NAME_DLL: Reductech.Sequence.Core
+  PACKAGE_NAME_NUGET: Sequence.Core
+  PACKAGE_NAME_DLL: Sequence.Core
   PUBLISH_NUGETORG: 1
 
 stages:
@@ -23,7 +23,7 @@ compile grammar:
     ANTLR_JAR_URI: https://www.antlr.org/download/antlr-4.10.1-complete.jar
     ANTLR_JAR: antlr-4.10.1-complete.jar
     ANTLR_ENCODING: UTF-8
-    ANTLR_NAMESPACE: Reductech.Sequence.Core.Internal.Parser
+    ANTLR_NAMESPACE: Sequence.Core.Internal.Parser
     ANTLR_OUTPUT: ./Core/Antlr
     ANTLR_GRAMMAR: ./Core/Internal/Parser/SCL.g4
   script:
@@ -40,15 +40,8 @@ test dev:
   script:
     - dotnet test --no-build --configuration $CONFIG --collect:"XPlat Code Coverage" --results-directory ./
       --settings coverlet.runsettings
-    - >-
-      pwsh -Command '$report = Get-Content -Path "*/coverage.cobertura.xml" -Raw ;
-      $fixPaths = $report -replace "filename=`".+?${env:CI_PROJECT_NAME}(/|\\)", "filename=`"" ;
-      [System.IO.File]::WriteAllText("./coverage.$($env:CI_JOB_NAME -replace "[^\w]+", "-").xml", $fixPaths)'
 
 mutation testing:
-  image: mcr.microsoft.com/dotnet/sdk:6.0-windowsservercore-ltsc2019
-  tags:
-    - rt-windows
   needs:
     - compile grammar
   rules:

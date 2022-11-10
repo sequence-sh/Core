@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using Reductech.Sequence.Core.Abstractions;
-using Reductech.Sequence.Core.Internal.Logging;
+using Sequence.Core.Abstractions;
+using Sequence.Core.Internal.Logging;
 
-namespace Reductech.Sequence.Core.Internal;
+namespace Sequence.Core.Internal;
 
 /// <summary>
 /// A runnable step that is not a constant.

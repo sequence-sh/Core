@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Abstractions;
+﻿using Sequence.Core.Abstractions;
 
-namespace Reductech.Sequence.Core.Internal;
+namespace Sequence.Core.Internal;
 
 /// <summary>
 /// Generates step factories dynamically based on configuration.

@@ -3,11 +3,11 @@ using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using MELT;
 using NuGet.Packaging;
-using Reductech.Sequence.ConnectorManagement;
-using Reductech.Sequence.ConnectorManagement.Base;
-using Reductech.Sequence.Core.Connectors;
+using Sequence.ConnectorManagement;
+using Sequence.ConnectorManagement.Base;
+using Sequence.Core.Connectors;
 
-namespace Reductech.Sequence.Core.Tests.Connectors;
+namespace Sequence.Core.Tests.Connectors;
 
 public class FakeConnectorRegistry : IConnectorRegistry
 {

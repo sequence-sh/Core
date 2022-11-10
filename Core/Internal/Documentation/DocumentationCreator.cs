@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Namotion.Reflection;
 
-namespace Reductech.Sequence.Core.Internal.Documentation;
+namespace Sequence.Core.Internal.Documentation;
 
 /// <summary>
 /// Options for creating documentation
@@ -14,7 +14,7 @@ public record DocumentationOptions(
     string NewlineToken = "<br/>")
 {
     /// <summary>
-    /// Root url of the Reductech Documentation Website
+    /// Root url of the Sequence Documentation Website
     /// </summary>
     public const string DocumentationRootUrl = "https://sequence.sh/steps/";
 

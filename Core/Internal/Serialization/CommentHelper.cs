@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal.Serialization;
+﻿namespace Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// Contains methods to help print comments at the right time

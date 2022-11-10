@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Reductech.Sequence.Core.Steps;
+namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Gets the current version of the application

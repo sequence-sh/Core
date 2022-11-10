@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core;
+﻿namespace Sequence.Core;
 
 /// <summary>
 /// An array backed by an async collection

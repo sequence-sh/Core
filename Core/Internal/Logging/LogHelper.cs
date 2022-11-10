@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Reductech.Sequence.Core.Internal.Logging;
+namespace Sequence.Core.Internal.Logging;
 
 /// <summary>
 /// A log message.

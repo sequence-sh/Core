@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.LanguageServer.Objects;
+﻿namespace Sequence.Core.LanguageServer.Objects;
 
 /// <summary>
 /// The response from a quick info request

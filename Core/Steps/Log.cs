@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Enums;
+﻿using Sequence.Core.Enums;
 
-namespace Reductech.Sequence.Core.Steps;
+namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Write a value to the logs

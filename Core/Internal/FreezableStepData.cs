@@ -1,9 +1,9 @@
 ﻿using StepParameterDict =
     System.Collections.Generic.IReadOnlyDictionary<
-        Reductech.Sequence.Core.Internal.StepParameterReference,
-        Reductech.Sequence.Core.Internal.FreezableStepProperty>;
+        Sequence.Core.Internal.StepParameterReference,
+        Sequence.Core.Internal.FreezableStepProperty>;
 
-namespace Reductech.Sequence.Core.Internal;
+namespace Sequence.Core.Internal;
 
 /// <summary>
 /// The data used by a Freezable Step.

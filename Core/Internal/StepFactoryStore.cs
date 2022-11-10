@@ -1,7 +1,7 @@
-﻿using Reductech.Sequence.Core.Abstractions;
-using Reductech.Sequence.Core.Connectors;
+﻿using Sequence.Core.Abstractions;
+using Sequence.Core.Connectors;
 
-namespace Reductech.Sequence.Core.Internal;
+namespace Sequence.Core.Internal;
 
 /// <summary>
 /// Allows you to get a step factory from a step name.

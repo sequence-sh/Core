@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.LanguageServer;
+﻿using Sequence.Core.LanguageServer;
 
-namespace Reductech.Sequence.Core.Tests.LanguageServer;
+namespace Sequence.Core.Tests.LanguageServer;
 
 public class FormattingTest
 {

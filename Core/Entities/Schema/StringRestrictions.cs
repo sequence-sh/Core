@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Reductech.Sequence.Core.Entities.Schema;
+namespace Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// Restrictions on a String Node

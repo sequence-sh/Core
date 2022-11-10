@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Reductech.Sequence.Core.Internal.Logging;
+using Sequence.Core.Internal.Logging;
 
-namespace Reductech.Sequence.Core.Internal.Analytics;
+namespace Sequence.Core.Internal.Analytics;
 
 /// <summary>
 /// A logger that logs analytics messages

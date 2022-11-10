@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-using Reductech.Sequence.Core.TestHarness.Rest;
+using Sequence.Core.TestHarness.Rest;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 public partial class RunErrorTests
 {
