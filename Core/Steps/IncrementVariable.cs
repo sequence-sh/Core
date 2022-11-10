@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Steps;
+﻿namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Increment an integer variable by a particular amount

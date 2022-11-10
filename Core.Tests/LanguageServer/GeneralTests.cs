@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.LanguageServer.Objects;
+﻿using Sequence.Core.LanguageServer.Objects;
 
-namespace Reductech.Sequence.Core.Tests.LanguageServer;
+namespace Sequence.Core.Tests.LanguageServer;
 
 public class GeneralTests
 {

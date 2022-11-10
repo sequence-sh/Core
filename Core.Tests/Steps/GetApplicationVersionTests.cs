@@ -1,6 +1,6 @@
 ﻿using Reductech.Sequence.ConnectorManagement.Base;
 
-namespace Reductech.Sequence.Core.Tests.Steps;
+namespace Sequence.Core.Tests.Steps;
 
 public partial class
     GetApplicationVersionTests : StepTestBase<GetApplicationVersion, StringStream>

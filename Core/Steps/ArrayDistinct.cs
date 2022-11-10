@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Steps;
+﻿namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Removes duplicate elements in an array or entities in an entity stream.

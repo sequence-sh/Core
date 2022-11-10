@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Reductech.Sequence.Core.TestHarness;
+namespace Sequence.Core.TestHarness;
 
 public static class SpaceCompressor
 {

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Tests;
+﻿namespace Sequence.Core.Tests;
 
 /// <summary>
 /// Makes sure all steps have a test class

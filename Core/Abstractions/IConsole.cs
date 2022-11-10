@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Reductech.Sequence.Core.Abstractions;
+namespace Sequence.Core.Abstractions;
 
 /// <summary>
 /// Provides methods for interacting with the console

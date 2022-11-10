@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Steps;
+﻿namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Negation of a boolean value.

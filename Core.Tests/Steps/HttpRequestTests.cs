@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Text;
-using Reductech.Sequence.Core.TestHarness.Rest;
+using Sequence.Core.TestHarness.Rest;
 
-namespace Reductech.Sequence.Core.Tests.Steps;
+namespace Sequence.Core.Tests.Steps;
 
 public partial class HttpRequestTests : StepTestBase<HttpRequest, StringStream>
 {

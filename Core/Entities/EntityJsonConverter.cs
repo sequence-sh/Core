@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Reductech.Sequence.Core.Entities;
+namespace Sequence.Core.Entities;
 
 /// <summary>
 /// Converts Entities to and from Json

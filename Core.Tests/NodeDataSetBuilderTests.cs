@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using Json.More;
-using Reductech.Sequence.Core.Entities.Schema;
+using Sequence.Core.Entities.Schema;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 public class NodeDataSetBuilderTests
 {

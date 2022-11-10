@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Reductech.Sequence.Core.Internal.Serialization;
+namespace Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// The default step serializer for functions.

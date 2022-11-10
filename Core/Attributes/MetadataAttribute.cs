@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Attributes;
+﻿namespace Sequence.Core.Attributes;
 
 /// <summary>
 /// Allows users to set custom metadata for a Step Property

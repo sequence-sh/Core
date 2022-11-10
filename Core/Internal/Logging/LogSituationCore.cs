@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace Reductech.Sequence.Core.Internal.Logging;
+namespace Sequence.Core.Internal.Logging;
 
 /// <summary>
 /// Identifying code for a Core log situation.

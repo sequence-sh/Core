@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Reductech.Sequence.Core.Internal.Errors {
+namespace Sequence.Core.Internal.Errors {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Reductech.Sequence.Core.Internal.Errors {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Reductech.Sequence.Core.Internal.Errors.ErrorMessages-EN", typeof(ErrorMessages_EN).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Sequence.Core.Internal.Errors.ErrorMessages-EN", typeof(ErrorMessages_EN).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

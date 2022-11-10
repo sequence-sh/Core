@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using RestSharp;
 
-namespace Reductech.Sequence.Core;
+namespace Sequence.Core;
 
 /// <summary>
 /// For Creating Rest Clients

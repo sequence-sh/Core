@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Attributes;
+﻿namespace Sequence.Core.Attributes;
 
 /// <summary>
 /// Indicates that this is parameter should not be used by SCL

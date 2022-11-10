@@ -1,8 +1,8 @@
 ﻿using System.IO;
-using Reductech.Sequence.Core.Enums;
+using Sequence.Core.Enums;
 using RestSharp;
 
-namespace Reductech.Sequence.Core.Steps;
+namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Makes a Http Request to download data from the web.

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Entities.Schema;
+﻿namespace Sequence.Core.Entities.Schema;
 
 /// <summary>
 /// A string format

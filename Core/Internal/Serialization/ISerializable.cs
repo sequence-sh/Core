@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal.Serialization;
+﻿namespace Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// Indicates an object that can serialized and formatted

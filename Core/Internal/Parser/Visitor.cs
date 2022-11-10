@@ -2,7 +2,7 @@
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 
-namespace Reductech.Sequence.Core.Internal.Parser;
+namespace Sequence.Core.Internal.Parser;
 
 public static partial class SCLParsing
 {

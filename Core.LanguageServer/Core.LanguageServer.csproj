@@ -4,14 +4,14 @@
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <RootNamespace>Reductech.Sequence.Core.LanguageServer</RootNamespace>
-    <AssemblyName>Reductech.Sequence.Core.LanguageServer</AssemblyName>
+    <RootNamespace>Sequence.Core.LanguageServer</RootNamespace>
+    <AssemblyName>Sequence.Core.LanguageServer</AssemblyName>
     <Nullable>enable</Nullable>
     <Version>0.18.0$(VersionSuffix)</Version>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Reductech.Sequence.Core.LanguageServer</PackageId>
+    <PackageId>Sequence.Core.LanguageServer</PackageId>
     <Title>Sequence® Core Language Server</Title>
     <Description>
       A language server for the Sequence Configuration Language.
@@ -22,8 +22,8 @@
     <PackageTags>ediscovery;forensics;automation;orchestration;edrm;sequence;lsp;scl;language-server</PackageTags>
 
     <PackageProjectUrl>https://sequence.sh</PackageProjectUrl>
-    <RepositoryUrl>https://gitlab.com/reductech/sequence/core.git</RepositoryUrl>
-    <PackageReleaseNotes>https://gitlab.com/reductech/sequence/core/-/blob/main/CHANGELOG.md</PackageReleaseNotes>
+    <RepositoryUrl>https://gitlab.com/sequence/core.git</RepositoryUrl>
+    <PackageReleaseNotes>https://gitlab.com/sequence/core/-/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 

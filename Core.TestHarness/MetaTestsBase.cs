@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.TestHarness;
+﻿namespace Sequence.Core.TestHarness;
 
 public abstract class MetaTestsBase
 {

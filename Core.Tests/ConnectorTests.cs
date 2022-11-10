@@ -3,7 +3,7 @@ using Reductech.Sequence.ConnectorManagement.Base;
 using Divergic.Logging.Xunit;
 using Reductech.Sequence.ConnectorManagement;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 [AutoTheory.UseTestOutputHelper]
 public partial class ConnectorTests

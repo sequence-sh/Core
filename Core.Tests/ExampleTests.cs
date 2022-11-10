@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using Divergic.Logging.Xunit;
-using Reductech.Sequence.Core.Internal.Parser;
+using Sequence.Core.Internal.Parser;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 /// <summary>
 /// These are not really tests but ways to quickly and easily run steps

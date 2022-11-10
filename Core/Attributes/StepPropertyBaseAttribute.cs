@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Attributes;
+﻿namespace Sequence.Core.Attributes;
 
 /// <summary>
 /// A property that will be used by the step.

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.TestHarness.Rest;
+﻿namespace Sequence.Core.TestHarness.Rest;
 
 public interface IRestSetup
 {

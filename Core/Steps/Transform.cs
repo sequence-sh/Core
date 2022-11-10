@@ -1,7 +1,7 @@
-﻿using Reductech.Sequence.Core.Enums;
-using Reductech.Sequence.Core.Internal.Logging;
+﻿using Sequence.Core.Enums;
+using Sequence.Core.Internal.Logging;
 
-namespace Reductech.Sequence.Core.Steps;
+namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Attempts to transform entities in the stream so that they match the schema.

@@ -5,13 +5,13 @@
     <IsPackable>false</IsPackable>
     <IsPublishable>false</IsPublishable>
     <IsTestProject>true</IsTestProject>
-    <RootNamespace>Reductech.Sequence.Core.Tests</RootNamespace>
-    <AssemblyName>Reductech.Sequence.Core.Tests</AssemblyName>
+    <RootNamespace>Sequence.Core.Tests</RootNamespace>
+    <AssemblyName>Sequence.Core.Tests</AssemblyName>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup>
-    <RepositoryUrl>https://gitlab.com/reductech/sequence/core.git</RepositoryUrl>
+    <RepositoryUrl>https://gitlab.com/sequence/core.git</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 
     <Authors>Reductech</Authors>

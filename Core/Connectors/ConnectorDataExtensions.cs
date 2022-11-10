@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Connectors;
+﻿namespace Sequence.Core.Connectors;
 
 /// <summary>
 /// Provides Core-specific extension methods for ConnectorData

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.LanguageServer;
+﻿namespace Sequence.Core.LanguageServer;
 
 /// <summary>
 /// Gives code completion suggestions

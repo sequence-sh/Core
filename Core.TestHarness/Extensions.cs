@@ -1,8 +1,8 @@
 ﻿using System.Net;
-using Reductech.Sequence.Core.ExternalProcesses;
-using Reductech.Sequence.Core.TestHarness.Rest;
+using Sequence.Core.ExternalProcesses;
+using Sequence.Core.TestHarness.Rest;
 
-namespace Reductech.Sequence.Core.TestHarness;
+namespace Sequence.Core.TestHarness;
 
 /// <summary>
 /// Extension methods for Test Harness

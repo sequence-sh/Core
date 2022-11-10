@@ -1,6 +1,6 @@
 ﻿using Antlr4.Runtime;
 
-namespace Reductech.Sequence.Core.Internal.Parser;
+namespace Sequence.Core.Internal.Parser;
 
 /// <summary>
 /// Matches SCL Syntax errors

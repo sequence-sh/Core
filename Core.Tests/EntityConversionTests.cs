@@ -1,12 +1,12 @@
 ﻿using System.Collections.Immutable;
 using Reductech.Sequence.ConnectorManagement.Base;
-using Reductech.Sequence.Core.Internal.Parser;
+using Sequence.Core.Internal.Parser;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 public class EntityConversionTests
 {
-    private const string ConnectorName = "Reductech.Sequence.Core.Tests";
+    private const string ConnectorName = "Sequence.Core.Tests";
 
     private static readonly Configuration TestConfiguration = new()
     {
@@ -38,7 +38,7 @@ public class EntityConversionTests
     };
 
     private const string TestConfigurationString =
-        "('AdditionalRequirements': [('FeaturesKey': \"Features\" 'RequiredFeatures': [\"Apple\", \"Banana\"] 'ConnectorName': \"Reductech.Sequence.Core.Tests\"), ('VersionKey': \"Version\" 'MinVersion': \"1.2.3.4\" 'MaxVersion': \"5.6.7.8\" 'ConnectorName': \"Reductech.Sequence.Core.Tests\")] 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
+        "('AdditionalRequirements': [('FeaturesKey': \"Features\" 'RequiredFeatures': [\"Apple\", \"Banana\"] 'ConnectorName': \"Sequence.Core.Tests\"), ('VersionKey': \"Version\" 'MinVersion': \"1.2.3.4\" 'MaxVersion': \"5.6.7.8\" 'ConnectorName': \"Sequence.Core.Tests\")] 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";
 
     private const string TestConfigurationString2 =
         "('AdditionalRequirements': [] 'TargetMachineTags': [\"alpha\", \"beta\"] 'DoNotSplit': True 'Priority': 3)";

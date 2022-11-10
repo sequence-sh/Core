@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Reductech.Sequence.Core.Tests.Steps;
+namespace Sequence.Core.Tests.Steps;
 
 public partial class StandardOutWriteTests : StepTestBase<StandardOutWrite, Unit>
 {

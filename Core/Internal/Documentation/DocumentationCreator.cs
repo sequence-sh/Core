@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Namotion.Reflection;
 
-namespace Reductech.Sequence.Core.Internal.Documentation;
+namespace Sequence.Core.Internal.Documentation;
 
 /// <summary>
 /// Options for creating documentation

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Enums;
+﻿namespace Sequence.Core.Enums;
 
 /// <summary>
 /// The case to convert the text to.

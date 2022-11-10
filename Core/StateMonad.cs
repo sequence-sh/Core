@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using Reductech.Sequence.Core.Abstractions;
+using Sequence.Core.Abstractions;
 
-namespace Reductech.Sequence.Core;
+namespace Sequence.Core;
 
 /// <summary>
 /// The state monad that is passed between steps.

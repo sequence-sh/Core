@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Reductech.Sequence.Core.Abstractions;
-using Reductech.Sequence.Core.Internal.Logging;
-using Reductech.Sequence.Core.Internal.Parser;
-using Reductech.Sequence.Core.Steps;
+using Sequence.Core.Abstractions;
+using Sequence.Core.Internal.Logging;
+using Sequence.Core.Internal.Parser;
+using Sequence.Core.Steps;
 
-namespace Reductech.Sequence.Core.Internal.Serialization;
+namespace Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// Runs processes from Text

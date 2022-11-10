@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Internal.Documentation;
+﻿using Sequence.Core.Internal.Documentation;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 public class DocumentationCreateTests
 {

@@ -1,7 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 
-namespace Reductech.Sequence.Core.Internal;
+namespace Sequence.Core.Internal;
 
 /// <summary>
 /// A position within a piece of text.

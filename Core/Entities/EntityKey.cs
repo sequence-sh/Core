@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Entities;
+﻿namespace Sequence.Core.Entities;
 
 /// <summary>
 /// An entity key. Case insensitive

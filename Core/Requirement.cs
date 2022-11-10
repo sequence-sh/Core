@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace Reductech.Sequence.Core;
+namespace Sequence.Core;
 
 /// <summary>
 /// A requirement of a step or step property

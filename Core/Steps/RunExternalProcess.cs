@@ -1,7 +1,7 @@
-﻿using Reductech.Sequence.Core.Enums;
-using Reductech.Sequence.Core.ExternalProcesses;
+﻿using Sequence.Core.Enums;
+using Sequence.Core.ExternalProcesses;
 
-namespace Reductech.Sequence.Core.Steps;
+namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Runs an external executable program.

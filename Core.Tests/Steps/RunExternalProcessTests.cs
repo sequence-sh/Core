@@ -1,7 +1,7 @@
 ﻿using System.Text;
-using Reductech.Sequence.Core.ExternalProcesses;
+using Sequence.Core.ExternalProcesses;
 
-namespace Reductech.Sequence.Core.Tests.Steps;
+namespace Sequence.Core.Tests.Steps;
 
 public partial class RunExternalProcessTests : StepTestBase<RunExternalProcess, Unit>
 {

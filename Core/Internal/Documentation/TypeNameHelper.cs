@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal.Documentation;
+﻿namespace Sequence.Core.Internal.Documentation;
 
 /// <summary>
 /// Contains methods for getting readable names of types

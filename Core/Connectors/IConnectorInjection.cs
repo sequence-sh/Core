@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Connectors;
+﻿namespace Sequence.Core.Connectors;
 
 /// <summary>
 /// Injects necessary contexts for this connector

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 public class JsonConvertersTests
 {

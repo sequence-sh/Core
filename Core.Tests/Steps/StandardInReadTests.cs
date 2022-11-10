@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace Reductech.Sequence.Core.Tests.Steps;
+namespace Sequence.Core.Tests.Steps;
 
 public partial class StandardInReadTests : StepTestBase<StandardInRead, StringStream>
 {

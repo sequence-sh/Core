@@ -1,7 +1,7 @@
 ﻿using System.Text;
-using Reductech.Sequence.Core.Steps;
+using Sequence.Core.Steps;
 
-namespace Reductech.Sequence.Core.Internal.Serialization;
+namespace Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// Serializes a sequence

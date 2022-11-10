@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Reductech.Sequence.Core.Enums;
+namespace Sequence.Core.Enums;
 
 /// <summary>
 /// An encoding

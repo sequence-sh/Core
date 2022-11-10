@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.ExternalProcesses;
+﻿using Sequence.Core.ExternalProcesses;
 
-namespace Reductech.Sequence.Core.Abstractions;
+namespace Sequence.Core.Abstractions;
 
 /// <summary>
 /// The external context of a sequence.

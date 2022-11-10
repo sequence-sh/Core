@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Internal.Analytics;
+﻿using Sequence.Core.Internal.Analytics;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 [UseTestOutputHelper]
 public partial class AnalyticsTests

@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal;
+﻿namespace Sequence.Core.Internal;
 
 /// <summary>
 /// Optimization settings while freezing

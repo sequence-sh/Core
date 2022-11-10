@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.ExternalProcesses;
+﻿using Sequence.Core.ExternalProcesses;
 
-namespace Reductech.Sequence.Core.TestHarness;
+namespace Sequence.Core.TestHarness;
 
 public sealed class ExternalContextSetupHelper
 {

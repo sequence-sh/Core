@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Entities.Schema;
+﻿using Sequence.Core.Entities.Schema;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 [UseTestOutputHelper]
 public partial class SchemaNodeTests

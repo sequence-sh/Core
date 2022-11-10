@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal.Errors;
+﻿namespace Sequence.Core.Internal.Errors;
 
 /// <summary>
 /// More than one errorBuilders

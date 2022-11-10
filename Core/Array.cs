@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core;
+﻿namespace Sequence.Core;
 
 /// <summary>
 /// Either a list or an asynchronous list

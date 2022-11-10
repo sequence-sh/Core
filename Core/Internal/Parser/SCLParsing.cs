@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Antlr4.Runtime;
 
-namespace Reductech.Sequence.Core.Internal.Parser;
+namespace Sequence.Core.Internal.Parser;
 
 /// <summary>
 /// Contains methods for parsing sequences

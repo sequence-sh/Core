@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal.Serialization;
+﻿namespace Sequence.Core.Internal.Serialization;
 
 /// <summary>
 /// A piece of comment text

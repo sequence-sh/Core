@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace Reductech.Sequence.Core.Enums;
+namespace Sequence.Core.Enums;
 
 /// <summary>
 /// Log severity

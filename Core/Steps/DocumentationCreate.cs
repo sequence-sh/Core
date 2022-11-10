@@ -1,6 +1,6 @@
-﻿using Reductech.Sequence.Core.Internal.Documentation;
+﻿using Sequence.Core.Internal.Documentation;
 
-namespace Reductech.Sequence.Core.Steps;
+namespace Sequence.Core.Steps;
 
 /// <summary>
 /// Generates documentation for all available steps.

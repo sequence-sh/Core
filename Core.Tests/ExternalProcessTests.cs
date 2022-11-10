@@ -1,9 +1,9 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Divergic.Logging.Xunit;
-using Reductech.Sequence.Core.ExternalProcesses;
+using Sequence.Core.ExternalProcesses;
 
-namespace Reductech.Sequence.Core.Tests;
+namespace Sequence.Core.Tests;
 
 [AutoTheory.UseTestOutputHelper]
 public partial class ExternalProcessTests

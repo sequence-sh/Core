@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Internal;
+﻿namespace Sequence.Core.Internal;
 
 /// <summary>
 /// A step that could have more than one possible type

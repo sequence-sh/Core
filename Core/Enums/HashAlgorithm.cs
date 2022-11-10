@@ -1,4 +1,4 @@
-﻿namespace Reductech.Sequence.Core.Enums;
+﻿namespace Sequence.Core.Enums;
 
 /// <summary>
 /// The algorithm to use for hashing

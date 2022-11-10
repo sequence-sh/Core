@@ -1,7 +1,7 @@
 ﻿using RestSharp;
 using RestSharp.Serializers.Json;
 
-namespace Reductech.Sequence.Core;
+namespace Sequence.Core;
 
 /// <summary>
 /// Uses a standard REST client

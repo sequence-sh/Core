@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Reductech.Sequence.Core.Internal.Documentation;
+namespace Sequence.Core.Internal.Documentation;
 
 internal static class Prettifier
 {
