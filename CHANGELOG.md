@@ -1,3 +1,25 @@
+# v0.18.0 (2022-11-14)
+
+## Issues Closed in this Release
+
+### New Features
+
+- Changes to `EntityValidateRelations` #497
+- Add a step to validate relations in an entity stream #494
+- Create a `Flatten` step that recursively flattens entities #493
+- Refactor Entities to be more performant #491
+- Do not get args for EnterStep unless Trace logging is enabled #490
+- Enable Constant Folding and specific step optimizations #489
+- Use `ValueTask` instead of `Task` for performance #488
+- There should be an error or warning if a user tries to change an injected variable #480
+- Code completion for variable names #481
+
+### Other
+
+- Update antl docker image to latest in CI #501
+- Update project dependencies #500
+- Update namespace and paths after move to Sequence group #499
+
 # v0.17.0 (2022-08-29)
 
 ## Summary of Changes
@@ -1012,4 +1034,5 @@ a previous process into the current one.
 ### Documentation
 
 - Add documentation
+
 
