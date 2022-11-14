@@ -156,8 +156,8 @@
   <data name="RemoveVariableOutOfScope" xml:space="preserve">
     <value>Could not remove variable {variable} as it was out of scope.</value>
   </data>
-  <data name="SchemaViolation" xml:space="preserve">
-    <value>Schema violation: '{message}' at '{location}'.</value>
+  <data name="SchemaViolated" xml:space="preserve">
+    <value>SchemaViolation: '{0}' at '{1}' on row '{2}', entity: '{3}'.</value>
   </data>
   <data name="SequenceCompleted" xml:space="preserve">
     <value>Sequence Completed</value>
