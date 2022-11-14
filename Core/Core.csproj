@@ -74,20 +74,20 @@
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
-    <PackageReference Include="Antlr4BuildTasks" Version="11.5.0" />
+    <PackageReference Include="Antlr4BuildTasks" Version="12.0.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.36.1" />
     <PackageReference Include="Generator.Equals" Version="2.6.0" />
-    <PackageReference Include="JsonSchema.Net" Version="3.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
+    <PackageReference Include="JsonSchema.Net" Version="3.3.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
     <PackageReference Include="Microsoft.SourceLink.GitLab" Version="1.1.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Namotion.Reflection" Version="2.1.1" />
     <PackageReference Include="OneOf" Version="3.0.223" />
-    <PackageReference Include="Sequence.ConnectorManager.Base" Version="0.11.0-a.main.2211101152" />
+    <PackageReference Include="Sequence.ConnectorManager.Base" Version="0.11.0-a.main.2211102319" />
     <PackageReference Include="RestSharp" Version="108.0.2" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
