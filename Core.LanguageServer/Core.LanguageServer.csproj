@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <PackageId>Sequence.Core.LanguageServer</PackageId>
-    <Title>Sequence® Core Language Server</Title>
+    <Title>Sequence Core Language Server</Title>
     <Description>
       A language server for the Sequence Configuration Language.
       Uses LSP (https://microsoft.github.io/language-server-protocol) to provide

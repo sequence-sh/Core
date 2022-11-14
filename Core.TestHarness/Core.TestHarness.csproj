@@ -14,8 +14,8 @@
 
   <PropertyGroup>
     <PackageId>Sequence.Core.TestHarness</PackageId>
-    <Title>Sequence® Core SDK Test Harness</Title>
-    <Description>Class library for automatically testing Sequence® Core steps.</Description>
+    <Title>Sequence Core SDK Test Harness</Title>
+    <Description>Class library for automatically testing Sequence Core steps.</Description>
     <Product>Sequence®</Product>
     <PackageTags>ediscovery;forensics;automation;orchestration;edrm;testing;sequence;scl</PackageTags>
 

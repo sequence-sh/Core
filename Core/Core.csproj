@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <PackageId>Sequence.Core</PackageId>
-    <Title>Sequence® Core SDK</Title>
+    <Title>Sequence Core SDK</Title>
     <Description>
       Sequence Configuration Language grammar and interpreter, and SDK for
       automating e-discovery and forensic workflows.
