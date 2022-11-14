@@ -119,7 +119,7 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// Sequence® Sequence Started
+    /// Sequence Started
     /// </summary>
     public static readonly LogSituation SequenceStarted = new(
         nameof(SequenceStarted),
@@ -135,7 +135,7 @@ public sealed record LogSituation : LogSituationBase
     );
 
     /// <summary>
-    /// Sequence® Sequence Completed
+    /// Sequence Completed
     /// </summary>
     public static readonly LogSituation SequenceCompleted = new(
         nameof(SequenceCompleted),
