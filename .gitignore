@@ -382,5 +382,6 @@ FodyWeavers.xsd
 /Core/Antlr
 /TestCSV2.csv
 /TestCSV.csv
+Cobertura.xml
 
 !Core.Tests/Connectors/*.nupkg
