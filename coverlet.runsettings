@@ -7,7 +7,7 @@
           <Format>cobertura</Format>
           <IncludeTestAssembly>false</IncludeTestAssembly>
           <Exclude>[ExampleConnector]*</Exclude>
-          <ExcludeByFile>**/*.Designer.cs</ExcludeByFile>
+          <ExcludeByFile>**/*.Designer.cs,**/Generator.Equals/**/*.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>

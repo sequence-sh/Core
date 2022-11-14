@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <PackageId>Sequence.Core</PackageId>
-    <Title>Sequence® Core SDK</Title>
+    <Title>Sequence Core SDK</Title>
     <Description>
       Sequence Configuration Language grammar and interpreter, and SDK for
       automating e-discovery and forensic workflows.
@@ -74,7 +74,7 @@
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
-    <PackageReference Include="Antlr4BuildTasks" Version="12.0.0" />
+    <PackageReference Include="Antlr4BuildTasks" Version="12.1.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.36.1" />
     <PackageReference Include="Generator.Equals" Version="2.6.0" />
     <PackageReference Include="JsonSchema.Net" Version="3.3.2" />
@@ -87,7 +87,7 @@
     </PackageReference>
     <PackageReference Include="Namotion.Reflection" Version="2.1.1" />
     <PackageReference Include="OneOf" Version="3.0.223" />
-    <PackageReference Include="Sequence.ConnectorManager.Base" Version="0.11.0-a.main.2211102319" />
+    <PackageReference Include="Sequence.ConnectorManager.Base" Version="0.11.0-a.main.2211141253" />
     <PackageReference Include="RestSharp" Version="108.0.2" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>

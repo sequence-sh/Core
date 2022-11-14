@@ -3,3 +3,4 @@ codecov:
 ignore:
   - 'ExampleConnector/'
   - '**/*.Designer.cs'
+  - '**/Generator.Equals/**/*.cs'
